@@ -1181,14 +1181,14 @@ static void on_preconditions_denied(radio_state_t state)
 
     bool receiving_psdu_now = false;
 
-    if (m_state == RADIO_STATE_RX)
+    if (state == RADIO_STATE_RX)
     {
         receiving_psdu_now = nrf_802154_trx_psdu_is_being_received();
     }
 
     trx_abort();
 
-    switch (m_state)
+    switch (state)
     {
         case RADIO_STATE_FALLING_ASLEEP:
             // There should be on_timeslot_ended event
@@ -1238,7 +1238,7 @@ static void on_preconditions_approved(radio_state_t state)
 
     trx_abort();
 
-    switch (m_state)
+    switch (state)
     {
         case RADIO_STATE_SLEEP:
             // Intentionally empty. Appropriate action will be performed on state change.
