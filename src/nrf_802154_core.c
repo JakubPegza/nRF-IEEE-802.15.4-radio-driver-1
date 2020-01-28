@@ -938,7 +938,7 @@ static nrf_802154_trx_transmit_notifications_t make_trx_frame_transmit_notificat
 }
 
 /** Initialize RX operation. */
-static void rx_init(bool disabled_was_triggered)
+static void rx_init(void)
 {
     bool free_buffer;
 
@@ -988,7 +988,7 @@ static void rx_init(bool disabled_was_triggered)
 }
 
 /** Initialize TX operation. */
-static bool tx_init(const uint8_t * p_data, bool cca, bool disabled_was_triggered)
+static bool tx_init(const uint8_t * p_data, bool cca)
 {
     if (!timeslot_is_granted() || !nrf_802154_rsch_timeslot_request(
             nrf_802154_tx_duration_get(p_data[0], cca, ack_is_requested(p_data))))
@@ -1025,7 +1025,7 @@ static bool tx_init(const uint8_t * p_data, bool cca, bool disabled_was_triggere
 }
 
 /** Initialize ED operation */
-static void ed_init(bool disabled_was_triggered)
+static void ed_init(void)
 {
     if (!timeslot_is_granted())
     {
@@ -1049,7 +1049,7 @@ static void ed_init(bool disabled_was_triggered)
 }
 
 /** Initialize CCA operation. */
-static void cca_init(bool disabled_was_triggered)
+static void cca_init(void)
 {
     if (!timeslot_is_granted() || !nrf_802154_rsch_timeslot_request(nrf_802154_cca_duration_get()))
     {
@@ -1065,7 +1065,7 @@ static void cca_init(bool disabled_was_triggered)
 }
 
 /** Initialize Continuous Carrier operation. */
-static void continuous_carrier_init(bool disabled_was_triggered)
+static void continuous_carrier_init(void)
 {
     if (!timeslot_is_granted())
     {
@@ -1081,8 +1081,7 @@ static void continuous_carrier_init(bool disabled_was_triggered)
 }
 
 /** Initialize Modulated Carrier operation. */
-static void modulated_carrier_init(bool            disabled_was_triggered,
-                                   const uint8_t * p_data)
+static void modulated_carrier_init(const uint8_t * p_data)
 {
     if (!timeslot_is_granted())
     {
@@ -1246,31 +1245,31 @@ static void on_preconditions_approved(radio_state_t state)
             break;
 
         case RADIO_STATE_RX:
-            rx_init(false);
+            rx_init();
             break;
 
         case RADIO_STATE_CCA_TX:
-            (void)tx_init(mp_tx_data, true, false);
+            (void)tx_init(mp_tx_data, true);
             break;
 
         case RADIO_STATE_TX:
-            (void)tx_init(mp_tx_data, false, false);
+            (void)tx_init(mp_tx_data, false);
             break;
 
         case RADIO_STATE_ED:
-            ed_init(false);
+            ed_init();
             break;
 
         case RADIO_STATE_CCA:
-            cca_init(false);
+            cca_init();
             break;
 
         case RADIO_STATE_CONTINUOUS_CARRIER:
-            continuous_carrier_init(false);
+            continuous_carrier_init();
             break;
 
         case RADIO_STATE_MODULATED_CARRIER:
-            modulated_carrier_init(false, mp_tx_data);
+            modulated_carrier_init(mp_tx_data);
             break;
 
         default:
@@ -1512,7 +1511,7 @@ uint8_t nrf_802154_trx_receive_frame_bcmatched(uint8_t bcc)
                  (!nrf_802154_pib_promiscuous_get()))
         {
             trx_abort();
-            rx_init(true);
+            rx_init();
 
             frame_accepted = false;
 
@@ -1549,7 +1548,7 @@ uint8_t nrf_802154_trx_receive_frame_bcmatched(uint8_t bcc)
             // We should not leave trx in temporary state, let's receive then.
             // We avoid hard reset of radio during TX ACK phase due to timeslot end,
             // which could result in spurious RF emission.
-            rx_init(false);
+            rx_init();
 
             nrf_802154_notify_receive_failed(NRF_802154_RX_ERROR_TIMESLOT_ENDED);
         }
@@ -1802,7 +1801,7 @@ void nrf_802154_trx_receive_frame_received(void)
                     mp_current_rx_buffer->free = false;
 
                     state_set(RADIO_STATE_RX);
-                    rx_init(true);
+                    rx_init();
 
                     received_frame_notify_and_nesting_allow(p_received_data);
                 }
@@ -1818,7 +1817,7 @@ void nrf_802154_trx_receive_frame_received(void)
                 mp_current_rx_buffer->free = false;
 
                 state_set(RADIO_STATE_RX);
-                rx_init(true);
+                rx_init();
 
                 received_frame_notify_and_nesting_allow(p_received_data);
             }
@@ -1836,14 +1835,14 @@ void nrf_802154_trx_receive_frame_received(void)
                 // Find new buffer
                 rx_buffer_in_use_set(nrf_802154_rx_buffer_free_find());
 
-                rx_init(true);
+                rx_init();
 
                 received_frame_notify_and_nesting_allow(p_received_data);
             }
             else
             {
                 // Receive to the same buffer
-                rx_init(true);
+                rx_init();
             }
         }
     }
@@ -1852,7 +1851,7 @@ void nrf_802154_trx_receive_frame_received(void)
         // CRC is OK, but filtering operation did not end - it is invalid frame with valid CRC
         // or problem due to software latency (i.e. handled BCMATCH, CRCERROR, CRCOK from two
         // consecutively received frames).
-        rx_init(true);
+        rx_init();
 
 #if NRF_802154_DISABLE_BCC_MATCHING
         if ((p_received_data[FRAME_TYPE_OFFSET] & FRAME_TYPE_MASK) != FRAME_TYPE_ACK)
@@ -1908,7 +1907,7 @@ void nrf_802154_trx_transmit_ack_transmitted(void)
 
     state_set(RADIO_STATE_RX);
 
-    rx_init(true);
+    rx_init();
 
     received_frame_notify_and_nesting_allow(p_received_data);
 
@@ -1998,7 +1997,7 @@ void nrf_802154_trx_transmit_frame_transmitted(void)
     {
         state_set(RADIO_STATE_RX);
 
-        rx_init(true);
+        rx_init();
 
         transmitted_frame_notify(NULL, 0, 0);
     }
@@ -2098,7 +2097,7 @@ static void on_bad_ack(void)
     // We received either a frame with incorrect CRC or not an ACK frame or not matching ACK
     state_set(RADIO_STATE_RX);
 
-    rx_init(true);
+    rx_init();
 
     transmit_failed_notify_and_nesting_allow(NRF_802154_TX_ERROR_INVALID_ACK);
 
@@ -2133,7 +2132,7 @@ void nrf_802154_trx_receive_ack_received(void)
         mp_current_rx_buffer->free = false;
 
         state_set(RADIO_STATE_RX);
-        rx_init(true);
+        rx_init();
 
         transmitted_frame_notify(p_ack_buffer->data,           // phr + psdu
                                  rssi_last_measurement_get(),  // rssi
@@ -2152,7 +2151,7 @@ void nrf_802154_trx_standalone_cca_finished(bool channel_was_idle)
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_LOW);
 
     state_set(RADIO_STATE_RX);
-    rx_init(true);
+    rx_init();
 
     cca_notify(channel_was_idle);
 
@@ -2211,7 +2210,7 @@ void nrf_802154_trx_transmit_frame_ccabusy(void)
 #endif
 
     state_set(RADIO_STATE_RX);
-    rx_init(true);
+    rx_init();
 
     transmit_failed_notify_and_nesting_allow(NRF_802154_TX_ERROR_BUSY_CHANNEL);
 
@@ -2247,7 +2246,7 @@ void nrf_802154_trx_energy_detection_finished(uint8_t ed_sample)
         nrf_802154_trx_channel_set(nrf_802154_pib_channel_get());
 
         state_set(RADIO_STATE_RX);
-        rx_init(true);
+        rx_init();
 
         energy_detected_notify(ed_result_get(m_ed_result));
 
@@ -2348,7 +2347,7 @@ bool nrf_802154_core_receive(nrf_802154_term_t              term_lvl,
                     m_trx_receive_frame_notifications_mask =
                         make_trx_frame_receive_notification_mask();
                     state_set(RADIO_STATE_RX);
-                    rx_init(true);
+                    rx_init();
                 }
             }
             else
@@ -2406,13 +2405,13 @@ bool nrf_802154_core_transmit(nrf_802154_term_t              term_lvl,
                 state_set(cca ? RADIO_STATE_CCA_TX : RADIO_STATE_TX);
                 mp_tx_data = p_data;
 
-                result = tx_init(p_data, cca, true);
+                result = tx_init(p_data, cca);
                 if (immediate)
                 {
                     if (!result)
                     {
                         state_set(RADIO_STATE_RX);
-                        rx_init(false);
+                        rx_init();
                     }
                 }
                 else
@@ -2463,7 +2462,7 @@ bool nrf_802154_core_energy_detection(nrf_802154_term_t term_lvl, uint32_t time_
             m_ed_result    = 0;
 
             state_set(RADIO_STATE_ED);
-            ed_init(true);
+            ed_init();
         }
 
         nrf_802154_critical_section_exit();
@@ -2487,7 +2486,7 @@ bool nrf_802154_core_cca(nrf_802154_term_t term_lvl)
         if (result)
         {
             state_set(RADIO_STATE_CCA);
-            cca_init(true);
+            cca_init();
         }
 
         nrf_802154_critical_section_exit();
@@ -2511,7 +2510,7 @@ bool nrf_802154_core_continuous_carrier(nrf_802154_term_t term_lvl)
         if (result)
         {
             state_set(RADIO_STATE_CONTINUOUS_CARRIER);
-            continuous_carrier_init(true);
+            continuous_carrier_init();
         }
 
         nrf_802154_critical_section_exit();
@@ -2537,7 +2536,7 @@ bool nrf_802154_core_modulated_carrier(nrf_802154_term_t term_lvl,
         {
             state_set(RADIO_STATE_MODULATED_CARRIER);
             mp_tx_data = p_data;
-            modulated_carrier_init(true, p_data);
+            modulated_carrier_init(p_data);
         }
 
         nrf_802154_critical_section_exit();
@@ -2594,7 +2593,7 @@ bool nrf_802154_core_channel_update(void)
             case RADIO_STATE_RX:
                 if (current_operation_terminate(NRF_802154_TERM_NONE, REQ_ORIG_CORE, true))
                 {
-                    rx_init(true);
+                    rx_init();
                 }
                 break;
 
