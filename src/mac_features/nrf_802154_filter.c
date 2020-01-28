@@ -334,12 +334,11 @@ static bool dst_pan_id_check(const uint8_t * p_panid, uint8_t frame_type)
  * Verify if destination short address of incoming frame allows processing by this node.
  *
  * @param[in] p_dst_addr  Pointer of destination address of incoming frame.
- * @param[in] frame_type  Type of the frame being filtered.
  *
  * @retval true   Destination address of incoming frame allows further processing of the frame.
  * @retval false  Destination address of incoming frame does not allow further processing.
  */
-static bool dst_short_addr_check(const uint8_t * p_dst_addr, uint8_t frame_type)
+static bool dst_short_addr_check(const uint8_t * p_dst_addr)
 {
     bool result;
 
@@ -360,12 +359,11 @@ static bool dst_short_addr_check(const uint8_t * p_dst_addr, uint8_t frame_type)
  * Verify if destination extended address of incoming frame allows processing by this node.
  *
  * @param[in] p_dst_addr  Pointer of destination address of incoming frame.
- * @param[in] frame_type  Type of the frame being filtered.
  *
  * @retval true   Destination address of incoming frame allows further processing of the frame.
  * @retval false  Destination address of incoming frame does not allow further processing.
  */
-static bool dst_extended_addr_check(const uint8_t * p_dst_addr, uint8_t frame_type)
+static bool dst_extended_addr_check(const uint8_t * p_dst_addr)
 {
     bool result;
 
@@ -414,13 +412,11 @@ static nrf_802154_rx_error_t dst_addr_check(const uint8_t * p_data, uint8_t fram
     switch (mhr_data.dst_addr_size)
     {
         case SHORT_ADDRESS_SIZE:
-            return dst_short_addr_check(mhr_data.p_dst_addr,
-                                        frame_type) ? NRF_802154_RX_ERROR_NONE :
+            return dst_short_addr_check(mhr_data.p_dst_addr) ? NRF_802154_RX_ERROR_NONE :
                    NRF_802154_RX_ERROR_INVALID_DEST_ADDR;
 
         case EXTENDED_ADDRESS_SIZE:
-            return dst_extended_addr_check(mhr_data.p_dst_addr,
-                                           frame_type) ? NRF_802154_RX_ERROR_NONE :
+            return dst_extended_addr_check(mhr_data.p_dst_addr) ? NRF_802154_RX_ERROR_NONE :
                    NRF_802154_RX_ERROR_INVALID_DEST_ADDR;
 
         case 0:
