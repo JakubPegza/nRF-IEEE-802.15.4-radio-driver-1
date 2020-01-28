@@ -47,7 +47,20 @@
 #include "nrf.h"
 
 #if RAAL_SOFTDEVICE
+
+#if defined (__GNUC__)
+_Pragma("GCC diagnostic push")
+_Pragma("GCC diagnostic ignored \"-Wreturn-type\"")
+_Pragma("GCC diagnostic ignored \"-Wunused-parameter\"")
+_Pragma("GCC diagnostic ignored \"-Wpedantic\"")
+#endif
+
 #include <nrf_soc.h>
+
+#if defined (__GNUC__)
+_Pragma("GCC diagnostic pop")
+#endif
+
 #endif // RAAL_SOFTDEVICE
 
 unsigned int m_seed;
