@@ -101,7 +101,7 @@ static void fcf_sequence_number_suppression_set(const uint8_t * p_frame)
     }
 }
 
-static void fcf_ie_present_set(const uint8_t * p_frame, const uint8_t * p_ie_data)
+static void fcf_ie_present_set(const uint8_t * p_ie_data)
 {
     if (p_ie_data != NULL)
     {
@@ -125,7 +125,7 @@ static void fcf_dst_addressing_mode_set(const uint8_t * p_frame)
     }
 }
 
-static void fcf_src_addressing_mode_set(const uint8_t * p_frame)
+static void fcf_src_addressing_mode_set(void)
 {
     m_ack_data[SRC_ADDR_TYPE_OFFSET] |= SRC_ADDR_TYPE_NONE;
 }
@@ -146,10 +146,10 @@ static void frame_control_set(const uint8_t                      * p_frame,
     fcf_frame_pending_set(p_frame);
     fcf_panid_compression_set(p_frame);
     fcf_sequence_number_suppression_set(p_frame);
-    fcf_ie_present_set(p_frame, p_ie_data);
+    fcf_ie_present_set(p_ie_data);
     fcf_dst_addressing_mode_set(p_frame);
     fcf_frame_version_set();
-    fcf_src_addressing_mode_set(p_frame);
+    fcf_src_addressing_mode_set();
 
     parse_results = nrf_802154_frame_parser_mhr_parse(m_ack_data, p_ack_offsets);
     assert(parse_results);
@@ -196,7 +196,7 @@ static void destination_set(const nrf_802154_frame_parser_mhr_data_t * p_frame,
     }
 }
 
-static void source_set(const uint8_t * p_frame)
+static void source_set(void)
 {
     // Intentionally empty: source address type is None.
 }
@@ -368,7 +368,7 @@ const uint8_t * nrf_802154_enh_ack_generator_create(const uint8_t * p_frame)
     destination_set(&frame_offsets, &ack_offsets);
 
     // Set source address and PAN ID.
-    source_set(p_frame);
+    source_set();
 
     // Set auxiliary security header.
     security_header_set(&frame_offsets, &ack_offsets, &p_sec_end);
