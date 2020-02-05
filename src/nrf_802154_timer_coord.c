@@ -178,6 +178,7 @@ void nrf_802154_lp_timer_synchronized(void)
     common_timepoint_t sync_time;
     uint32_t           lp_delta;
     uint32_t           hp_delta;
+    uint32_t           prev_resync_time;
     int32_t            timers_diff;
     int32_t            drift;
     int32_t            tb_fraction_of_lp_delta;
@@ -186,6 +187,10 @@ void nrf_802154_lp_timer_synchronized(void)
 
     if (nrf_802154_hp_timer_sync_time_get(&sync_time.hp_timer_time))
     {
+        // In order to determine if synchronization period was missed later on, this variable must
+        // be assigned to based on the previous value of m_drift_known.
+        prev_resync_time = m_drift_known ? RESYNC_TIME : FIRST_RESYNC_TIME;
+
         sync_time.lp_timer_time = nrf_802154_lp_timer_sync_time_get();
 
         // Calculate timers drift
@@ -221,8 +226,20 @@ void nrf_802154_lp_timer_synchronized(void)
         m_synchronized = true;
 
         nrf_802154_hp_timer_sync_prepare();
-        nrf_802154_lp_timer_sync_start_at(m_last_sync.lp_timer_time,
-                                          m_drift_known ? RESYNC_TIME : FIRST_RESYNC_TIME);
+
+        // If synchronization period was missed, i.e. the actual current time differs from
+        // the expected current time more than the previous synchronization period, synchronize immediately.
+        if ((nrf_802154_lp_timer_time_get() - m_last_sync.lp_timer_time) >
+                prev_resync_time - 2 * nrf_802154_lp_timer_granularity_get())
+        {
+            nrf_802154_lp_timer_sync_start_now();
+        }
+        // Otherwise, schedule synchronization to occur as usual.
+        else
+        {
+            nrf_802154_lp_timer_sync_start_at(m_last_sync.lp_timer_time,
+                                              m_drift_known ? RESYNC_TIME : FIRST_RESYNC_TIME);
+        }
     }
     else
     {
