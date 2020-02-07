@@ -613,16 +613,18 @@ void nrf_802154_src_addr_matching_method_set(nrf_802154_src_addr_match_t match_m
     nrf_802154_ack_data_src_addr_matching_method_set(match_method);
 }
 
-bool nrf_802154_ack_data_set(const uint8_t * p_addr,
-                             bool            extended,
-                             const void    * p_data,
-                             uint16_t        length,
-                             uint8_t         data_type)
+bool nrf_802154_ack_data_set(const uint8_t       * p_addr,
+                             bool                  extended,
+                             const void          * p_data,
+                             uint16_t              length,
+                             nrf_802154_ack_data_t data_type)
 {
     return nrf_802154_ack_data_for_addr_set(p_addr, extended, data_type, p_data, length);
 }
 
-bool nrf_802154_ack_data_clear(const uint8_t * p_addr, bool extended, uint8_t data_type)
+bool nrf_802154_ack_data_clear(const uint8_t       * p_addr,
+                               bool                  extended,
+                               nrf_802154_ack_data_t data_type)
 {
     return nrf_802154_ack_data_for_addr_clear(p_addr, extended, data_type);
 }

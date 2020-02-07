@@ -1051,11 +1051,11 @@ void nrf_802154_src_addr_matching_method_set(nrf_802154_src_addr_match_t match_m
  * @retval True   Address successfully added to the list.
  * @retval False  Not enough memory to store this address in the list.
  */
-bool nrf_802154_ack_data_set(const uint8_t * p_addr,
-                             bool            extended,
-                             const void    * p_data,
-                             uint16_t        length,
-                             uint8_t         data_type);
+bool nrf_802154_ack_data_set(const uint8_t       * p_addr,
+                             bool                  extended,
+                             const void          * p_data,
+                             uint16_t              length,
+                             nrf_802154_ack_data_t data_type);
 
 /**
  * @brief Removes the address of a peer node for which the ACK data is set from the pending bit list.
@@ -1078,7 +1078,9 @@ bool nrf_802154_ack_data_set(const uint8_t * p_addr,
  * @retval True   Address removed from the list.
  * @retval False  Address not found in the list.
  */
-bool nrf_802154_ack_data_clear(const uint8_t * p_addr, bool extended, uint8_t data_type);
+bool nrf_802154_ack_data_clear(const uint8_t       * p_addr,
+                               bool                  extended,
+                               nrf_802154_ack_data_t data_type);
 
 /**
  * @brief Enables or disables setting a pending bit in automatically transmitted ACK frames.

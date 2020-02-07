@@ -71,11 +71,11 @@ void nrf_802154_ack_data_enable(bool enabled);
  * @retval true   Address successfully added to the list.
  * @retval false  Address not added to the list (list is full).
  */
-bool nrf_802154_ack_data_for_addr_set(const uint8_t * p_addr,
-                                      bool            extended,
-                                      uint8_t         data_type,
-                                      const void    * p_data,
-                                      uint8_t         data_len);
+bool nrf_802154_ack_data_for_addr_set(const uint8_t       * p_addr,
+                                      bool                  extended,
+                                      nrf_802154_ack_data_t data_type,
+                                      const void          * p_data,
+                                      uint8_t               data_len);
 
 /**
  * @brief Removes an address from the ACK data list.
@@ -91,7 +91,9 @@ bool nrf_802154_ack_data_for_addr_set(const uint8_t * p_addr,
  * @retval true   Address successfully removed from the list.
  * @retval false  Address not removed from the list (address is missing from the list).
  */
-bool nrf_802154_ack_data_for_addr_clear(const uint8_t * p_addr, bool extended, uint8_t data_type);
+bool nrf_802154_ack_data_for_addr_clear(const uint8_t       * p_addr,
+                                        bool                  extended,
+                                        nrf_802154_ack_data_t data_type);
 
 /**
  * @brief Removes all addresses of a given length from the ACK data list.
@@ -100,7 +102,7 @@ bool nrf_802154_ack_data_for_addr_clear(const uint8_t * p_addr, bool extended, u
  *                       to be removed from the list.
  * @param[in]  data_type Type of data that is to be cleared for all addresses of a given length.
  */
-void nrf_802154_ack_data_reset(bool extended, uint8_t data_type);
+void nrf_802154_ack_data_reset(bool extended, nrf_802154_ack_data_t data_type);
 
 /**
  * @brief Select the source matching algorithm.
