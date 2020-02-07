@@ -212,6 +212,8 @@ typedef struct
 #endif  // NRF_802154_TX_STARTED_NOTIFY_ENABLED
 
     bool rssi_started;
+
+    volatile bool rssi_settled;
 } nrf_802154_flags_t;
 
 static nrf_802154_flags_t m_flags; ///< Flags used to store the current driver state.
@@ -790,6 +792,8 @@ void nrf_802154_trx_receive_frame(uint8_t                                bcc,
     // Clear the RSSI measurement flag.
     m_flags.rssi_started = false;
 
+    m_flags.rssi_settled = false;
+
     nrf_radio_txpower_set(NRF_RADIO, nrf_802154_pib_tx_power_get());
 
     if (mp_receive_buffer != NULL)
@@ -1034,11 +1038,32 @@ bool nrf_802154_trx_rssi_measure(void)
 
     if (m_trx_state == TRX_STATE_RXFRAME)
     {
-        nrf_radio_event_clear(NRF_RADIO, NRF_RADIO_EVENT_RSSIEND);
-        nrf_radio_task_trigger(NRF_RADIO, NRF_RADIO_TASK_RSSISTART);
-        m_flags.rssi_started = true;
+        // When TRX is in RXFRAME the RADIO may be also ramping down after previous operation or still ramping up
+        nrf_radio_state_t radio_state = nrf_radio_state_get();
 
-        result = true;
+        if ((radio_state == RADIO_STATE_STATE_RxIdle) || (radio_state == RADIO_STATE_STATE_Rx))
+        {
+            if (!m_flags.rssi_settled)
+            {
+                // This operation is requested first time after nrf_802154_trx_receive_frame has been called
+                // Radio is ramped up, but we need to wait RSSISETTLE time.
+                nrf_802154_delay_us(15U);
+                m_flags.rssi_settled = true;
+            }
+
+            nrf_radio_event_clear(NRF_RADIO_EVENT_RSSIEND);
+            nrf_radio_task_trigger(NRF_RADIO_TASK_RSSISTART);
+            m_flags.rssi_started = true;
+
+            result = true;
+        }
+        else
+        {
+            // The RADIO may be:
+            // - still ramping down after transmit
+            // - ramping up for receive
+            // - ramping down after frame is received (shorts)
+        }
     }
 
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_LOW);
