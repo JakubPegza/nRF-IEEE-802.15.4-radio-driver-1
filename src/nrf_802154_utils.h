@@ -35,6 +35,8 @@
 #include <assert.h>
 #include <stdint.h>
 #include "nrf.h"
+#include <nrfx.h>
+#include <soc/nrfx_coredep.h>
 
 /**
  * @defgroup nrf_802154_utils Utils definitions used in the 802.15.4 driver
@@ -76,6 +78,13 @@
 
 /**@brief Wait procedure used in a busy loop. */
 #define nrf_802154_busy_wait() __WFE()
+
+/**@brief Active waiting for given number of microseconds.
+ *
+ * It is guaranteed that execution of this macro will take at least @c time_in_us
+ * number of microseconds.
+ */
+#define nrf_802154_delay_us(time_in_us) nrfx_coredep_delay_us(time_in_us)
 
 /**@brief Type holding MCU critical section state.
  *
