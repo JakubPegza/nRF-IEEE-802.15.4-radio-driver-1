@@ -1047,7 +1047,10 @@ bool nrf_802154_trx_rssi_measure(void)
             {
                 // This operation is requested first time after nrf_802154_trx_receive_frame has been called
                 // Radio is ramped up, but we need to wait RSSISETTLE time.
-                nrf_802154_delay_us(15U);
+                // Precisely, we need to wait NRF_RADIO_EVENT_RSSIEND between READY->START short worked
+                // and RSSI_START task is triggered. Due to limited resources we assume worst case and
+                // wait whole time when rssi_measure is requested first time after nrf_802154_trx_receive_frame.
+                nrf_802154_delay_us(RSSI_SETTLE_TIME_US);
                 m_flags.rssi_settled = true;
             }
 
