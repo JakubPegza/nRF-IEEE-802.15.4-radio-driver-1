@@ -1039,7 +1039,7 @@ bool nrf_802154_trx_rssi_measure(void)
     if (m_trx_state == TRX_STATE_RXFRAME)
     {
         // When TRX is in RXFRAME the RADIO may be also ramping down after previous operation or still ramping up
-        nrf_radio_state_t radio_state = nrf_radio_state_get();
+        nrf_radio_state_t radio_state = nrf_radio_state_get(NRF_RADIO);
 
         if ((radio_state == RADIO_STATE_STATE_RxIdle) || (radio_state == RADIO_STATE_STATE_Rx))
         {
@@ -1054,8 +1054,8 @@ bool nrf_802154_trx_rssi_measure(void)
                 m_flags.rssi_settled = true;
             }
 
-            nrf_radio_event_clear(NRF_RADIO_EVENT_RSSIEND);
-            nrf_radio_task_trigger(NRF_RADIO_TASK_RSSISTART);
+            nrf_radio_event_clear(NRF_RADIO, NRF_RADIO_EVENT_RSSIEND);
+            nrf_radio_task_trigger(NRF_RADIO, NRF_RADIO_TASK_RSSISTART);
             m_flags.rssi_started = true;
 
             result = true;
