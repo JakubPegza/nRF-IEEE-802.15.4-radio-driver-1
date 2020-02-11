@@ -77,7 +77,7 @@ static void callback_fired(void * p_context)
 {
     ifs_operation_t * p_ctx = (ifs_operation_t *)p_context;
 
-    nrf_802154_request_transmit(NRF_802154_TERM_802154,
+    nrf_802154_request_transmit(NRF_802154_TERM_NONE,
                                 REQ_ORIG_IFS,
                                 p_ctx->p_data,
                                 p_ctx->cca,

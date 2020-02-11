@@ -2389,12 +2389,12 @@ bool nrf_802154_core_transmit(nrf_802154_term_t              term_lvl,
 
     if (result)
     {
-        result = current_operation_terminate(term_lvl, req_orig, true);
-
-        if (result)
+        /* Short-circuit evaluation in place. */
+        if ((immediate) || (nrf_802154_core_hooks_pre_transmission(p_data, cca)))
         {
-            /* Short-circuit evaluation in place. */
-            if ((immediate) || (nrf_802154_core_hooks_pre_transmission(p_data, cca)))
+            result = current_operation_terminate(term_lvl, req_orig, true);
+
+            if (result)
             {
                 m_coex_tx_request_mode                  = nrf_802154_pib_coex_tx_request_mode_get();
                 m_trx_transmit_frame_notifications_mask =
