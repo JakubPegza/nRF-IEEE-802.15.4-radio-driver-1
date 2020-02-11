@@ -155,8 +155,16 @@
 #define PHY_SYMBOLS_PER_OCTET        2                                            ///< Number of symbols in a single byte (octet).
 #define PHY_SHR_SYMBOLS              10                                           ///< Number of symbols in the Synchronization Header (SHR).
 
-#define ED_MIN_DBM                   (-94)                                        ///< dBm value corresponding to value 0 in the EDSAMPLE register.
+#if defined (NRF52840_XXAA) || defined(NRF52811_XXAA) || defined(NRF5340_XXAA_NETWORK)
+#define ED_MIN_DBM                   (-92)                                        ///< dBm value corresponding to value 0 in the EDSAMPLE register.
 #define ED_RESULT_FACTOR             4                                            ///< Factor needed to calculate the ED result based on the data from the RADIO peripheral.
+#elif defined (NRF52833_XXAA) || defined(NRF52820_XXAA)
+#define ED_MIN_DBM                   (-93)                                        ///< dBm value corresponding to value 0 in the EDSAMPLE register.
+#define ED_RESULT_FACTOR             5                                            ///< Factor needed to calculate the ED result based on the data from the RADIO peripheral.
+#else
+#error "Selected chip is not supported."
+#endif
+
 #define ED_RESULT_MAX                0xff                                         ///< Maximal ED result.
 
 #define BROADCAST_ADDRESS            ((uint8_t[SHORT_ADDRESS_SIZE]) {0xff, 0xff}) ///< Broadcast short address.
@@ -184,4 +192,4 @@ typedef enum
 #endif // NRF_802154_IFS_ENABLED
 } req_originator_t;
 
-#endif // NRD_DRV_RADIO802154_CONST_H_
+#endif // NRF_802154_CONST_H_
