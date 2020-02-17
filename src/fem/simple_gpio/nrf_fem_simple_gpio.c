@@ -43,7 +43,6 @@
 #include "compiler_abstraction.h"
 #include "nrf_802154_config.h"
 #include "nrf.h"
-#include "nrf_error.h"
 #include "nrf_gpio.h"
 #include "nrf_gpiote.h"
 #include "nrf_ppi.h"
@@ -149,7 +148,7 @@ static int32_t event_configuration_set(const nrf_802154_fal_event_t * const p_ev
         }
         else
         {
-            return NRF_ERROR_INVALID_STATE;
+            return NRFX_ERROR_INVALID_STATE;
         }
     }
     else
@@ -213,7 +212,7 @@ static int32_t event_configuration_set(const nrf_802154_fal_event_t * const p_ev
             break;
     }
 
-    return NRF_SUCCESS;
+    return NRFX_SUCCESS;
 }
 
 /** Deconfigure the event with the provided values. */
@@ -252,7 +251,7 @@ static int32_t event_configuration_clear(const nrf_802154_fal_event_t * const p_
             break;
     }
 
-    return NRF_SUCCESS;
+    return NRFX_SUCCESS;
 }
 
 int32_t nrf_802154_fal_pa_configuration_set(const nrf_802154_fal_event_t * const p_activate_event,
@@ -262,7 +261,7 @@ int32_t nrf_802154_fal_pa_configuration_set(const nrf_802154_fal_event_t * const
 
     if (!m_nrf_fem_interface_config.pa_pin_config.enable)
     {
-        return NRF_ERROR_FORBIDDEN;
+        return NRFX_ERROR_FORBIDDEN;
     }
 
     if (p_activate_event)
@@ -271,7 +270,7 @@ int32_t nrf_802154_fal_pa_configuration_set(const nrf_802154_fal_event_t * const
                                            &m_nrf_fem_interface_config.pa_pin_config,
                                            true,
                                            m_nrf_fem_interface_config.fem_config.pa_time_gap_us);
-        if (ret_code != NRF_SUCCESS)
+        if (ret_code != NRFX_SUCCESS)
         {
             return ret_code;
         }
@@ -283,13 +282,13 @@ int32_t nrf_802154_fal_pa_configuration_set(const nrf_802154_fal_event_t * const
                                            &m_nrf_fem_interface_config.pa_pin_config,
                                            false,
                                            m_nrf_fem_interface_config.fem_config.pa_time_gap_us);
-        if (ret_code != NRF_SUCCESS)
+        if (ret_code != NRFX_SUCCESS)
         {
             return ret_code;
         }
     }
 
-    return NRF_SUCCESS;
+    return NRFX_SUCCESS;
 }
 
 int32_t nrf_802154_fal_lna_configuration_set(const nrf_802154_fal_event_t * const p_activate_event,
@@ -299,7 +298,7 @@ int32_t nrf_802154_fal_lna_configuration_set(const nrf_802154_fal_event_t * cons
 
     if (!m_nrf_fem_interface_config.lna_pin_config.enable)
     {
-        return NRF_ERROR_FORBIDDEN;
+        return NRFX_ERROR_FORBIDDEN;
     }
 
     if (p_activate_event)
@@ -308,7 +307,7 @@ int32_t nrf_802154_fal_lna_configuration_set(const nrf_802154_fal_event_t * cons
                                            &m_nrf_fem_interface_config.lna_pin_config,
                                            true,
                                            m_nrf_fem_interface_config.fem_config.lna_time_gap_us);
-        if (ret_code != NRF_SUCCESS)
+        if (ret_code != NRFX_SUCCESS)
         {
             return ret_code;
         }
@@ -320,13 +319,13 @@ int32_t nrf_802154_fal_lna_configuration_set(const nrf_802154_fal_event_t * cons
                                            &m_nrf_fem_interface_config.lna_pin_config,
                                            false,
                                            m_nrf_fem_interface_config.fem_config.lna_time_gap_us);
-        if (ret_code != NRF_SUCCESS)
+        if (ret_code != NRFX_SUCCESS)
         {
             return ret_code;
         }
     }
 
-    return NRF_SUCCESS;
+    return NRFX_SUCCESS;
 }
 
 int32_t nrf_802154_fal_pa_configuration_clear(const nrf_802154_fal_event_t * const p_activate_event,
@@ -336,13 +335,13 @@ int32_t nrf_802154_fal_pa_configuration_clear(const nrf_802154_fal_event_t * con
 
     if (!m_nrf_fem_interface_config.pa_pin_config.enable)
     {
-        return NRF_ERROR_FORBIDDEN;
+        return NRFX_ERROR_FORBIDDEN;
     }
 
     if (p_activate_event)
     {
         ret_code = event_configuration_clear(p_activate_event, true);
-        if (ret_code != NRF_SUCCESS)
+        if (ret_code != NRFX_SUCCESS)
         {
             return ret_code;
         }
@@ -351,13 +350,13 @@ int32_t nrf_802154_fal_pa_configuration_clear(const nrf_802154_fal_event_t * con
     if (p_deactivate_event)
     {
         ret_code = event_configuration_clear(p_deactivate_event, false);
-        if (ret_code != NRF_SUCCESS)
+        if (ret_code != NRFX_SUCCESS)
         {
             return ret_code;
         }
     }
 
-    return NRF_SUCCESS;
+    return NRFX_SUCCESS;
 }
 
 int32_t nrf_802154_fal_lna_configuration_clear(
@@ -368,13 +367,13 @@ int32_t nrf_802154_fal_lna_configuration_clear(
 
     if (!m_nrf_fem_interface_config.lna_pin_config.enable)
     {
-        return NRF_ERROR_FORBIDDEN;
+        return NRFX_ERROR_FORBIDDEN;
     }
 
     if (p_activate_event)
     {
         ret_code = event_configuration_clear(p_activate_event, true);
-        if (ret_code != NRF_SUCCESS)
+        if (ret_code != NRFX_SUCCESS)
         {
             return ret_code;
         }
@@ -383,13 +382,13 @@ int32_t nrf_802154_fal_lna_configuration_clear(
     if (p_deactivate_event)
     {
         ret_code = event_configuration_clear(p_deactivate_event, false);
-        if (ret_code != NRF_SUCCESS)
+        if (ret_code != NRFX_SUCCESS)
         {
             return ret_code;
         }
     }
 
-    return NRF_SUCCESS;
+    return NRFX_SUCCESS;
 }
 
 void nrf_802154_fal_deactivate_now(nrf_fal_functionality_t type)
@@ -437,14 +436,14 @@ int32_t nrf_fem_interface_configuration_set(nrf_fem_interface_config_t const * c
         gpiote_configure();
     }
 
-    return NRF_SUCCESS;
+    return NRFX_SUCCESS;
 }
 
 int32_t nrf_fem_interface_configuration_get(nrf_fem_interface_config_t * p_config)
 {
     *p_config = m_nrf_fem_interface_config;
 
-    return NRF_SUCCESS;
+    return NRFX_SUCCESS;
 }
 
 void nrf_802154_fal_cleanup(void)

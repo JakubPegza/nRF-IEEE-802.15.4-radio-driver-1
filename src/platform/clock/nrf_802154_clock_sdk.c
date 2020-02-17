@@ -41,9 +41,9 @@
 #include <stddef.h>
 
 #include <compiler_abstraction.h>
-#include <nrf_drv_clock.h>
+#include <nrfx_clock.h>
 
-static void clock_handler(nrf_drv_clock_evt_type_t event);
+static void clock_handler(nrfx_clock_evt_type_t event);
 
 static nrf_drv_clock_handler_item_t m_clock_handler =
 {
@@ -51,7 +51,7 @@ static nrf_drv_clock_handler_item_t m_clock_handler =
     .event_handler = clock_handler,
 };
 
-static void clock_handler(nrf_drv_clock_evt_type_t event)
+static void clock_handler(nrfx_clock_evt_type_t event)
 {
     if (event == NRF_DRV_CLOCK_EVT_HFCLK_STARTED)
     {
