@@ -118,7 +118,11 @@ static uint16_t ifs_needed_by_time(uint32_t current_timestamp)
 {
     if (!nrf_802154_timer_sched_time_is_in_future(m_last_frame_timestamp, 0, current_timestamp))
     {
-        return 0;
+        /* Explicitly allow case where the timstamps are equal, i.e. we are running very fast. */
+        if (current_timestamp != m_last_frame_timestamp)
+        {
+            return 0;
+        }
     }
     uint16_t ifs_period;
     uint32_t dt = current_timestamp - m_last_frame_timestamp;
