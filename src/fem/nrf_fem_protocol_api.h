@@ -50,7 +50,7 @@
 #include "nrf_fem_control_config.h"
 #include "nrf_fem_protocol_legacy_api.h"
 
-#include "nrf_error.h"
+#include "nrfx_errors.h"
 #include "nrf_ppi.h"
 #include "nrf_timer.h"
 
@@ -125,9 +125,9 @@ typedef struct
  * @note If a timer event is provided, the caller of this function is responsible for starting the timer and its shorts.
  *       Moreover, the caller is responsible for stopping the timer no earlier than the provided compare channel expires.
  *
- * @retval   ::NRF_SUCCESS               PA activate setup is successful.
- * @retval   ::NRF_ERROR_FORBIDDEN       PA is currently disabled.
- * @retval   ::NRF_ERROR_INVALID_STATE   PA activate setup could not be performed due to invalid or missing configuration parameters
+ * @retval   ::NRFX_SUCCESS               PA activate setup is successful.
+ * @retval   ::NRFX_ERROR_FORBIDDEN       PA is currently disabled.
+ * @retval   ::NRFX_ERROR_INVALID_STATE   PA activate setup could not be performed due to invalid or missing configuration parameters
  *                                       in p_activate_event or p_deactivate_event, or both.
  */
 int32_t nrf_802154_fal_pa_configuration_set(const nrf_802154_fal_event_t * const p_activate_event,
@@ -139,9 +139,9 @@ int32_t nrf_802154_fal_pa_configuration_set(const nrf_802154_fal_event_t * const
  * @param[in] p_activate_event   Pointer to the activation event structure.
  * @param[in] p_deactivate_event Pointer to the deactivation event structure.
  *
- * @retval   ::NRF_SUCCESS               PA activate setup purge is successful.
- * @retval   ::NRF_ERROR_FORBIDDEN       PA is currently disabled.
- * @retval   ::NRF_ERROR_INVALID_STATE   PA activate setup purge could not be performed due to invalid or missing configuration parameters
+ * @retval   ::NRFX_SUCCESS               PA activate setup purge is successful.
+ * @retval   ::NRFX_ERROR_FORBIDDEN       PA is currently disabled.
+ * @retval   ::NRFX_ERROR_INVALID_STATE   PA activate setup purge could not be performed due to invalid or missing configuration parameters
  *                                       in p_activate_event or p_deactivate_event, or both.
  */
 int32_t nrf_802154_fal_pa_configuration_clear(const nrf_802154_fal_event_t * const p_activate_event,
@@ -169,9 +169,9 @@ int32_t nrf_802154_fal_pa_configuration_clear(const nrf_802154_fal_event_t * con
  * @note If a timer event is provided, the caller of this function is responsible for starting the timer and its shorts.
  *       Moreover, the caller is responsible for stopping the timer no earlier than the provided compare channel expires.
  *
- * @retval   ::NRF_SUCCESS               LNA activate setup is successful.
- * @retval   ::NRF_ERROR_FORBIDDEN       LNA is currently disabled.
- * @retval   ::NRF_ERROR_INVALID_STATE   LNA activate setup could not be performed due to invalid or missing configuration parameters
+ * @retval   ::NRFX_SUCCESS               LNA activate setup is successful.
+ * @retval   ::NRFX_ERROR_FORBIDDEN       LNA is currently disabled.
+ * @retval   ::NRFX_ERROR_INVALID_STATE   LNA activate setup could not be performed due to invalid or missing configuration parameters
  *                                       in p_activate_event or p_deactivate_event, or both.
  */
 int32_t nrf_802154_fal_lna_configuration_set(const nrf_802154_fal_event_t * const p_activate_event,
@@ -183,9 +183,9 @@ int32_t nrf_802154_fal_lna_configuration_set(const nrf_802154_fal_event_t * cons
  * @param[in] p_activate_event   Pointer to the activation event structure.
  * @param[in] p_deactivate_event Pointer to the deactivation event structure.
  *
- * @retval   ::NRF_SUCCESS               LNA activate setup purge is successful.
- * @retval   ::NRF_ERROR_FORBIDDEN       LNA is currently disabled.
- * @retval   ::NRF_ERROR_INVALID_STATE   LNA activate setup purge could not be performed due to invalid or missing configuration parameters
+ * @retval   ::NRFX_SUCCESS               LNA activate setup purge is successful.
+ * @retval   ::NRFX_ERROR_FORBIDDEN       LNA is currently disabled.
+ * @retval   ::NRFX_ERROR_INVALID_STATE   LNA activate setup purge could not be performed due to invalid or missing configuration parameters
  *                                       in p_activate_event or p_deactivate_event, or both.
  */
 int32_t nrf_802154_fal_lna_configuration_clear(
@@ -235,7 +235,7 @@ static inline int32_t nrf_802154_fal_pa_configuration_set(
 {
     (void)p_activate_event;
     (void)p_deactivate_event;
-    return NRF_ERROR_FORBIDDEN;
+    return NRFX_ERROR_FORBIDDEN;
 }
 
 static inline int32_t nrf_802154_fal_pa_configuration_clear(
@@ -244,7 +244,7 @@ static inline int32_t nrf_802154_fal_pa_configuration_clear(
 {
     (void)p_activate_event;
     (void)p_deactivate_event;
-    return NRF_ERROR_FORBIDDEN;
+    return NRFX_ERROR_FORBIDDEN;
 }
 
 static inline int32_t nrf_802154_fal_lna_configuration_set(
@@ -253,7 +253,7 @@ static inline int32_t nrf_802154_fal_lna_configuration_set(
 {
     (void)p_activate_event;
     (void)p_deactivate_event;
-    return NRF_ERROR_FORBIDDEN;
+    return NRFX_ERROR_FORBIDDEN;
 }
 
 static inline int32_t nrf_802154_fal_lna_configuration_clear(
@@ -262,7 +262,7 @@ static inline int32_t nrf_802154_fal_lna_configuration_clear(
 {
     (void)p_activate_event;
     (void)p_deactivate_event;
-    return NRF_ERROR_FORBIDDEN;
+    return NRFX_ERROR_FORBIDDEN;
 }
 
 static inline void nrf_802154_fal_deactivate_now(nrf_fal_functionality_t type)

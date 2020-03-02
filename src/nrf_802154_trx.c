@@ -365,7 +365,7 @@ static void trigger_disable_to_start_rampup(void)
 /** Configure FEM to set LNA at appropriate time. */
 static void fem_for_lna_set(void)
 {
-    if (nrf_802154_fal_lna_configuration_set(&m_activate_rx_cc0, NULL) == NRF_SUCCESS)
+    if (nrf_802154_fal_lna_configuration_set(&m_activate_rx_cc0, NULL) == NRFX_SUCCESS)
     {
         uint32_t event_addr = nrf_egu_event_address_get(NRF_802154_SWI_EGU_INSTANCE,
                                                                   EGU_EVENT);
@@ -391,7 +391,7 @@ static void fem_for_lna_reset(void)
 /** Configure FEM to set PA at appropriate time. */
 static void fem_for_pa_set(void)
 {
-    if (nrf_802154_fal_pa_configuration_set(&m_activate_tx_cc0, NULL) == NRF_SUCCESS)
+    if (nrf_802154_fal_pa_configuration_set(&m_activate_tx_cc0, NULL) == NRFX_SUCCESS)
     {
         uint32_t event_addr = nrf_egu_event_address_get(NRF_802154_SWI_EGU_INSTANCE,
                                                                   EGU_EVENT);
@@ -424,12 +424,12 @@ static void fem_for_tx_set(bool cca)
         bool pa_set  = false;
         bool lna_set = false;
 
-        if (nrf_802154_fal_lna_configuration_set(&m_activate_rx_cc0, &m_ccaidle) == NRF_SUCCESS)
+        if (nrf_802154_fal_lna_configuration_set(&m_activate_rx_cc0, &m_ccaidle) == NRFX_SUCCESS)
         {
             lna_set = true;
         }
 
-        if (nrf_802154_fal_pa_configuration_set(&m_ccaidle, NULL) == NRF_SUCCESS)
+        if (nrf_802154_fal_pa_configuration_set(&m_ccaidle, NULL) == NRFX_SUCCESS)
         {
             pa_set = true;
         }
@@ -439,7 +439,7 @@ static void fem_for_tx_set(bool cca)
     }
     else
     {
-        success = (nrf_802154_fal_pa_configuration_set(&m_activate_tx_cc0, NULL) == NRF_SUCCESS);
+        success = (nrf_802154_fal_pa_configuration_set(&m_activate_tx_cc0, NULL) == NRFX_SUCCESS);
     }
 
     if (success)
@@ -863,7 +863,7 @@ void nrf_802154_trx_receive_frame(uint8_t                                bcc,
     // Set FEM
     uint32_t delta_time;
 
-    if (nrf_802154_fal_lna_configuration_set(&m_activate_rx_cc0, NULL) == NRF_SUCCESS)
+    if (nrf_802154_fal_lna_configuration_set(&m_activate_rx_cc0, NULL) == NRFX_SUCCESS)
     {
         delta_time = nrf_timer_cc_get(NRF_802154_TIMER_INSTANCE,
                                        NRF_TIMER_CC_CHANNEL0);
@@ -1238,7 +1238,7 @@ bool nrf_802154_trx_transmit_ack(const void * p_transmit_buffer, uint32_t delay_
     // Set the moment for FEM at which real transmission starts.
     m_activate_tx_cc0_timeshifted.event.timer.counter_value = timer_cc_ramp_up_start + TXRU_TIME;
 
-    if (nrf_802154_fal_pa_configuration_set(&m_activate_tx_cc0_timeshifted, NULL) == NRF_SUCCESS)
+    if (nrf_802154_fal_pa_configuration_set(&m_activate_tx_cc0_timeshifted, NULL) == NRFX_SUCCESS)
     {
         // FEM scheduled its operations on timer, so the timer must be running until last
         // operation scheduled by the FEM (TIMER's CC0), which is later than radio ramp up

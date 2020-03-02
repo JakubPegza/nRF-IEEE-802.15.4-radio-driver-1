@@ -61,7 +61,7 @@
 #include "nrf_802154_trx.h"
 #include "nrf_802154_types.h"
 #include "nrf_802154_utils.h"
-#include "nrf_error.h"
+#include "nrfx_errors.h"
 #include "nrf_radio.h"
 #include "fem/nrf_fem_protocol_api.h"
 #include "mac_features/nrf_802154_delayed_trx.h"

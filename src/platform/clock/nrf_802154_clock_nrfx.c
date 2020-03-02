@@ -31,7 +31,7 @@
 
 /**
  * @file
- *   This file implements the nrf 802.15.4 HF Clock abstraction with SDK driver.
+ *   This file implements the nrf 802.15.4 HF Clock abstraction with nrfx driver.
  *
  * This implementation uses clock driver implementation from SDK.
  */
@@ -43,22 +43,14 @@
 #include <compiler_abstraction.h>
 #include <nrfx_clock.h>
 
-static void clock_handler(nrfx_clock_evt_type_t event);
-
-static nrf_drv_clock_handler_item_t m_clock_handler =
-{
-    .p_next        = NULL,
-    .event_handler = clock_handler,
-};
-
 static void clock_handler(nrfx_clock_evt_type_t event)
 {
-    if (event == NRF_DRV_CLOCK_EVT_HFCLK_STARTED)
+    if (event == NRFX_CLOCK_EVT_HFCLK_STARTED)
     {
         nrf_802154_clock_hfclk_ready();
     }
 
-    if (event == NRF_DRV_CLOCK_EVT_LFCLK_STARTED)
+    if (event == NRFX_CLOCK_EVT_LFCLK_STARTED)
     {
         nrf_802154_clock_lfclk_ready();
     }
@@ -66,42 +58,44 @@ static void clock_handler(nrfx_clock_evt_type_t event)
 
 void nrf_802154_clock_init(void)
 {
-    nrf_drv_clock_init();
+    nrfx_clock_init(&clock_handler);
+    nrfx_clock_enable();
 }
 
 void nrf_802154_clock_deinit(void)
 {
-    nrf_drv_clock_uninit();
+    nrfx_clock_disable();
+    nrfx_clock_uninit();
 }
 
 void nrf_802154_clock_hfclk_start(void)
 {
-    nrf_drv_clock_hfclk_request(&m_clock_handler);
+    nrfx_clock_hfclk_start();
 }
 
 void nrf_802154_clock_hfclk_stop(void)
 {
-    nrf_drv_clock_hfclk_release();
+    nrfx_clock_hfclk_stop();
 }
 
 bool nrf_802154_clock_hfclk_is_running(void)
 {
-    return nrf_drv_clock_hfclk_is_running();
+    return nrfx_clock_hfclk_is_running();
 }
 
 void nrf_802154_clock_lfclk_start(void)
 {
-    nrf_drv_clock_lfclk_request(&m_clock_handler);
+    nrfx_clock_lfclk_start();
 }
 
 void nrf_802154_clock_lfclk_stop(void)
 {
-    nrf_drv_clock_lfclk_release();
+    nrfx_clock_lfclk_stop();
 }
 
 bool nrf_802154_clock_lfclk_is_running(void)
 {
-    return nrf_drv_clock_lfclk_is_running();
+    return nrfx_clock_lfclk_is_running();
 }
 
 __WEAK void nrf_802154_clock_hfclk_ready(void)
@@ -112,4 +106,9 @@ __WEAK void nrf_802154_clock_hfclk_ready(void)
 __WEAK void nrf_802154_clock_lfclk_ready(void)
 {
     // Intentionally empty.
+}
+
+void POWER_CLOCK_IRQHandler(void)
+{
+    nrfx_clock_irq_handler();
 }

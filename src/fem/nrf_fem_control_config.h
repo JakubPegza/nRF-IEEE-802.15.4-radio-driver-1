@@ -39,7 +39,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "nrf_error.h"
+#include "nrfx_common.h"
+#include "nrfx_errors.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,13 +91,13 @@ static inline int32_t nrf_fem_interface_configuration_set(
     nrf_fem_interface_config_t const * const p_config)
 {
     (void)p_config;
-    return NRF_ERROR_NOT_SUPPORTED;
+    return NRFX_ERROR_NOT_SUPPORTED;
 }
 
 static inline int32_t nrf_fem_interface_configuration_get(nrf_fem_interface_config_t * p_config)
 {
     (void)p_config;
-    return NRF_ERROR_NOT_SUPPORTED;
+    return NRFX_ERROR_NOT_SUPPORTED;
 }
 
 #endif // ENABLE_FEM
