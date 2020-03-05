@@ -40,7 +40,7 @@
 
 #include "nrf_802154_config.h"
 #include "nrf_802154_peripherals.h"
-#include "nrf_802154_priority_drop.h"
+#include "nrf_802154_rsch_prio_drop.h"
 
 #include "nrf_802154_swi.h"
 #include "nrf_egu.h"
@@ -78,24 +78,24 @@ static void swi_hfclk_stop_terminate(void)
     nrf_egu_event_clear(SWI_EGU, HFCLK_STOP_EVENT);
 }
 
-void nrf_802154_priority_drop_init(void)
+void nrf_802154_rsch_prio_drop_init(void)
 {
     nrf_egu_int_enable(SWI_EGU, HFCLK_STOP_INT);
 
     nrf_802154_swi_init();
 }
 
-void nrf_802154_priority_drop_hfclk_stop(void)
+void nrf_802154_rsch_prio_drop_hfclk_stop(void)
 {
     swi_hfclk_stop();
 }
 
-void nrf_802154_priority_drop_hfclk_stop_terminate(void)
+void nrf_802154_rsch_prio_drop_hfclk_stop_terminate(void)
 {
     swi_hfclk_stop_terminate();
 }
 
-void nrf_802154_priority_drop_swi_irq_handler(void)
+void nrf_802154_rsch_prio_drop_swi_irq_handler(void)
 {
     if (nrf_egu_event_check(SWI_EGU, HFCLK_STOP_EVENT))
     {

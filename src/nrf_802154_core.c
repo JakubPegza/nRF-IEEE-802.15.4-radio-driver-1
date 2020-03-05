@@ -71,7 +71,7 @@
 #include "mac_features/ack_generator/nrf_802154_ack_generator.h"
 #include "rsch/nrf_802154_rsch.h"
 #include "rsch/nrf_802154_rsch_crit_sect.h"
-#include "timer_scheduler/nrf_802154_timer_sched.h"
+#include "timer/nrf_802154_timer_sched.h"
 #include "platform/hp_timer/nrf_802154_hp_timer.h"
 
 #include "nrf_802154_core_hooks.h"

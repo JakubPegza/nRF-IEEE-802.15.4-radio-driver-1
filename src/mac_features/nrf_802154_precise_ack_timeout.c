@@ -47,7 +47,7 @@
 #include "nrf_802154_notification.h"
 #include "nrf_802154_procedures_duration.h"
 #include "nrf_802154_request.h"
-#include "timer_scheduler/nrf_802154_timer_sched.h"
+#include "timer/nrf_802154_timer_sched.h"
 
 #if NRF_802154_ACK_TIMEOUT_ENABLED
 

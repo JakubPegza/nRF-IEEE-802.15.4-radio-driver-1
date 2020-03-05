@@ -26,9 +26,7 @@ add_library(radio_driver src/nrf_802154.c
                          src/nrf_802154_request_direct.c
                          src/nrf_802154_swi.c)
 
-target_compile_definitions(radio_driver PUBLIC "ENABLE_FEM=1")
 target_link_libraries(radio_driver nrfx)
+target_link_libraries(radio_driver 802154_sl_soft)
+target_link_libraries(radio_driver 802154_sl_platform_soft)
 target_include_directories(radio_driver PUBLIC src)
-
-add_library(nowificoex src/platform/coex/nrf_802154_wifi_coex_none.c)
-target_link_libraries(nowificoex radio_driver)

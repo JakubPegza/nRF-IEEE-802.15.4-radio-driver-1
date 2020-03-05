@@ -44,7 +44,7 @@
 #include "nrf_802154_pib.h"
 #include "nrf_802154_request.h"
 #include "mac_features/nrf_802154_frame_parser.h"
-#include "timer_scheduler/nrf_802154_timer_sched.h"
+#include "timer/nrf_802154_timer_sched.h"
 
 #if NRF_802154_IFS_ENABLED
 typedef struct
