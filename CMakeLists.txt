@@ -27,6 +27,6 @@ add_library(radio_driver src/nrf_802154.c
                          src/nrf_802154_swi.c)
 
 target_link_libraries(radio_driver nrfx)
-target_link_libraries(radio_driver 802154_sl_soft)
-target_link_libraries(radio_driver 802154_sl_platform_soft)
+target_link_libraries(radio_driver nrf_802154_sl)
+target_link_libraries(radio_driver nrf_802154_sl_platform)
 target_include_directories(radio_driver PUBLIC src)

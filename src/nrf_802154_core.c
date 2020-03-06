@@ -57,7 +57,6 @@
 #include "nrf_802154_rx_buffer.h"
 #include "nrf_802154_stats.h"
 #include "nrf_802154_utils.h"
-#include "nrf_802154_timer_coord.h"
 #include "nrf_802154_trx.h"
 #include "nrf_802154_types.h"
 #include "nrf_802154_utils.h"
@@ -71,6 +70,7 @@
 #include "mac_features/ack_generator/nrf_802154_ack_generator.h"
 #include "rsch/nrf_802154_rsch.h"
 #include "rsch/nrf_802154_rsch_crit_sect.h"
+#include "timer/nrf_802154_timer_coord.h"
 #include "timer/nrf_802154_timer_sched.h"
 #include "platform/hp_timer/nrf_802154_hp_timer.h"
 
