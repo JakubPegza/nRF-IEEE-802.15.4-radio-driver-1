@@ -1,6 +1,6 @@
 @startuml
 
-'Typical coex signalling during frame reception with ACK transmission
+'Typical coex signalling during frame transmission with ACK reception
 'Exact moment of request is irrelevant now
 
 concise "RADIO" as radio
@@ -34,31 +34,30 @@ request is $request_inactive
 priority is $priority_none
 grant is $grant_inactive
 
-'Frame reception starts
 @+10
-radio is "RX FRAME"
-
-@+10
-priority is $priority_rx
+priority is $priority_tx
 request is $request_active
 
 @+10
 grant is $grant_active
 
+'Frame transmission starts
+@+10
+radio is "TX FRAME"
 
 @+50
 radio is {-}
-'Frame reception ended
+'Frame transmission ended
 
-'Switching to tx ack
+'Switching to rx ack
 @+10
-priority is $priority_tx
+priority is $priority_rx
 
 'ACK transmission
 @+10
 radio is "TX ACK"
 
-'ACK transmission finished
+'ACK reception finished
 @+30
 radio is {-}
 request is $request_inactive
