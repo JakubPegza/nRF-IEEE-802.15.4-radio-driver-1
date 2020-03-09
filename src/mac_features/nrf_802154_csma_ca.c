@@ -55,7 +55,7 @@
 #include "mac_features/nrf_802154_frame_parser.h"
 #include "platform/random/nrf_802154_random.h"
 #include "rsch/nrf_802154_rsch.h"
-#include "timer_scheduler/nrf_802154_timer_sched.h"
+#include "timer/nrf_802154_timer_sched.h"
 
 #if NRF_802154_CSMA_CA_ENABLED
 

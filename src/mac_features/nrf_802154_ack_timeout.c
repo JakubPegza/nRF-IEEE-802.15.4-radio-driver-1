@@ -46,7 +46,7 @@
 #include "../nrf_802154_debug.h"
 #include "nrf_802154_notification.h"
 #include "nrf_802154_request.h"
-#include "timer_scheduler/nrf_802154_timer_sched.h"
+#include "timer/nrf_802154_timer_sched.h"
 
 #define RETRY_DELAY     500     ///< Procedure is delayed by this time if cannot be performed at the moment.
 #define MAX_RETRY_DELAY 1000000 ///< Maximal allowed delay of procedure retry.

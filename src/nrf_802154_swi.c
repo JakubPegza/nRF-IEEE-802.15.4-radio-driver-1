@@ -70,7 +70,7 @@ __WEAK void nrf_802154_notification_swi_irq_handler(void)
     /* Implementation provided by other module if necessary */
 }
 
-__WEAK void nrf_802154_priority_drop_swi_irq_handler(void)
+__WEAK void nrf_802154_rsch_prio_drop_swi_irq_handler(void)
 {
     /* Implementation provided by other module if necessary */
 }
@@ -84,6 +84,6 @@ void SWI_IRQHandler(void)
 {
     nrf_802154_trx_swi_irq_handler();
     nrf_802154_notification_swi_irq_handler();
-    nrf_802154_priority_drop_swi_irq_handler();
+    nrf_802154_rsch_prio_drop_swi_irq_handler();
     nrf_802154_request_swi_irq_handler();
 }

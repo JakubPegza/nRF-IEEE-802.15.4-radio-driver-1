@@ -52,7 +52,7 @@
 #include "nrf_802154_procedures_duration.h"
 #include "nrf_802154_request.h"
 #include "rsch/nrf_802154_rsch.h"
-#include "timer_scheduler/nrf_802154_timer_sched.h"
+#include "timer/nrf_802154_timer_sched.h"
 
 #if NRF_802154_DELAYED_TRX_ENABLED
 

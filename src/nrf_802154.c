@@ -52,12 +52,10 @@
 #include "nrf_802154_debug.h"
 #include "nrf_802154_notification.h"
 #include "nrf_802154_pib.h"
-#include "nrf_802154_priority_drop.h"
 #include "nrf_802154_request.h"
 #include "nrf_802154_rssi.h"
 #include "nrf_802154_rx_buffer.h"
 #include "nrf_802154_stats.h"
-#include "nrf_802154_timer_coord.h"
 #include "nrf_radio.h"
 #include "platform/clock/nrf_802154_clock.h"
 #include "platform/lp_timer/nrf_802154_lp_timer.h"
@@ -65,7 +63,9 @@
 #include "platform/temperature/nrf_802154_temperature.h"
 #include "rsch/nrf_802154_rsch.h"
 #include "rsch/nrf_802154_rsch_crit_sect.h"
-#include "timer_scheduler/nrf_802154_timer_sched.h"
+#include "rsch/nrf_802154_rsch_prio_drop.h"
+#include "timer/nrf_802154_timer_coord.h"
+#include "timer/nrf_802154_timer_sched.h"
 
 #include "mac_features/nrf_802154_ack_timeout.h"
 #include "mac_features/nrf_802154_csma_ca.h"
@@ -193,6 +193,12 @@ uint32_t nrf_802154_first_symbol_timestamp_get(uint32_t end_timestamp, uint8_t p
 
 void nrf_802154_init(void)
 {
+    nrf_802154_sl_crit_sect_interface_t crit_sect_int = 
+    {
+        .enter = nrf_802154_critical_section_enter,
+        .exit  = nrf_802154_critical_section_exit
+    };
+
     nrf_802154_ack_data_init();
     nrf_802154_core_init();
     nrf_802154_clock_init();
@@ -201,10 +207,10 @@ void nrf_802154_init(void)
     nrf_802154_notification_init();
     nrf_802154_lp_timer_init();
     nrf_802154_pib_init();
-    nrf_802154_priority_drop_init();
+    nrf_802154_rsch_prio_drop_init();
     nrf_802154_random_init();
     nrf_802154_request_init();
-    nrf_802154_rsch_crit_sect_init();
+    nrf_802154_rsch_crit_sect_init(&crit_sect_int);
     nrf_802154_rsch_init();
     nrf_802154_rx_buffer_init();
     nrf_802154_temperature_init();
