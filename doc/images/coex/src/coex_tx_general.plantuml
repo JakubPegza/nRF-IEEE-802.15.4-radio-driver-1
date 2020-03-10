@@ -53,9 +53,9 @@ radio is {-}
 @+10
 priority is $priority_rx
 
-'ACK transmission
+'ACK reception
 @+10
-radio is "TX ACK"
+radio is "RX ACK"
 
 'ACK reception finished
 @+30

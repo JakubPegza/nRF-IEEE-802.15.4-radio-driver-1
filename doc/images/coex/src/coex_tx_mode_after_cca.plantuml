@@ -45,7 +45,7 @@ radio is {-}
 drv is "CCA"
 radio is "CCA"
 @+10
-radio -> drv: \nChanel busy
+radio -> drv: \nChannel busy
 
 drv is "Backoff"
 radio is {-}
