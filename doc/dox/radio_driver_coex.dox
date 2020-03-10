@@ -1,0 +1,213 @@
+/**
+
+@page rd_coex Coexistence with other radios within single device
+
+@section rd_coex_introduction Introduction
+
+A SOC running 802.15.4 Radio Driver can be part of a compound device equipped with more radio
+modules. A device having both 802.15.4 radio and WiFi module is a typical example. Radios of
+the device can use different modulation types, protocols and overlapping frequency bands causing mutual
+operation disturbances. To address this issue SOC running 802.15.4 Radio Driver can cooperate
+with external Packet Traffic Arbiter (PTA) which responsibility is to allow the only one radio
+to transmit its packet at a time. Each party that would like to transmit a frame requests
+access to RF medium to the PTA before it transmits a frame. The PTA arbitrates between requests
+and grants access to the medium to the one of requesting parties. When a party actively receives
+a frame transmitted from elsewhere it also requests access to medium to increase chance of proper
+reception not interrupted by other parties which possibly cannot even detect incoming signal.
+
+@section rd_coex_three_pin_interface_overview 3-pin interface overview
+
+The coexistence interface connects 802.15.4 device with a PTA and consists of three lines:
+REQUEST, PRIORITY and GRANT.
+
+@image html coex/three_wire_iface.svg "3-pin coexistence interface"
+
+@li REQUEST pin is an output of the 802.15.4 device and input of the PTA. When this pin is active
+the 802.15.4 device requests the PTA for exclusive radio medium access. Active state is currently
+fixed to logic high. When coexistence interface is disabled this pin is driven low.
+Type of the output and the pin number to be used is configurable at compile time.
+
+@li PRIORITY pin is an output of the 802.15.4 device and input of the PTA. The 802.15.4 device uses
+this pin to inform the PTA about operation that the 802.15.4 is performing. This pin is driven low
+for transmit operations. For receive operations as well as during no 802.15.4 radio activity this
+pin is driven high. When coexistence interface is disabled this pin is driven high. Type of
+the output and the pin number to be used is configurable at compile time.
+
+@li GRANT pin is an input of the 802.15.4 device and output of the PTA. This pin is activated by
+the PTA when it grants access to the radio medium to the 802.15.4 device. Active state is
+currently fixed to low. The pin number to be used is configurable at compile time.
+
+@section rd_coex_reception_ops Operation during frame reception
+
+Following picture shows behavior of coexistence interface during a frame receive operation.
+
+@image html coex/coex_rx_general.png "Coexistence interface during reception of a frame (time not to scale)"
+
+When 802.15.4 device is in receive mode but no frame is being received REQUEST and PRIORITY
+signals remain inactive. GRANT signal is monitored but ignored. When a frame is being received
+PRIORITY is set to state indicating reception and REQUEST signal is activated. Precise moment
+of issuing request to the PTA depends on receive request mode (please refer to @ref rd_coex_run_time_config_rx_req_mode).
+The frame is being received regardless of GRANT signal activation by the PTA. When the frame is accepted
+by the 802.15.4 device and ACK is required, the PRIORITY line is set to sate indicating
+transmission. If GRANT line has been activated by the PTA and not revoked, the ACK frame
+is transmitted. If GRANT line has been not activated by the PTA or it has been revoked,
+the ACK frame is not transmitted, but received frame is passed to the next higher layer.
+
+@section rd_coex_transmission_ops Operation during frame transmission
+
+Following picture shows behavior of coexistence interface during a frame transmission.
+
+@image html coex/coex_tx_general.png "Coexistence interface during transmission of a frame (time not to scale)"
+
+When the 802.15.4 device is going to transmit a frame the PRIORITY line is set to state indicating
+transmission and REQUEST signal is activated. Precise moment of issuing request to the PTA
+depends on transmit request mode (please refer to @ref rd_coex_run_time_config_tx_req_mode).
+When the 802.15.4 device received GRANT signal it transmits the frame. If ACK frame is required
+for the transmitted frame the PRIORITY is set to state indicating reception. After ACK frame
+is received or ACK waiting timed out the REQUEST line is set to inactive state and PRIORITY
+line is set to its inactive state. The PTA revokes GRANT line then.
+The process of requesting to the PTA is executed for every transmission attempt. A transmission
+with full CSMA/CA medium access protocol is also considered a signle transmission attempt.
+
+@section rd_coex_compile_time_config Compile-time configuration options
+
+An integrator of the 802.15.4 Radio Driver source code can set a variety of options related
+to coexistence interface at compile-time by passing following defines to the compiler invocation.
+
+@li @c MPSL_COEX_3WIRE_REQUEST_GPIO_PIN
+Selects GPIO pin number of the SOC to be used as REQUEST output pin of the coexistence interface.
+Integrator should always define proper value as required by the PCB of the product.
+
+@li @c MPSL_COEX_3WIRE_REQUEST_GPIO_DRIVE
+Selects drive type of the REQUEST output pin. Please refer to the nrfx library (defined constants
+with identifiers starting with GPIO_PIN_CNF_DRIVE_) for possible values.
+Default value: @c GPIO_PIN_CNF_DRIVE_S0S1
+
+@li @c MPSL_COEX_3WIRE_REQUEST_GPIO_PULL
+Selects if internal pull-up/pull-down resistors of the SOC should be used for REQUEST pin.
+Please refer to the nrfx library (defined constants with identifiers starting with
+@c GPIO_PIN_CNF_PULL_) for possible values.
+Default value: @c GPIO_PIN_CNF_PULL_Disabled
+
+@li @c MPSL_COEX_3WIRE_PRIORITY_GPIO_PIN
+Selects GPIO pin number of the SOC to be used as PRIORITY output of the coexistence interface.
+Integrator should always define proper value as required by the PCB of the product.
+
+@li @c MPSL_COEX_3WIRE_PRIORITY_GPIO_DRIVE
+Selects drive type of the PRIORITY output pin. Please refer to the nrfx library (defined constants
+with identifiers starting with @c GPIO_PIN_CNF_DRIVE_) for possible values.
+Default value: @c GPIO_PIN_CNF_DRIVE_S0S1
+
+@li @c MPSL_COEX_3WIRE_PRIORITY_GPIO_PULL
+Selects if internal pull-up/pull-down resistors of the SOC should be used for PRIORITY pin.
+Please refer to the nrfx library (defined constants with identifiers starting with
+@c GPIO_PIN_CNF_PULL_) for possible values.
+Default value: @c GPIO_PIN_CNF_PULL_Disabled
+
+@li @c MPSL_COEX_3WIRE_GRANTED_GPIO_PIN
+Selects GPIO pin number of the SOC to be used as GRANT input of the coexistence interface.
+Integrator should always define proper value as required by the PCB of the product.
+
+@li @c MPSL_COEX_3WIRE_GRANTED_GPIOTE_CHANNEL
+Selects GPIOTE channel to be used for event and interrupt generation when GRANT input changes.
+Default value: @c 4
+
+@li @c NRF_802154_COEX_INITIALLY_ENABLED
+Selects if coexistence interface should be initially enabled at the initialization of the radio driver.
+
+@section rd_coex_run_time_config Run-time configuration options
+
+@subsection rd_coex_run_time_config_endi Enable and disable coexistence signaling
+The coexistence interface is initially enabled or disabled depending on compile-time configuration
+option @c NRF_802154_COEX_INITIALLY_ENABLED. The user can enable and disable the coexistence
+interface at run-time when the 802.15.4 Radio Driver is in sleep state. When the coexistence
+interface is disabled the output pins are driven to inactive state and state of the GRANT pin
+is ignored (please refer to @ref rd_coex_three_pin_interface_overview). The driver behaves like
+any request the driver would make to PTA is immediately granted but without issuing changes
+to coexistence interface pins.
+Responsible API calls: @c nrf_802154_wifi_coex_enable, @c nrf_802154_wifi_coex_disable
+
+@subsection rd_coex_run_time_config_rx_req_mode Receive request mode
+When the 802.15.4 device is receiving a frame, it may activate REQUEST signal to the PTA
+in a variety of reception phases. The receive request mode can be changed at run-time when
+the 802.15.4 Radio Driver is in sleep state by a call to @c nrf_802154_coex_rx_request_mode_set.
+The following modes are supported:
+@li @c NRF_802154_COEX_RX_REQUEST_MODE_ENERGY_DETECTION
+@li @c NRF_802154_COEX_RX_REQUEST_MODE_PREAMBLE
+@li @c NRF_802154_COEX_RX_REQUEST_MODE_DESTINED.
+
+Default receive request mode is @c NRF_802154_COEX_RX_REQUEST_MODE_DESTINED.
+
+Because of the nature of the 802.15.4 protocol the most precise decision about destination of a frame
+can be made at the latest moment of a frame reception. Therfore selection of certain receive request
+mode is a tradeof between requesting to the PTA for frames not destined to given device and
+a possibility of interfenece caused by other radio activity as a result of not requesting early enough.
+
+@subsubsection rd_coex_run_time_config_rx_req_mode_ENERGY_DETECTION NRF_802154_COEX_RX_REQUEST_MODE_ENERGY_DETECTION receive request mode
+In this mode the 802.15.4 device requests to the PTA on earliest signs of a frame being received over
+the air possible to detect by the SOC. This occurs usually during a reception of a preamble of a frame.
+Please note that SOC may occasionally interpret noise or other signals as 802.15.4
+preamble what results in spurious requests to the PTA. When such condition occurs the 802.15.4
+device revokes request. When full SHR and PHR are received correctly the frame reception
+is carried on with request activated.
+
+@image html coex/coex_rx_req_mode_energy_detection.png "Reception in NRF_802154_COEX_RX_REQUEST_MODE_ENERGY_DETECTION mode (time not to scale)"
+
+@subsubsection rd_coex_run_time_config_rx_req_mode_PREAMBLE NRF_802154_COEX_RX_REQUEST_MODE_PREAMBLE receive request mode
+In this mode the 802.15.4 device requests to the PTA when SHR and PHR fields of the frame
+is received. This mode is more robust to noise than
+@c NRF_802154_COEX_RX_REQUEST_MODE_ENERGY_DETECTION mode and has slightly less false positives.
+The request to the PTA is issued when 802.15.4 device does not know if the frame is destined to it yet.
+
+@image html coex/coex_rx_req_mode_preamble.png "Reception in NRF_802154_COEX_RX_REQUEST_MODE_PREAMBLE mode (time not to scale)"
+
+@subsubsection rd_coex_run_time_config_rx_req_mode_DESTINED NRF_802154_COEX_RX_REQUEST_MODE_DESTINED receive request mode
+In this mode the 802.15.4 device requests to the PTA when addressing information contained in PSDU
+is received and the 802.15.4 device is the recipient of the frame. Frames not destined to
+the device do not cause request to the PTA.
+
+@image html coex/coex_rx_req_mode_destined.png "Reception in NRF_802154_COEX_RX_REQUEST_MODE_DESTINED mode (time not to scale)"
+
+@subsection rd_coex_run_time_config_tx_req_mode Transmit request mode
+When the 802.15.4 device is transmitting a frame, it can activate REQUEST signal to a PTA
+in a variety of transmission phases. The transmit request mode can be changed at run-time when
+the 802.15.4 Radio Driver is in sleep state by a call to @c nrf_802154_coex_tx_request_mode_set.
+The following modes are supported:
+@li @c NRF_802154_COEX_TX_REQUEST_MODE_FRAME_READY
+@li @c NRF_802154_COEX_TX_REQUEST_MODE_CCA_START
+@li @c NRF_802154_COEX_TX_REQUEST_MODE_CCA_DONE.
+
+Default transmit request mode is @c NRF_802154_COEX_TX_REQUEST_MODE_FRAME_READY.
+
+@subsubsection rd_coex_run_time_config_tx_req_mode_FRAME_READY NRF_802154_COEX_TX_REQUEST_MODE_FRAME_READY transmit request mode
+In this mode the 802.15.4 device requests the PTA for transmission permission when the frame
+is passed for transmission by the next higher layer. This mode is based on approach to request
+as early as possible. For transmission using CSMA/CA the request is issued before initial backoff
+period and is held active for the whole CSMA/CA operation. For transmissions without CSMA/CA the
+request is issued before CCA operation. The waiting for the initial backoff period and the waiting for GRANT
+signal activation is done in parallel. If the GRANT is activated before initial backoff period ends, there is
+no impact on CSMA/CA timing. If the initial backoff passes but GRANT is not activated, the initial
+backoff period is extended until GRANT activation.
+
+@image html coex/coex_tx_mode_full_csmaca.png "Transmission in NRF_802154_COEX_TX_REQUEST_MODE_FRAME_READY mode (time not to scale)"
+
+@subsubsection rd_coex_run_time_config_tx_req_mode_CCA_START NRF_802154_COEX_TX_REQUEST_MODE_CCA_START transmit request mode
+In this mode the 802.15.4 device requests the PTA for transmission permission just before first
+CCA operation is to be executed. For transmission using CSMA/CA the request is issued after
+initial backoff period and is held active for the rest of CSMA/CA operation. For transmissions without
+CSMA/CA the request is issued before CCA operation and in this case there is no difference
+to NRF_802154_COEX_TX_REQUEST_MODE_FRAME_READY mode.
+
+@image html coex/coex_tx_mode_before_cca.png "Transmission in NRF_802154_COEX_TX_REQUEST_MODE_CCA_START mode (time not to scale)"
+
+@subsubsection rd_coex_run_time_config_tx_req_mode_CCA_DONE NRF_802154_COEX_TX_REQUEST_MODE_CCA_DONE transmit request mode
+In this mode the 802.15.4 device requests the PTA for transmission permission after CCA operation
+indicated the channel was idle and the transmission is already started. In this mode it is possible
+that 802.15.4 transmission will disturb transmission or reception being performed by other radios.
+The transmission can be performed by 802.15.4 device without GRANT activation issued by the PTA at all.
+If such transmission is eventually granted by the PTA the transmission is carried on. The PTA can deactivate
+GRANT line what will result in interruption of 802.15.4 transmission.
+
+@image html coex/coex_tx_mode_after_cca.png "Transmission in NRF_802154_COEX_TX_REQUEST_MODE_CCA_DONE mode (time not to scale)"
+
+*/
