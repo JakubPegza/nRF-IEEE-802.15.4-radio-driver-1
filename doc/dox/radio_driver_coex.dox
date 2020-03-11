@@ -8,7 +8,7 @@ A SOC running 802.15.4 Radio Driver can be part of a compound device equipped wi
 modules. A device having both 802.15.4 radio and WiFi module is a typical example. Radios of
 the device can use different modulation types, protocols and overlapping frequency bands causing mutual
 operation disturbances. To address this issue SOC running 802.15.4 Radio Driver can cooperate
-with external Packet Traffic Arbiter (PTA) which responsibility is to allow the only one radio
+with external Packet Traffic Arbiter (PTA, please refer to IEEE 802.15.2) which responsibility is to allow the only one radio
 to transmit its packet at a time. Each party that would like to transmit a frame requests
 access to RF medium to the PTA before it transmits a frame. The PTA arbitrates between requests
 and grants access to the medium to the one of requesting parties. When a party actively receives
@@ -23,7 +23,7 @@ REQUEST, PRIORITY and GRANT.
 @image html coex/three_wire_iface.svg "3-pin coexistence interface"
 
 @li REQUEST pin is an output of the 802.15.4 device and input of the PTA. When this pin is active
-the 802.15.4 device requests the PTA for exclusive radio medium access. Active state is currently
+the 802.15.4 device requests the PTA for radio medium access. Active state is currently
 fixed to logic high. When coexistence interface is disabled this pin is driven low.
 Type of the output and the pin number to be used is configurable at compile time.
 
@@ -48,7 +48,7 @@ signals remain inactive. GRANT signal is monitored but ignored. When a frame is 
 PRIORITY is set to state indicating reception and REQUEST signal is activated. Precise moment
 of issuing request to the PTA depends on receive request mode (please refer to @ref rd_coex_run_time_config_rx_req_mode).
 The frame is being received regardless of GRANT signal activation by the PTA. When the frame is accepted
-by the 802.15.4 device and ACK is required, the PRIORITY line is set to sate indicating
+by the 802.15.4 device and ACK is required, the PRIORITY line is set to state indicating
 transmission. If GRANT line has been activated by the PTA and not revoked, the ACK frame
 is transmitted. If GRANT line has been not activated by the PTA or it has been revoked,
 the ACK frame is not transmitted, but received frame is passed to the next higher layer.
@@ -67,7 +67,8 @@ for the transmitted frame the PRIORITY is set to state indicating reception. Aft
 is received or ACK waiting timed out the REQUEST line is set to inactive state and PRIORITY
 line is set to its inactive state. The PTA revokes GRANT line then.
 The process of requesting to the PTA is executed for every transmission attempt. A transmission
-with full CSMA/CA medium access protocol is also considered a signle transmission attempt.
+with full CSMA/CA medium access protocol can be considered a single transmission attempt,
+depending on selected transmit request mode.
 
 @section rd_coex_compile_time_config Compile-time configuration options
 
@@ -80,7 +81,7 @@ Integrator should always define proper value as required by the PCB of the produ
 
 @li @c MPSL_COEX_3WIRE_REQUEST_GPIO_DRIVE
 Selects drive type of the REQUEST output pin. Please refer to the nrfx library (defined constants
-with identifiers starting with GPIO_PIN_CNF_DRIVE_) for possible values.
+with identifiers starting with @c GPIO_PIN_CNF_DRIVE_) for possible values.
 Default value: @c GPIO_PIN_CNF_DRIVE_S0S1
 
 @li @c MPSL_COEX_3WIRE_REQUEST_GPIO_PULL
@@ -139,9 +140,9 @@ The following modes are supported:
 Default receive request mode is @c NRF_802154_COEX_RX_REQUEST_MODE_DESTINED.
 
 Because of the nature of the 802.15.4 protocol the most precise decision about destination of a frame
-can be made at the latest moment of a frame reception. Therfore selection of certain receive request
-mode is a tradeof between requesting to the PTA for frames not destined to given device and
-a possibility of interfenece caused by other radio activity as a result of not requesting early enough.
+can be made at the latest moment of a frame reception. Therefore selection of certain receive request
+mode is a trade-off between requesting to the PTA for frames not destined to given device and
+a possibility of interference caused by other radio activity as a result of not requesting early enough.
 
 @subsubsection rd_coex_run_time_config_rx_req_mode_ENERGY_DETECTION NRF_802154_COEX_RX_REQUEST_MODE_ENERGY_DETECTION receive request mode
 In this mode the 802.15.4 device requests to the PTA on earliest signs of a frame being received over
@@ -194,7 +195,9 @@ backoff period is extended until GRANT activation.
 @subsubsection rd_coex_run_time_config_tx_req_mode_CCA_START NRF_802154_COEX_TX_REQUEST_MODE_CCA_START transmit request mode
 In this mode the 802.15.4 device requests the PTA for transmission permission just before first
 CCA operation is to be executed. For transmission using CSMA/CA the request is issued after
-initial backoff period and is held active for the rest of CSMA/CA operation. For transmissions without
+initial backoff period and is held active for the rest of CSMA/CA operation. The 802.15.4 device will wait
+for GRANT signal activation before proceeding with CCA. This affects the timing of CSMA/CA operation
+by effectively extending initial backoff period. For transmissions without
 CSMA/CA the request is issued before CCA operation and in this case there is no difference
 to NRF_802154_COEX_TX_REQUEST_MODE_FRAME_READY mode.
 
