@@ -35,11 +35,13 @@
  */
 #define NRF_802154_MODULE_ID NRF_802154_MODULE_ID_ANT_DIVERSITY
 
+#include "nrf_802154_config.h"
+
+#if ENABLE_ANT_DIVERSITY
 #include "nrf_802154_ant_diversity.h"
 
 #include <assert.h>
 
-#include "nrf_802154_config.h"
 #include "nrf_802154_const.h"
 #include "nrf_802154_debug.h"
 #include "nrf_802154_peripherals.h"
@@ -88,18 +90,21 @@ static void ad_timer_init()
 #if ANT_DIVERSITY_PPI
 static void ad_ppi_and_gpiote_init()
 {
-    nrf_gpiote_task_configure(NRF_802154_ANT_DIVERSITY_GPIOTE_CHANNEL,
+    nrf_gpiote_task_configure(NRF_GPIOTE,
+                              NRF_802154_ANT_DIVERSITY_GPIOTE_CHANNEL,
                               m_ant_div_config.ant_sel_pin,
                               (nrf_gpiote_polarity_t)GPIOTE_CONFIG_POLARITY_Toggle,
                               (nrf_gpiote_outinit_t)(nrf_802154_ant_diversity_antenna_get() ?
                                                      NRF_GPIOTE_INITIAL_VALUE_HIGH :
                                                      NRF_GPIOTE_INITIAL_VALUE_LOW));
 
-    nrf_ppi_channel_endpoint_setup(ANT_DIV_PPI,
+    nrf_ppi_channel_endpoint_setup(NRF_PPI,
+                                   ANT_DIV_PPI,
                                    (uint32_t)nrf_timer_event_address_get(
                                        ANT_DIV_TIMER,
                                        NRF_TIMER_EVENT_COMPARE0),
-                                   (uint32_t)nrf_gpiote_task_addr_get(
+                                   (uint32_t)nrf_gpiote_task_address_get(
+                                       NRF_GPIOTE,
                                        NRF_802154_ANT_DIVERSITY_GPIOTE_TASK));
 }
 
@@ -174,7 +179,7 @@ static void ad_timer_rssi_configure()
     // Anomaly 78: CLEAR instead of STOP, SHUTDOWN triggered manually in IRQHandler.
     nrf_timer_shorts_enable(ANT_DIV_TIMER,
                             NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK);
-    nrf_timer_cc_write(ANT_DIV_TIMER,
+    nrf_timer_cc_set(ANT_DIV_TIMER,
                        NRF_TIMER_CC_CHANNEL0,
                        nrf_timer_us_to_ticks(RSSI_SETTLE_TIME_US, NRF_TIMER_FREQ_1MHz));
 
@@ -208,7 +213,7 @@ static void ad_timer_toggle_configure()
     nrf_timer_shorts_enable(ANT_DIV_TIMER,
                             NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK);
 
-    nrf_timer_cc_write(ANT_DIV_TIMER,
+    nrf_timer_cc_set(ANT_DIV_TIMER,
                        NRF_TIMER_CC_CHANNEL0,
                        nrf_timer_us_to_ticks((uint32_t)m_ant_div_config.toggle_time,
                                              NRF_TIMER_FREQ_1MHz));
@@ -220,8 +225,8 @@ static void ad_timer_toggle_configure()
     NVIC_ClearPendingIRQ(NRF_802154_ANT_DIVERSITY_TIMER_IRQN);
     NVIC_EnableIRQ(NRF_802154_ANT_DIVERSITY_TIMER_IRQN);
 #elif ANT_DIVERSITY_PPI
-    nrf_gpiote_task_enable(NRF_802154_ANT_DIVERSITY_GPIOTE_CHANNEL);
-    nrf_ppi_channel_enable(ANT_DIV_PPI);
+    nrf_gpiote_task_enable(NRF_GPIOTE, NRF_802154_ANT_DIVERSITY_GPIOTE_CHANNEL);
+    nrf_ppi_channel_enable(NRF_PPI, ANT_DIV_PPI);
 #else
 #error Antenna diversity variant unsupported or not implemented
 #endif
@@ -243,8 +248,8 @@ static void ad_timer_toggle_deconfigure()
     // Set GPIO output pin value to the same as currently set by GPIOTE module
     // This prevents pin switching after control of the pin is ceded by GPIOTE
     nrf_gpio_pin_write(m_ant_div_config.ant_sel_pin, nrf_802154_ant_diversity_antenna_get());
-    nrf_gpiote_task_disable(NRF_802154_ANT_DIVERSITY_GPIOTE_CHANNEL);
-    nrf_ppi_channel_disable(ANT_DIV_PPI);
+    nrf_gpiote_task_disable(NRF_GPIOTE, NRF_802154_ANT_DIVERSITY_GPIOTE_CHANNEL);
+    nrf_ppi_channel_disable(NRF_PPI, ANT_DIV_PPI);
 #else
 #error Antenna diversity variant unsupported or not implemented
 #endif
@@ -637,3 +642,5 @@ void NRF_802154_ANT_DIVERSITY_TIMER_IRQHANDLER()
     nrf_timer_event_clear(ANT_DIV_TIMER, NRF_TIMER_EVENT_COMPARE0);
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_LOW);
 }
+
+#endif //ENABLE_ANT_DIVERSITY

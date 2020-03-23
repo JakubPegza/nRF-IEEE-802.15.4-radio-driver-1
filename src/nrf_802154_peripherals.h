@@ -153,7 +153,7 @@ extern "C" {
 #define NRF_802154_ANT_DIVERSITY_GPIOTE_CHANNEL            4
 #endif
 
-#define NRF_802154_ANT_DIVERSITY_GPIOTE_TASK               NRFX_CONCAT_2(NRF_GPIOTE_TASKS_OUT_, \
+#define NRF_802154_ANT_DIVERSITY_GPIOTE_TASK               NRFX_CONCAT_2(NRF_GPIOTE_TASK_OUT_, \
                                                                          NRF_802154_ANT_DIVERSITY_GPIOTE_CHANNEL)
 
 #define NRF_802154_ANT_DIVERSITY_PPI_CHANNELS_USED_MASK    (1 << \
