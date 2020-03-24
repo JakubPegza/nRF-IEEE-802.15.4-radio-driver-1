@@ -536,6 +536,8 @@ extern "C" {
  * 
  * Selects PPI variant of antenna diversity.
  * Exclusive with @ref ANT_DIVERSITY_SW
+ * 
+ * @note ANT_DIVERSITY_PPI is currently the default variant of antenna diversity. 
  */
 /**
  * @def ANT_DIVERSITY_SW
@@ -544,6 +546,10 @@ extern "C" {
  * Exclusive with @ref ANT_DIVERSITY_PPI
  */
 #if ENABLE_ANT_DIVERSITY
+#if ANT_DIVERSITY_PPI && ANT_DIVERSITY_SW
+#error "ANT_DIVERSITY_PPI and ANT_DIVERSITY_SW are mutally exclusive"
+#endif // ANT_DIVERSITY_PPI && ANT_DIVERSITY_SW
+
 #if !ANT_DIVERSITY_PPI && !ANT_DIVERSITY_SW
 #define ANT_DIVERSITY_PPI 1
 #endif // !ANT_DIVERSITY_PPI && !ANT_DIVERSITY_SW

@@ -176,12 +176,12 @@ nrf_802154_ant_diversity_config_t nrf_802154_ant_diversity_config_get(void)
 
 static void ad_timer_rssi_configure()
 {
-    // Anomaly 78: CLEAR instead of STOP, SHUTDOWN triggered manually in IRQHandler.
+    // Anomaly 78: CLEAR instead of STOP, SHUTDOWN triggered manually.
     nrf_timer_shorts_enable(ANT_DIV_TIMER,
                             NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK);
     nrf_timer_cc_set(ANT_DIV_TIMER,
-                       NRF_TIMER_CC_CHANNEL0,
-                       nrf_timer_us_to_ticks(RSSI_SETTLE_TIME_US, NRF_TIMER_FREQ_1MHz));
+                     NRF_TIMER_CC_CHANNEL0,
+                     nrf_timer_us_to_ticks(RSSI_SETTLE_TIME_US, NRF_TIMER_FREQ_1MHz));
 
     nrf_timer_int_enable(ANT_DIV_TIMER, NRF_TIMER_INT_COMPARE0_MASK);
 
@@ -195,7 +195,7 @@ static void ad_timer_rssi_configure()
 
 static void ad_timer_rssi_deconfigure()
 {
-    // Anomaly 78: CLEAR instead of STOP, SHUTDOWN triggered manually in IRQHandler.
+    // Anomaly 78: CLEAR instead of STOP, SHUTDOWN triggered manually.
     nrf_timer_shorts_disable(ANT_DIV_TIMER,
                              NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK);
     nrf_timer_int_disable(ANT_DIV_TIMER, NRF_TIMER_INT_COMPARE0_MASK);
@@ -214,9 +214,9 @@ static void ad_timer_toggle_configure()
                             NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK);
 
     nrf_timer_cc_set(ANT_DIV_TIMER,
-                       NRF_TIMER_CC_CHANNEL0,
-                       nrf_timer_us_to_ticks((uint32_t)m_ant_div_config.toggle_time,
-                                             NRF_TIMER_FREQ_1MHz));
+                     NRF_TIMER_CC_CHANNEL0,
+                     nrf_timer_us_to_ticks((uint32_t)m_ant_div_config.toggle_time,
+                                           NRF_TIMER_FREQ_1MHz));
 
 #if ANT_DIVERSITY_SW
     nrf_timer_int_enable(ANT_DIV_TIMER, NRF_TIMER_INT_COMPARE0_MASK);
