@@ -1,4 +1,5 @@
 add_library(radio_driver src/nrf_802154.c
+                         src/nrf_802154_ant_diversity.c
                          src/nrf_802154_core.c
                          src/nrf_802154_core_hooks.c
                          src/nrf_802154_critical_section.c
