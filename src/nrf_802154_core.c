@@ -1385,8 +1385,6 @@ void nrf_802154_trx_receive_ack_started(void)
 
 static void on_rx_prestarted_timeout(void * p_context)
 {
-    bool in_crit_sect;
-
     (void)p_context;
 
     /* If we were in critical section this handler would not be called.
@@ -1403,9 +1401,7 @@ static void on_rx_prestarted_timeout(void * p_context)
      * priority change to be called by nrf_802154_critical_section_exit.
      */
 
-    in_crit_sect = nrf_802154_critical_section_enter();
-    assert(in_crit_sect);
-    (void)in_crit_sect;
+    nrf_802154_critical_section_forcefully_enter();
 
 #if ENABLE_ANT_DIVERSITY
     nrf_802154_ant_diversity_preamble_timeout_notify();
