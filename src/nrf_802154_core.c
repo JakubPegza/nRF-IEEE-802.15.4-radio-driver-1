@@ -1399,6 +1399,12 @@ static void on_rx_prestarted_timeout(void * p_context)
      * - The only related interrupt that can preempt this handler while it owns critical section
      * is from raal timeslot margin, which will fail to enter critical section and schedule
      * priority change to be called by nrf_802154_critical_section_exit.
+     * 
+     * Critical section is entered forcefully here nonetheless, due to a rare issue with 
+     * nrf_802154_critical_section_exit being preempted before the nested critical section counter 
+     * could be decremented. Allowing for critical section nesting here resolves the problem.
+     * TODO: After the bug is fixed, change to nrf_802154_critical_section_enter and check if 
+     * critical section was successfully entered.
      */
 
     nrf_802154_critical_section_forcefully_enter();
