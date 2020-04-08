@@ -318,7 +318,7 @@ nrf_802154_ant_diversity_mode_t nrf_802154_antenna_diversity_tx_mode_get(void)
 bool nrf_802154_antenna_diversity_rx_antenna_set(nrf_802154_ant_diversity_antenna_t antenna)
 {
     bool result         = nrf_802154_pib_ant_diversity_rx_antenna_set(antenna);
-    bool is_manual_mode = nrf_802154_pib_ant_diversity_rx_mode_get() == NRF_802154_ANT_DIVERSITY_MODE_MANUAL
+    bool is_manual_mode = nrf_802154_pib_ant_diversity_rx_mode_get() == NRF_802154_ANT_DIVERSITY_MODE_MANUAL;
     if (result && is_manual_mode)
     {
         nrf_802154_request_antenna_update();
@@ -335,7 +335,7 @@ nrf_802154_ant_diversity_antenna_t nrf_802154_antenna_diversity_rx_antenna_get(v
 bool nrf_802154_antenna_diversity_tx_antenna_set(nrf_802154_ant_diversity_antenna_t antenna)
 {
     bool result         = nrf_802154_pib_ant_diversity_tx_antenna_set(antenna);
-    bool is_manual_mode = nrf_802154_pib_ant_diversity_tx_mode_get() == NRF_802154_ANT_DIVERSITY_MODE_MANUAL
+    bool is_manual_mode = nrf_802154_pib_ant_diversity_tx_mode_get() == NRF_802154_ANT_DIVERSITY_MODE_MANUAL;
 
     if (result && is_manual_mode)
     {
