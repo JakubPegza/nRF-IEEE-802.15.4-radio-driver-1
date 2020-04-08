@@ -43,8 +43,8 @@
 #include "nrf_802154_swi.h"
 #include "nrf_802154_utils.h"
 
-#include "nrf_egu.h"
-#include "nrf_radio.h"
+#include <hal/nrf_egu.h>
+#include <hal/nrf_radio.h>
 
 #include "nrf_802154_procedures_duration.h"
 #include "nrf_802154_critical_section.h"
