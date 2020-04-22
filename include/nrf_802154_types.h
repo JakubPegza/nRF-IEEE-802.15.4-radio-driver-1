@@ -48,7 +48,7 @@
 /**
  * @brief States of the driver.
  */
-typedef uint8_t nrf_802154_state_t;
+typedef uint32_t nrf_802154_state_t;
 
 #define NRF_802154_STATE_INVALID            0x01 // !< Radio in an invalid state.
 #define NRF_802154_STATE_SLEEP              0x02 // !< Radio in the sleep state.
@@ -76,7 +76,7 @@ typedef uint32_t nrf_802154_ret_t;
 #define NRF_802154_RET_RUNTIME_ERROR   0x07 // !< Runtime error occured (for example, CPU was held for too long).
 #define NRF_802154_RET_TIMESLOT_ENDED  0x08 // !< Radio timeslot ended during the requested procedure.
 #define NRF_802154_RET_TIMESLOT_DENIED 0x09 // !< Operation did not start due to a denied timeslot request.
-#define NRF_802154_RET_TIMEOUT         0x0A // !< Requested timeslot ended.
+#define NRF_802154_RET_TIMEOUT         0x0A // !< Time window requested for the operation has elapsed.
 #define NRF_802154_RET_BUSY_CHANNEL    0x0B // !< Channel was busy before the transmission.
 #define NRF_802154_RET_INVALID_ACK     0x0C // !< Received ACK frame is other than expected.
 #define NRF_802154_RET_NO_ACK          0x0D // !< ACK frame was not received during the timeout period.
@@ -120,7 +120,7 @@ typedef uint32_t nrf_802154_cfg_par_t;
 /** The short address that identifies the device in the PAN.
  *
  * The value pointer must point to an uint8_t array containing 2 elements.
- * The value is little endian.
+ * The value is little-endian.
  * This parameter is defined in the IEEE 802.15.4 specification as macShortAddress.
  */
 #define NRF_802154_CFG_PAR_SHORT_ADDR        0x03
@@ -128,7 +128,7 @@ typedef uint32_t nrf_802154_cfg_par_t;
 /** The extended address assigned to the device.
  *
  * The value pointer must point to an uint8_t array containing 8 elements.
- * The value is little endian.
+ * The value is little-endian.
  * This parameter is defined in the IEEE 802.15.4 specification as macExtendedAddress.
  */
 #define NRF_802154_CFG_PAR_EXT_ADDR          0x04
@@ -297,23 +297,22 @@ typedef uint32_t nrf_802154_cfg_par_t;
  */
 typedef uint32_t nrf_802154_addr_type_t;
 
-#define NRF_802154_ADDR_EXTENDED 0x00 // !< Extended address (8 bytes)
-#define NRF_802154_ADDR_SHORT    0x01 // !< Short address (2 bytes)
+#define NRF_802154_ADDR_TYPE_EXTENDED 0x00 // !< Extended address (8 bytes)
+#define NRF_802154_ADDR_TYPE_SHORT    0x01 // !< Short address (2 bytes)
 //!@}
 
 //!@{
 /**
- * @brief Algorithms setting Pending Bit in ACK frames.
+ * @brief Algorithms for setting Pending Bit in ACK frames.
  *
  * You can use one of the following methods that can be set during the initialization phase
  * by calling @ref nrf_802154_cfg_set with @ref NRF_802154_CFG_PAR_ACK_PB_METHOD parameter:
- *   - Disabled: @ref NRF_802154_ACK_PB_METHOD_DISABLED -- The pending bit is always set.
- *   - For Thread: @ref NRF_802154_ACK_PB_METHOD_THREAD -- The pending bit is set only for the
- *     addresses found in the list.
- *   - For Zigbee: @ref NRF_802154_ACK_PB_METHOD_BLACKLIST -- The pending bit is cleared only for
- *     the short addresses found in the list.\n
- *     This method does not set pending bit in an ACK sent as a response to non-command and
- *     non-data-request frames.
+ *   - @ref NRF_802154_ACK_PB_METHOD_DISABLED -- The pending bit is always set.
+ *   - @ref NRF_802154_ACK_PB_METHOD_THREAD -- The pending bit is set only for the addresses found
+ *     in the list. This method meets Thread protocl requirements.
+ *   - @ref NRF_802154_ACK_PB_METHOD_BLACKLIST -- The pending bit is cleared only for the addresses
+ *     found in the list. This method does not set pending bit in an ACK sent as a response to
+ *     non-command and non-data-request frames. This method meets Zigbee protocol requirements.
  */
 typedef uint32_t nrf_802154_ack_pb_method_t;
 
@@ -322,7 +321,7 @@ typedef uint32_t nrf_802154_ack_pb_method_t;
 
 /** Pending bit is set only for the addresses found in the list.
  *
- * This method is compliant with Thread 1.2 specification (and proved to work with the devices
+ * This method meets Thread 1.2 specification requirements (and is proved to work with the devices
  * implementing earlier Thread specifications).
  * It is not strictly following IEEE 802.15.4-2015 standard. The pending bit field is set in
  * an Ack sent as a response to any frame (including data frames and all command frames) if the
@@ -333,7 +332,7 @@ typedef uint32_t nrf_802154_ack_pb_method_t;
 /** Pending bit is set only in an ACK sent as a response to the data poll command, unless the
  * address is found in the list.
  *
- * This method is compliant with IEEE 802.15.4-2015 standard:
+ * This method meets the IEEE 802.15.4-2015 specification requirements:
  * - 6.7.3 "Extracting pending data from a coordinator"
  * - 7.2.1.3 "Frame Pending bit"
  * - 7.3.3 "Ack frame format"
@@ -348,12 +347,12 @@ typedef uint32_t nrf_802154_ack_pb_method_t;
 /**
  * @brief Types of data that can be set in an ACK message.
  */
-typedef uint8_t nrf_802154_ack_data_t;
+typedef uint32_t nrf_802154_ack_data_t;
 
 /** Pending bit in an ACK frame.
  *
  * The p_data field in the @ref nrf_802154_ack_data_metadata_t shall be set to NULL and considered
- * irrelevant. The length field shall be set to NULL and considered ireelevant.
+ * irrelevant. The length field shall be set to NULL and considered irrelevant.
  */
 #define NRF_802154_ACK_DATA_PENDING_BIT 0x00
 
@@ -371,7 +370,7 @@ typedef uint8_t nrf_802154_ack_data_t;
 /**
  * @brief Type of CCA mode.
  */
-typedef uint8_t nrf_802154_cca_mode_t;
+typedef uint32_t nrf_802154_cca_mode_t;
 
 #define NRF_802154_CCA_MODE_1     0x00 // !< Energy Above Threshold. Will report busy whenever energy is detected above set threshold.
 #define NRF_802154_CCA_MODE_2     0x01 // !< Carrier Sense Only. Will report busy whenever compliant IEEE 802.15.4 signal is seen.
@@ -399,11 +398,11 @@ typedef struct
 /**
  * @brief Type containing selected transmission procedure.
  */
-typedef uint8_t nrf_802154_tx_procedure_t;
+typedef uint32_t nrf_802154_tx_procedure_t;
 
-#define NRF_802154_TX_PROCEDURE_SIMPLE 0  // !< Just transmit the data, without checking channel status.
-#define NRF_802154_TX_PROCEDURE_CCA    1  // !< Perform the CCA procedure before transmission.
-#define NRF_802154_TX_PROCEDURE_CSMACA 2  // !< Perform the CSMA-CA procedure before transmittion.
+#define NRF_802154_TX_PROCEDURE_SIMPLE 0x00  // !< Just transmit the data, without checking channel status.
+#define NRF_802154_TX_PROCEDURE_CCA    0x01  // !< Perform the CCA procedure before transmission.
+#define NRF_802154_TX_PROCEDURE_CSMACA 0x02  // !< Perform the CSMA-CA procedure before transmittion.
 //!@}
 
 //!@{
@@ -415,7 +414,7 @@ typedef uint8_t nrf_802154_tx_procedure_t;
  * - @ref NRF_802154_COEX_RX_REQUEST_MODE_PREAMBLE,
  * - @ref NRF_802154_COEX_RX_REQUEST_MODE_DESTINED
  */
-typedef uint8_t nrf_802154_coex_rx_request_mode_t;
+typedef uint32_t nrf_802154_coex_rx_request_mode_t;
 
 #define NRF_802154_COEX_RX_REQUEST_MODE_ENERGY_DETECTION 0x01 // !< Coex requests to arbiter in receive mode upon energy detected.
 #define NRF_802154_COEX_RX_REQUEST_MODE_PREAMBLE         0x02 // !< Coex requests to arbiter in receive mode upon preamble reception.
@@ -431,7 +430,7 @@ typedef uint8_t nrf_802154_coex_rx_request_mode_t;
  * - @ref NRF_802154_COEX_TX_REQUEST_MODE_CCA_START,
  * - @ref NRF_802154_COEX_TX_REQUEST_MODE_CCA_DONE
  */
-typedef uint8_t nrf_802154_coex_tx_request_mode_t;
+typedef uint32_t nrf_802154_coex_tx_request_mode_t;
 
 #define NRF_802154_COEX_TX_REQUEST_MODE_FRAME_READY 0x01 // !< Coex requests to arbiter in transmit mode when the frame is ready to be transmitted.
 #define NRF_802154_COEX_TX_REQUEST_MODE_CCA_START   0x02 // !< Coex requests to arbiter in transmit mode before CCA is started.
@@ -447,7 +446,7 @@ typedef uint8_t nrf_802154_coex_tx_request_mode_t;
  * - @ref NRF_802154_IFS_MODE_MATCHING_ADDRESSES,
  * - @ref NRF_802154_IFS_MODE_ALWAYS
  */
-typedef uint8_t nrf_802154_ifs_mode_t;
+typedef uint32_t nrf_802154_ifs_mode_t;
 
 #define NRF_802154_IFS_MODE_DISABLED           0x00 // !< Interframe spacing is never inserted.
 #define NRF_802154_IFS_MODE_MATCHING_ADDRESSES 0x01 // !< Interframe spacing is inserted only on matching addresses.
@@ -463,7 +462,7 @@ typedef uint8_t nrf_802154_ifs_mode_t;
  * - @ref NRF_802154_ANT_DIVERSITY_MODE_MANUAL,
  * - @ref NRF_802154_ANT_DIVERSITY_MODE_AUTO
  */
-typedef uint8_t nrf_802154_ant_diversity_mode_t;
+typedef uint32_t nrf_802154_ant_diversity_mode_t;
 
 #define NRF_802154_ANT_DIVERSITY_MODE_DISABLED 0x00 // !< Antenna diversity is disabled - Antenna will not be controlled by ant_diversity module. While in this mode, current antenna is unspecified.
 #define NRF_802154_ANT_DIVERSITY_MODE_MANUAL   0x01 // !< Antenna is selected manually
@@ -472,14 +471,14 @@ typedef uint8_t nrf_802154_ant_diversity_mode_t;
 
 //!@{
 /**
- * @brief Available antennas
+ * @brief Available antennas.
  *
  * Possible values:
  * - @ref NRF_802154_ANT_DIVERSITY_ANTENNA_NONE
  * - @ref NRF_802154_ANT_DIVERSITY_ANTENNA_1,
  * - @ref NRF_802154_ANT_DIVERSITY_ANTENNA_2,
  */
-typedef uint8_t nrf_802154_ant_diversity_antenna_t;
+typedef uint32_t nrf_802154_ant_diversity_antenna_t;
 
 #define NRF_802154_ANT_DIVERSITY_ANTENNA_NONE 0x00 // !< Used to indicate that antenna for the last reception was not selected via antenna diversity algorithm.
 #define NRF_802154_ANT_DIVERSITY_ANTENNA_1    0x01 // !< First antenna
@@ -539,7 +538,7 @@ typedef struct
 } nrf_802154_stat_totals_t;
 
 /**
- * @brief Type of structure holding statistics about the Radio Driver behavior.
+ * @brief Type of structure holding the Radio Driver statistics.
  */
 typedef struct
 {

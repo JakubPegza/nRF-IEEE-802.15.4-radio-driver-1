@@ -82,9 +82,9 @@ typedef struct
  * This function initializes the RADIO peripheral in the @ref RADIO_STATE_SLEEP state.
  *
  * This function is to be called once, before any other functions from this module. Calling this
- * function again without calling @ref nrf_802154_deinit earlier results in undefined behavior.
+ * function again without calling @ref nrf_802154_uninit earlier results in undefined behavior.
  *
- * To reinitialize the module with different configuration call @ref nrf_802154_deinit and
+ * To reinitialize the module with different configuration call @ref nrf_802154_uninit and
  * @ref nrf_802154_init again with new configuration.
  *
  * @param[in] p_cfg  Structure with initialization parameters of the module. Default initialization
@@ -95,9 +95,9 @@ void nrf_802154_init(const nrf_802154_init_cfg_t * p_cfg);
 /**
  * @brief Deinitialize the 802.15.4 driver.
  *
- * This function deinitializes the RADIO peripheral and resets it to the default state.
+ * This function uninitializes the RADIO peripheral and resets it to the default state.
  */
-void nrf_802154_deinit(void);
+void nrf_802154_uninit(void);
 
 #if !NRF_802154_INTERNAL_RADIO_IRQ_HANDLING
 /**
@@ -938,6 +938,9 @@ static inline void nrf_802154_transmit_at_metadata_init(
  *                        should exclude PHR or FCS fields of the 802.15.4 frame.
  * @param[in]  length     Length of the given frame. This value must exclude PHR and FCS fields
  *                        from the given frame (exact size of buffer pointed to by @p p_data).
+ * @param[in]  time       Absolute target time when the transmission procedure is requested to
+ *                        start, in microseconds (us). The first symbol of the preamble starts
+ *                        transmission at requested time.
  * @param[in]  p_metadata Metadata describing the transmission procedure. If NULL the default
  *                        metadata like created with @ref nrf_802154_transmit_at_metadata_init are
  *                        used.
