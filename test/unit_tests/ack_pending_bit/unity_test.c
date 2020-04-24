@@ -32,25 +32,8 @@
 #include "unity.h"
 
 #include "nrf_802154_config.h"
-#include "nrf_802154_const.h"
-#include "mock_nrf_radio.h"
-#include "mock_nrf_802154.h"
-#include "mock_nrf_802154_ack_generator.h"
-#include "mock_nrf_802154_core_hooks.h"
-#include "mock_nrf_802154_critical_section.h"
-#include "mock_nrf_802154_debug.h"
-#include "mock_nrf_802154_filter.h"
+
 #include "mock_nrf_802154_frame_parser.h"
-#include "mock_nrf_802154_notification.h"
-#include "mock_nrf_802154_pib.h"
-#include "mock_nrf_802154_priority_drop.h"
-#include "mock_nrf_802154_procedures_duration.h"
-#include "mock_nrf_802154_request.h"
-#include "mock_nrf_802154_rsch.h"
-#include "mock_nrf_802154_rsch_crit_sect.h"
-#include "mock_nrf_802154_rssi.h"
-#include "mock_nrf_802154_rx_buffer.h"
-#include "mock_nrf_802154_timer_coord.h"
 
 #ifdef NRF_802154_PENDING_SHORT_ADDRESSES
     #undef NRF_802154_PENDING_SHORT_ADDRESSES
@@ -949,9 +932,9 @@ void test_ShouldSetAckPendingBit(void)
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &src_addr_extended, test_addr_extended_1);
-    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
+    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &src_addr_extended, test_addr_extended_1);
+    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
 
     result = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_extended);
     TEST_ASSERT_FALSE(result);
@@ -961,9 +944,9 @@ void test_ShouldSetAckPendingBit(void)
     TEST_ASSERT_TRUE(result);
 
 
-    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &src_addr_extended, test_addr_extended_1);
-    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
+    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &src_addr_extended, test_addr_extended_1);
+    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
 
     result = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_extended);
     TEST_ASSERT_TRUE(result);
@@ -972,9 +955,9 @@ void test_ShouldSetAckPendingBit(void)
 
     src_addr_extended = false;
 
-    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &src_addr_extended, test_addr_short_1);
-    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
+    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &src_addr_extended, test_addr_short_1);
+    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
 
     result = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_FALSE(result);
@@ -984,10 +967,21 @@ void test_ShouldSetAckPendingBit(void)
     TEST_ASSERT_TRUE(result);
 
 
-    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &src_addr_extended, test_addr_short_1);
-    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
+    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &src_addr_extended, test_addr_short_1);
+    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
 
     result = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_TRUE(result);
+}
+
+/* It is required to be added to each test. That is because unity is using
+ * different main signature (returns int) and zephyr expects main which does
+ * not return value.
+ */
+extern int unity_main(void);
+
+void main(void)
+{
+	(void)unity_main();
 }
