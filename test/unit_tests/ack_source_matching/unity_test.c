@@ -1,38 +1,14 @@
 /*
- * Copyright (c) 2019 - 2020, Nordic Semiconductor ASA
- * All rights reserved.
+ * Copyright (c) 2020 Nordic Semiconductor ASA. All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its
- *    contributors may be used to endorse or promote products derived from this
- *    software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY, AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * The information contained herein is confidential property of Nordic Semiconductor ASA.
+ * The use, copying, transfer or disclosure of such information is prohibited except by
+ * express written agreement with Nordic Semiconductor ASA.
  */
 
 #include "unity.h"
 
 #include "nrf_802154_const.h"
-#include "mock_nrf_802154.h"
 #include "mock_nrf_802154_frame_parser.h"
 
 #include "mac_features/ack_generator/nrf_802154_ack_data.c"
@@ -118,9 +94,9 @@ void test_ThreadPendingDisabled()
     nrf_802154_ack_data_enable(false);
     test_extended_flag = false;
 
-    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &test_extended_flag, test_addr_short_1);
-    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&test_extended_flag);
+    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &test_extended_flag, test_addr_short_1);
+    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&test_extended_flag);
 
     res = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_TRUE(res);
@@ -133,9 +109,9 @@ void test_ThreadSourceAddressNULL()
     nrf_802154_ack_data_src_addr_matching_method_set(NRF_802154_SRC_ADDR_MATCH_THREAD);
     test_extended_flag = false;
 
-    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &test_extended_flag, NULL);
-    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&test_extended_flag);
+    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &test_extended_flag, NULL);
+    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&test_extended_flag);
 
     res = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_TRUE(res);
@@ -151,9 +127,9 @@ void test_ThreadShortAddressOnList()
     res = nrf_802154_ack_data_for_addr_set(test_addr_short_1, test_extended_flag, NRF_802154_ACK_DATA_PENDING_BIT, NULL, 0);
     TEST_ASSERT_TRUE(res);
 
-    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &test_extended_flag, test_addr_short_1);
-    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&test_extended_flag);
+    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &test_extended_flag, test_addr_short_1);
+    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&test_extended_flag);
 
     res = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_TRUE(res);
@@ -169,9 +145,9 @@ void test_ThreadExtAddressOnList()
     res = nrf_802154_ack_data_for_addr_set(test_addr_extended_1, test_extended_flag, NRF_802154_ACK_DATA_PENDING_BIT, NULL, 0);
     TEST_ASSERT_TRUE(res);
 
-    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &test_extended_flag, test_addr_extended_1);
-    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&test_extended_flag);
+    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &test_extended_flag, test_addr_extended_1);
+    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&test_extended_flag);
 
     res = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_extended);
     TEST_ASSERT_TRUE(res);
@@ -184,9 +160,9 @@ void test_ThreadShortAddressNotOnList()
     nrf_802154_ack_data_src_addr_matching_method_set(NRF_802154_SRC_ADDR_MATCH_THREAD);
     test_extended_flag = false;
 
-    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &test_extended_flag, test_addr_short_1);
-    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&test_extended_flag);
+    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &test_extended_flag, test_addr_short_1);
+    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&test_extended_flag);
 
     res = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_FALSE(res);
@@ -199,9 +175,9 @@ void test_ThreadExtAddressNotOnList()
     nrf_802154_ack_data_src_addr_matching_method_set(NRF_802154_SRC_ADDR_MATCH_THREAD);
     test_extended_flag = true;
 
-    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &test_extended_flag, test_addr_extended_1);
-    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&test_extended_flag);
+    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &test_extended_flag, test_addr_extended_1);
+    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&test_extended_flag);
 
     res = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_extended);
     TEST_ASSERT_FALSE(res);
@@ -224,9 +200,9 @@ void test_ZigbeeParseFailed()
     bool res;
     nrf_802154_ack_data_src_addr_matching_method_set(NRF_802154_SRC_ADDR_MATCH_ZIGBEE);
 
-    nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_short, &test_mhr_data_short, false);
-    nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
-    nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_short);
+    __wrap_nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_short, &test_mhr_data_short, false);
+    __wrap_nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
+    __wrap_nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_short);
 
     res = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_TRUE(res);
@@ -239,9 +215,9 @@ void test_ZigbeeTypeNotCommand()
     nrf_802154_ack_data_src_addr_matching_method_set(NRF_802154_SRC_ADDR_MATCH_ZIGBEE);
     test_psdu_short[FRAME_TYPE_OFFSET] = FCF_BYTE_0_DATA;
 
-    nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_short, &test_mhr_data_short, true);
-    nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
-    nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_short);
+    __wrap_nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_short, &test_mhr_data_short, true);
+    __wrap_nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
+    __wrap_nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_short);
 
     res = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_FALSE(res);
@@ -257,9 +233,9 @@ void test_ZigbeeCommandNotRequest()
     // Short
     test_psdu_short[test_mhr_data_short.addressing_end_offset] = MAC_CMD_BEACON_REQ;
 
-    nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_short, &test_mhr_data_short, true);
-    nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
-    nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_short);
+    __wrap_nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_short, &test_mhr_data_short, true);
+    __wrap_nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
+    __wrap_nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_short);
 
     res = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_FALSE(res);
@@ -267,9 +243,9 @@ void test_ZigbeeCommandNotRequest()
     // Extended
     test_psdu_extended[test_mhr_data_extended.addressing_end_offset] = MAC_CMD_BEACON_REQ;
 
-    nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_extended, &test_mhr_data_extended, true);
-    nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
-    nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_extended);
+    __wrap_nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_extended, &test_mhr_data_extended, true);
+    __wrap_nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
+    __wrap_nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_extended);
 
     res = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_extended);
     TEST_ASSERT_FALSE(res);
@@ -286,9 +262,9 @@ void test_ZigbeeAddressOnList()
     res = nrf_802154_ack_data_for_addr_set(test_addr_short_1, test_extended_flag, NRF_802154_ACK_DATA_PENDING_BIT, NULL, 0);
     TEST_ASSERT_TRUE(res);
 
-    nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_short, &test_mhr_data_short, true);
-    nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
-    nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_short);
+    __wrap_nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_short, &test_mhr_data_short, true);
+    __wrap_nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
+    __wrap_nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_short);
 
     res = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_FALSE(res);
@@ -298,9 +274,9 @@ void test_ZigbeeAddressOnList()
     res = nrf_802154_ack_data_for_addr_set(test_addr_extended_1, test_extended_flag, NRF_802154_ACK_DATA_PENDING_BIT, NULL, 0);
     TEST_ASSERT_TRUE(res);
 
-    nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_extended, &test_mhr_data_extended, true);
-    nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
-    nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_extended);
+    __wrap_nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_extended, &test_mhr_data_extended, true);
+    __wrap_nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
+    __wrap_nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_extended);
 
     res = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_extended);
     TEST_ASSERT_TRUE(res);
@@ -316,9 +292,9 @@ void test_ZigbeeAddressNotOnList()
     // Short
     test_extended_flag = false;
 
-    nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_short, &test_mhr_data_short, true);
-    nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
-    nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_short);
+    __wrap_nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_short, &test_mhr_data_short, true);
+    __wrap_nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
+    __wrap_nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_short);
 
     res = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_TRUE(res);
@@ -326,10 +302,12 @@ void test_ZigbeeAddressNotOnList()
     // Extended
     test_extended_flag = true;
 
-    nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_extended, &test_mhr_data_extended, true);
-    nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
-    nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_extended);
+    __wrap_nrf_802154_frame_parser_mhr_parse_ExpectAndReturn(test_psdu_extended, &test_mhr_data_extended, true);
+    __wrap_nrf_802154_frame_parser_mhr_parse_IgnoreArg_p_fields();
+    __wrap_nrf_802154_frame_parser_mhr_parse_ReturnThruPtr_p_fields(&test_mhr_data_extended);
 
     res = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_extended);
     TEST_ASSERT_TRUE(res);
 }
+
+UNITY_TEST_MAIN()

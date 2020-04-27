@@ -1,56 +1,16 @@
 /*
- * Copyright (c) 2018 - 2020, Nordic Semiconductor ASA
- * All rights reserved.
+ * Copyright (c) 2020 Nordic Semiconductor ASA. All Rights Reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its
- *    contributors may be used to endorse or promote products derived from this
- *    software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY, AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * The information contained herein is confidential property of Nordic Semiconductor ASA.
+ * The use, copying, transfer or disclosure of such information is prohibited except by
+ * express written agreement with Nordic Semiconductor ASA.
  */
 
 #include "unity.h"
 
 #include "nrf_802154_config.h"
-#include "nrf_802154_const.h"
-#include "mock_nrf_radio.h"
-#include "mock_nrf_802154.h"
-#include "mock_nrf_802154_ack_generator.h"
-#include "mock_nrf_802154_core_hooks.h"
-#include "mock_nrf_802154_critical_section.h"
-#include "mock_nrf_802154_debug.h"
-#include "mock_nrf_802154_filter.h"
+
 #include "mock_nrf_802154_frame_parser.h"
-#include "mock_nrf_802154_notification.h"
-#include "mock_nrf_802154_pib.h"
-#include "mock_nrf_802154_priority_drop.h"
-#include "mock_nrf_802154_procedures_duration.h"
-#include "mock_nrf_802154_request.h"
-#include "mock_nrf_802154_rsch.h"
-#include "mock_nrf_802154_rsch_crit_sect.h"
-#include "mock_nrf_802154_rssi.h"
-#include "mock_nrf_802154_rx_buffer.h"
-#include "mock_nrf_802154_timer_coord.h"
 
 #ifdef NRF_802154_PENDING_SHORT_ADDRESSES
     #undef NRF_802154_PENDING_SHORT_ADDRESSES
@@ -949,9 +909,9 @@ void test_ShouldSetAckPendingBit(void)
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &src_addr_extended, test_addr_extended_1);
-    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
+    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &src_addr_extended, test_addr_extended_1);
+    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
 
     result = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_extended);
     TEST_ASSERT_FALSE(result);
@@ -961,9 +921,9 @@ void test_ShouldSetAckPendingBit(void)
     TEST_ASSERT_TRUE(result);
 
 
-    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &src_addr_extended, test_addr_extended_1);
-    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
+    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &src_addr_extended, test_addr_extended_1);
+    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
 
     result = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_extended);
     TEST_ASSERT_TRUE(result);
@@ -972,9 +932,9 @@ void test_ShouldSetAckPendingBit(void)
 
     src_addr_extended = false;
 
-    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &src_addr_extended, test_addr_short_1);
-    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
+    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &src_addr_extended, test_addr_short_1);
+    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
 
     result = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_FALSE(result);
@@ -984,10 +944,12 @@ void test_ShouldSetAckPendingBit(void)
     TEST_ASSERT_TRUE(result);
 
 
-    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &src_addr_extended, test_addr_short_1);
-    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
+    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &src_addr_extended, test_addr_short_1);
+    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
 
     result = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_TRUE(result);
 }
+
+UNITY_TEST_MAIN()
