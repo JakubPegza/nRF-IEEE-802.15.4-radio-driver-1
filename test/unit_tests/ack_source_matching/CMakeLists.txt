@@ -1,7 +1,9 @@
 #
-# Copyright (c) 2020 Nordic Semiconductor
+# Copyright (c) 2020 Nordic Semiconductor ASA. All Rights Reserved.
 #
-# SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+# The information contained herein is confidential property of Nordic Semiconductor ASA.
+# The use, copying, transfer or disclosure of such information is prohibited except by
+# express written agreement with Nordic Semiconductor ASA.
 #
 
 cmake_minimum_required(VERSION 3.13.1)
