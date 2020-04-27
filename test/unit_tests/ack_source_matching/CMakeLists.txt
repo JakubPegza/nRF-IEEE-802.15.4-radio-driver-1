@@ -8,13 +8,8 @@
 
 cmake_minimum_required(VERSION 3.13.1)
 
-include($ENV{ZEPHYR_BASE}/../nrf/cmake/boilerplate.cmake)
-include($ENV{ZEPHYR_BASE}/cmake/app/boilerplate.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_LIST_DIR}/../unit_test_boilerplate.cmake)
 project(nrf_802154_ack_data_source_matching_unit_test)
-
-# Set paths to include directories
-set(nrfx_root $ENV{ZEPHYR_BASE}/../modules/hal/nordic/nrfx)
-set(nrf_radio_802154_root $ENV{ZEPHYR_BASE}/../modules/hal/nordic/drivers/nrf_radio_802154)
 
 # Generate Unity runner for the test
 test_runner_generate(unity_test.c)
