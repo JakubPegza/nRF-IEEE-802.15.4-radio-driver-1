@@ -333,13 +333,4 @@ void test_ZigbeeAddressNotOnList()
     TEST_ASSERT_TRUE(res);
 }
 
-/* It is required to be added to each test. That is because unity is using
- * different main signature (returns int) and zephyr expects main which does
- * not return value.
- */
-extern int unity_main(void);
-
-void main(void)
-{
-	(void)unity_main();
-}
+UNITY_TEST_MAIN()

@@ -27,6 +27,7 @@ target_compile_definitions(app PRIVATE NRF52840_XXAA)
 target_compile_definitions(app PRIVATE UNIT_TEST)
 
 # Include dependencies
+target_include_directories(app PRIVATE ./../)
 target_include_directories(app PRIVATE ${nrfx_root}/mdk)
 target_include_directories(app PRIVATE ${nrf_radio_802154_root}/src)
 target_include_directories(app PRIVATE ${nrf_radio_802154_root}/src/mac_features/ack_generator)
