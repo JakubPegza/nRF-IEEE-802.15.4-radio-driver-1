@@ -115,6 +115,26 @@ extern "C" {
 #endif // NRF_802154_INTERNAL_RADIO_IRQ_HANDLING
 
 /**
+ * @def NRF_802154_INTERNAL_SWI_IRQ_HANDLING
+ *
+ * If the driver is expected to internally handle the SWI IRQ.
+ * If the driver is used in an OS, the SWI IRQ can be handled by the OS and passed to
+ * the driver by @ref nrf_802154_swi_irq_handler.
+ * In this case, the internal handling must be disabled.
+ *
+ */
+
+#ifndef NRF_802154_INTERNAL_SWI_IRQ_HANDLING
+
+#if RAAL_SOFTDEVICE || RAAL_REM
+#define NRF_802154_INTERNAL_SWI_IRQ_HANDLING 0
+#else // RAAL_SOFTDEVICE || RAAL_REM
+#define NRF_802154_INTERNAL_SWI_IRQ_HANDLING 1
+#endif  // RAAL_SOFTDEVICE || RAAL_REM
+
+#endif // NRF_802154_INTERNAL_SWI_IRQ_HANDLING
+
+/**
  * @def NRF_802154_IRQ_PRIORITY
  *
  * Interrupt priority for RADIO peripheral.

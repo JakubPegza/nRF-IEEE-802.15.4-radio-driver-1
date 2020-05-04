@@ -89,6 +89,20 @@ void nrf_802154_deinit(void);
 void nrf_802154_radio_irq_handler(void);
 #endif // !NRF_802154_INTERNAL_RADIO_IRQ_HANDLING
 
+#if !NRF_802154_INTERNAL_SWI_IRQ_HANDLING
+/**
+ * @brief Handles the interrupt request from the RADIO peripheral.
+ *
+ * @note If NRF_802154_INTERNAL_SWI_IRQ_HANDLING is enabled, the driver internally handles the
+ *       SWI IRQ, and this function must not be called.
+ *
+ * This function is intended for use in an operating system environment, where the OS handles IRQ
+ * and indirectly passes it to the driver, or with a RAAL implementation that indirectly passes
+ * radio IRQ to the driver (that is, SoftDevice).
+ */
+void nrf_802154_swi_irq_handler(void);
+#endif // !NRF_802154_INTERNAL_SWI_IRQ_HANDLING
+
 /**
  * @brief Sets the channel on which the radio is to operate.
  *

@@ -48,13 +48,25 @@
 
 #define SWI_EGU        NRF_802154_SWI_EGU_INSTANCE ///< Label of SWI peripheral.
 #define SWI_IRQn       NRF_802154_SWI_IRQN         ///< Symbol of SWI IRQ number.
-#define SWI_IRQHandler NRF_802154_SWI_IRQ_HANDLER  ///< Symbol of SWI IRQ handler.
+#if NRF_802154_INTERNAL_SWI_IRQ_HANDLING
+#define SWI_IRQHandler     NRF_802154_SWI_IRQ_HANDLER  ///< Symbol of SWI IRQ handler.
+#else
+#define SWI_IRQHandler     nrf_802154_swi_irq_handler  ///< Symbol of SWI IRQ handler.
+#endif
 
 void nrf_802154_swi_init(void)
 {
 #if !NRF_IS_IRQ_PRIORITY_ALLOWED(NRF_802154_SWI_PRIORITY)
 #error NRF_802154_SWI_PRIORITY value out of the allowed range.
 #endif
+
+#if !NRF_802154_INTERNAL_SWI_IRQ_HANDLING
+#ifdef __ZEPHYR__
+    IRQ_CONNECT(SWI_IRQn, NRF_802154_SWI_PRIORITY,
+                nrf_802154_swi_irq_handler, NULL, 0);
+#endif
+#endif
+
     NVIC_SetPriority(SWI_IRQn, NRF_802154_SWI_PRIORITY);
     NVIC_ClearPendingIRQ(SWI_IRQn);
     NVIC_EnableIRQ(SWI_IRQn);
