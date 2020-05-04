@@ -44,7 +44,7 @@
 #include "nrf_802154_config.h"
 #include "nrf_802154_types.h"
 
-#include <hal/nrf_ppi.h>
+#include "hal/nrf_ppi.h"
 
 #if ENABLE_FEM
 #include "fem/nrf_fem_protocol_api.h"

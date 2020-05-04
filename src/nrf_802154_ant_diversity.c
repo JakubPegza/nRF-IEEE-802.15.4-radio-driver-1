@@ -48,10 +48,10 @@
 #include "nrf_802154_pib.h"
 #include "nrf_802154_rssi.h"
 #include "nrf_802154_trx.h"
-#include <hal/nrf_gpio.h>
-#include <hal/nrf_gpiote.h>
-#include <hal/nrf_ppi.h>
-#include <hal/nrf_timer.h>
+#include "hal/nrf_gpio.h"
+#include "hal/nrf_gpiote.h"
+#include "hal/nrf_ppi.h"
+#include "hal/nrf_timer.h"
 #include "rsch/nrf_802154_rsch.h"
 
 #define ANT_DIV_TIMER NRF_802154_ANT_DIVERSITY_TIMER_INSTANCE

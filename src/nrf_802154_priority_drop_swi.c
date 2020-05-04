@@ -43,7 +43,7 @@
 #include "nrf_802154_rsch_prio_drop.h"
 
 #include "nrf_802154_swi.h"
-#include <hal/nrf_egu.h>
+#include "hal/nrf_egu.h"
 #include "platform/clock/nrf_802154_clock.h"
 
 #define SWI_EGU          NRF_802154_SWI_EGU_INSTANCE ///< Label of SWI peripheral.
