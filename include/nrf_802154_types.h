@@ -179,7 +179,6 @@ typedef uint32_t nrf_802154_cfg_par_t;
  * ed_threshold = -75
  * corr_threshold = 25
  * corr_limit = 5
- * sliding_window = false
  *
  * The mode parameter is defined in the IEEE 802.15.4 specification as phyCcaMode.
  */
@@ -390,7 +389,6 @@ typedef struct
     int8_t                ed_threshold;   // !< Busy threshold of the CCA energy in dBm. Not used in @ref NRF_RADIO_CCA_MODE_2.
     uint8_t               corr_threshold; // !< Busy threshold of the CCA correlator. Not used in @ref NRF_RADIO_CCA_MODE_1.
     uint8_t               corr_limit;     // !< Limit of occurrences above the busy threshold of the CCA correlator. Not used in @ref NRF_RADIO_CCA_MODE_1.
-    bool                  sliding_window; // !< Sliding window mode i.e. whether the device waits indefinitely for the clear channel to transmit. Can be only used while in @ref NRF_RADIO_CCA_MODE_1 mode.
 } nrf_802154_cca_cfg_t;
 //!@}
 
