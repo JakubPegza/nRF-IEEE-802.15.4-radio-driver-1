@@ -172,7 +172,9 @@ static const nrf_802154_fal_event_t m_activate_rx_cc0 =
     {
         .p_timer_instance     = NRF_802154_TIMER_INSTANCE,
         .compare_channel_mask = ((1 << NRF_TIMER_CC_CHANNEL0) | (1 << NRF_TIMER_CC_CHANNEL2)),
-        .counter_value        = RX_RAMP_UP_TIME,
+        .counter_period = {
+            .end = RX_RAMP_UP_TIME
+        },
     },
 };
 
@@ -184,7 +186,9 @@ static const nrf_802154_fal_event_t m_activate_tx_cc0 =
     {
         .p_timer_instance     = NRF_802154_TIMER_INSTANCE,
         .compare_channel_mask = ((1 << NRF_TIMER_CC_CHANNEL0) | (1 << NRF_TIMER_CC_CHANNEL2)),
-        .counter_value        = TX_RAMP_UP_TIME,
+        .counter_period = {
+            .end = TX_RAMP_UP_TIME
+        },
     },
 };
 
@@ -1357,7 +1361,7 @@ bool nrf_802154_trx_transmit_ack(const void * p_transmit_buffer, uint32_t delay_
     m_activate_tx_cc0_timeshifted = m_activate_tx_cc0;
 
     // Set the moment for FEM at which real transmission starts.
-    m_activate_tx_cc0_timeshifted.event.timer.counter_value = timer_cc_ramp_up_start + TXRU_TIME;
+    m_activate_tx_cc0_timeshifted.event.timer.counter_period.end = timer_cc_ramp_up_start + TXRU_TIME;
 
     if (nrf_802154_fal_pa_configuration_set(&m_activate_tx_cc0_timeshifted, NULL) == NRFX_SUCCESS)
     {
