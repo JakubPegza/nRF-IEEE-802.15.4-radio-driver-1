@@ -13,7 +13,6 @@ zephyr_library_sources(
     src/nrf_802154_rx_buffer.c
     src/nrf_802154_stats.c
     src/nrf_802154_trx.c
-#    src/fal/nrf_802154_fal.c
     src/mac_features/nrf_802154_csma_ca.c
     src/mac_features/nrf_802154_delayed_trx.c
     src/mac_features/nrf_802154_filter.c
