@@ -40,9 +40,9 @@
 #include <stdint.h>
 
 #include "nrf.h"
-#include "nrf_gpio.h"
-#include "nrf_gpiote.h"
-#include "nrf_ppi.h"
+#include "hal/nrf_gpio.h"
+#include "hal/nrf_gpiote.h"
+#include "hal/nrf_ppi.h"
 
 /**
  * @brief Initialize PPI to toggle GPIO pins on radio events.

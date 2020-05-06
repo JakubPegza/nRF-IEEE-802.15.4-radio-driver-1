@@ -47,7 +47,7 @@
 #include "nrf_802154_queue.h"
 #include "nrf_802154_swi.h"
 #include "nrf_802154_utils.h"
-#include "nrf_egu.h"
+#include "hal/nrf_egu.h"
 
 #define SWI_EGU        NRF_802154_SWI_EGU_INSTANCE ///< Label of SWI peripheral.
 

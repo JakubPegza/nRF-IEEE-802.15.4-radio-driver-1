@@ -38,7 +38,7 @@
  * Avoid including nrfx dependencies in a unit test build.
  */
 #if !defined(UNIT_TEST)
-    #include "nrf_radio.h"
+    #include "hal/nrf_radio.h"
 #else
     typedef uint8_t nrf_radio_cca_mode_t;
 #endif

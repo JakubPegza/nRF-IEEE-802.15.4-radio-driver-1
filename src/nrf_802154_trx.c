@@ -43,8 +43,8 @@
 #include "nrf_802154_swi.h"
 #include "nrf_802154_utils.h"
 
-#include "nrf_egu.h"
-#include "nrf_radio.h"
+#include "hal/nrf_egu.h"
+#include "hal/nrf_radio.h"
 
 #include "nrf_802154_procedures_duration.h"
 #include "nrf_802154_critical_section.h"
@@ -172,7 +172,9 @@ static const nrf_802154_fal_event_t m_activate_rx_cc0 =
     {
         .p_timer_instance     = NRF_802154_TIMER_INSTANCE,
         .compare_channel_mask = ((1 << NRF_TIMER_CC_CHANNEL0) | (1 << NRF_TIMER_CC_CHANNEL2)),
-        .counter_value        = RX_RAMP_UP_TIME,
+        .counter_period = {
+            .end = RX_RAMP_UP_TIME
+        },
     },
 };
 
@@ -184,7 +186,9 @@ static const nrf_802154_fal_event_t m_activate_tx_cc0 =
     {
         .p_timer_instance     = NRF_802154_TIMER_INSTANCE,
         .compare_channel_mask = ((1 << NRF_TIMER_CC_CHANNEL0) | (1 << NRF_TIMER_CC_CHANNEL2)),
-        .counter_value        = TX_RAMP_UP_TIME,
+        .counter_period = {
+            .end = TX_RAMP_UP_TIME
+        },
     },
 };
 
@@ -496,7 +500,7 @@ static void ppis_for_egu_and_ramp_up_set(nrf_radio_task_t ramp_up_task, bool sel
                                                     NRF_802154_SWI_EGU_INSTANCE,
                                                     EGU_EVENT),
                                                 nrf_radio_task_address_get(NRF_RADIO, ramp_up_task),
-                                                nrf_ppi_task_address_get(NRF_PPI, 
+                                                nrf_ppi_task_address_get(NRF_PPI,
                                                     PPI_CHGRP0_DIS_TASK));
     }
     else
@@ -952,7 +956,7 @@ void nrf_802154_trx_receive_frame(uint8_t                                bcc,
         // RADIO.EVENTS_HELPER1 -> PPI_RADIO_HELPER1_EGU_HELPER1 -> EGU.TASK_HELPER1 -> EGU.EVENT_HELPER1 ->
         // SWI_IRQHandler (in nrf_802154_swi.c), calls nrf_802154_trx_swi_irq_handler
         nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_RADIO_HELPER1_EGU_HELPER1,
-                                       nrf_radio_event_address_get(NRF_RADIO, 
+                                       nrf_radio_event_address_get(NRF_RADIO,
                                            NRF_RADIO_EVENT_HELPER1),
                                        nrf_egu_task_address_get(
                                            NRF_802154_SWI_EGU_INSTANCE, EGU_HELPER1_TASK));
@@ -1030,9 +1034,9 @@ void nrf_802154_trx_receive_frame(uint8_t                                bcc,
                                             nrf_egu_event_address_get(
                                                 NRF_802154_SWI_EGU_INSTANCE,
                                                 EGU_EVENT),
-                                            nrf_radio_task_address_get(NRF_RADIO, 
+                                            nrf_radio_task_address_get(NRF_RADIO,
                                                 NRF_RADIO_TASK_RXEN),
-                                            nrf_ppi_task_address_get(NRF_PPI, 
+                                            nrf_ppi_task_address_get(NRF_PPI,
                                                 PPI_CHGRP0_DIS_TASK));
     nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_EGU_TIMER_START,
                                    nrf_egu_event_address_get(
@@ -1121,9 +1125,9 @@ void nrf_802154_trx_receive_ack(void)
                                             nrf_egu_event_address_get(
                                                 NRF_802154_SWI_EGU_INSTANCE,
                                                 EGU_EVENT),
-                                            nrf_radio_task_address_get(NRF_RADIO, 
+                                            nrf_radio_task_address_get(NRF_RADIO,
                                                 NRF_RADIO_TASK_RXEN),
-                                            nrf_ppi_task_address_get(NRF_PPI, 
+                                            nrf_ppi_task_address_get(NRF_PPI,
                                                 PPI_CHGRP0_DIS_TASK));
     nrf_ppi_channel_include_in_group(NRF_PPI, PPI_EGU_RAMP_UP, PPI_CHGRP0);
 
@@ -1251,9 +1255,9 @@ void nrf_802154_trx_transmit_frame(const void                            * p_tra
         if (sliding_window)
         {
             nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_CCABUSY_CCASTART,
-                                           nrf_radio_event_address_get(NRF_RADIO, 
+                                           nrf_radio_event_address_get(NRF_RADIO,
                                                NRF_RADIO_EVENT_CCABUSY),
-                                           nrf_radio_task_address_get(NRF_RADIO, 
+                                           nrf_radio_task_address_get(NRF_RADIO,
                                                NRF_RADIO_TASK_CCASTART));
             nrf_ppi_channel_enable(NRF_PPI, PPI_CCABUSY_CCASTART);
         }
@@ -1348,7 +1352,7 @@ bool nrf_802154_trx_transmit_ack(const void * p_transmit_buffer, uint32_t delay_
                                    nrf_timer_event_address_get(
                                        NRF_802154_TIMER_INSTANCE,
                                        NRF_TIMER_EVENT_COMPARE1),
-                                   nrf_radio_task_address_get(NRF_RADIO, 
+                                   nrf_radio_task_address_get(NRF_RADIO,
                                        NRF_RADIO_TASK_TXEN));
 
     // Set FEM PPIs
@@ -1357,7 +1361,7 @@ bool nrf_802154_trx_transmit_ack(const void * p_transmit_buffer, uint32_t delay_
     m_activate_tx_cc0_timeshifted = m_activate_tx_cc0;
 
     // Set the moment for FEM at which real transmission starts.
-    m_activate_tx_cc0_timeshifted.event.timer.counter_value = timer_cc_ramp_up_start + TXRU_TIME;
+    m_activate_tx_cc0_timeshifted.event.timer.counter_period.end = timer_cc_ramp_up_start + TXRU_TIME;
 
     if (nrf_802154_fal_pa_configuration_set(&m_activate_tx_cc0_timeshifted, NULL) == NRFX_SUCCESS)
     {
@@ -1773,7 +1777,7 @@ static void rxack_finish_disable_ints(void)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
-    nrf_radio_int_disable(NRF_RADIO, 
+    nrf_radio_int_disable(NRF_RADIO,
         NRF_RADIO_INT_ADDRESS_MASK | NRF_RADIO_INT_CRCERROR_MASK | NRF_RADIO_INT_CRCOK_MASK);
 
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);
@@ -1850,15 +1854,15 @@ void nrf_802154_trx_standalone_cca(void)
     // Enable IRQs
     nrf_radio_event_clear(NRF_RADIO, NRF_RADIO_EVENT_CCABUSY);
     nrf_radio_event_clear(NRF_RADIO, NRF_RADIO_EVENT_CCAIDLE);
-    nrf_radio_int_enable(NRF_RADIO, 
+    nrf_radio_int_enable(NRF_RADIO,
         (sliding_window ? 0 : NRF_RADIO_INT_CCABUSY_MASK) | NRF_RADIO_INT_CCAIDLE_MASK);
 
     if (sliding_window)
     {
         nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_CCABUSY_CCASTART,
-                                       nrf_radio_event_address_get(NRF_RADIO, 
+                                       nrf_radio_event_address_get(NRF_RADIO,
                                            NRF_RADIO_EVENT_CCABUSY),
-                                       nrf_radio_task_address_get(NRF_RADIO, 
+                                       nrf_radio_task_address_get(NRF_RADIO,
                                            NRF_RADIO_TASK_CCASTART));
         nrf_ppi_channel_enable(NRF_PPI, PPI_CCABUSY_CCASTART);
     }
