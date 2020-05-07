@@ -80,9 +80,11 @@ zephyr_compile_definitions(
   # Enable ack timeout
   NRF_802154_ACK_TIMEOUT_ENABLED=1
 
+  # Enable DTRX
+  NRF_802154_DELAYED_TRX_ENABLED=1
+
   # Disable unused radio driver features
   NRF_802154_FRAME_TIMESTAMP_ENABLED=0
-  NRF_802154_DELAYED_TRX_ENABLED=1
 
   # Enable antenna diversity
   ENABLE_ANT_DIVERSITY=1
