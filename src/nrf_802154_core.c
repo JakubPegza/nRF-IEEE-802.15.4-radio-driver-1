@@ -2254,12 +2254,6 @@ void nrf_802154_trx_transmit_frame_ccabusy(void)
 
     nrf_802154_stat_counter_increment(cca_failed_attempts);
 
-    /* In case of sliding window cca, where time taken by cca can be variable,
-     * there is no possibility that this handler is called, as the cca is restarted automatically.
-     * Sliding window cca is ended either by success or by trx_abort.
-     *
-     * In case of ordinary cca, the time of cca is constant. */
-
 #if (NRF_802154_TOTAL_TIMES_MEASUREMENT_ENABLED)
     uint32_t t_listening = RX_RAMP_UP_TIME + PHY_US_TIME_FROM_SYMBOLS(A_CCA_DURATION_SYMBOLS);
 
