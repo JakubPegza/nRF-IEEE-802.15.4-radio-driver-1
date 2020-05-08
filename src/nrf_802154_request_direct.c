@@ -43,12 +43,20 @@
 #include "nrf_802154_core.h"
 #include "hal/nrf_radio.h"
 
-#define REQUEST_FUNCTION(func_core, ...) \
+#define REQUEST_FUNCTION_PARMS(func_core, ...) \
     bool result;                         \
                                          \
     result = func_core(__VA_ARGS__);     \
                                          \
     return result;
+
+#define REQUEST_FUNCTION(func_core)      \
+    bool result;                         \
+                                         \
+    result = func_core();                \
+                                         \
+    return result;
+
 
 void nrf_802154_request_init(void)
 {
@@ -57,7 +65,7 @@ void nrf_802154_request_init(void)
 
 bool nrf_802154_request_sleep(nrf_802154_term_t term_lvl)
 {
-    REQUEST_FUNCTION(nrf_802154_core_sleep, term_lvl)
+    REQUEST_FUNCTION_PARMS(nrf_802154_core_sleep, term_lvl)
 }
 
 bool nrf_802154_request_receive(nrf_802154_term_t              term_lvl,
@@ -65,7 +73,7 @@ bool nrf_802154_request_receive(nrf_802154_term_t              term_lvl,
                                 nrf_802154_notification_func_t notify_function,
                                 bool                           notify_abort)
 {
-    REQUEST_FUNCTION(nrf_802154_core_receive, term_lvl, req_orig, notify_function, notify_abort)
+    REQUEST_FUNCTION_PARMS(nrf_802154_core_receive, term_lvl, req_orig, notify_function, notify_abort)
 }
 
 bool nrf_802154_request_transmit(nrf_802154_term_t              term_lvl,
@@ -75,7 +83,7 @@ bool nrf_802154_request_transmit(nrf_802154_term_t              term_lvl,
                                  bool                           immediate,
                                  nrf_802154_notification_func_t notify_function)
 {
-    REQUEST_FUNCTION(nrf_802154_core_transmit,
+    REQUEST_FUNCTION_PARMS(nrf_802154_core_transmit,
                      term_lvl,
                      req_orig,
                      p_data,
@@ -86,17 +94,17 @@ bool nrf_802154_request_transmit(nrf_802154_term_t              term_lvl,
 
 bool nrf_802154_request_energy_detection(nrf_802154_term_t term_lvl, uint32_t time_us)
 {
-    REQUEST_FUNCTION(nrf_802154_core_energy_detection, term_lvl, time_us)
+    REQUEST_FUNCTION_PARMS(nrf_802154_core_energy_detection, term_lvl, time_us)
 }
 
 bool nrf_802154_request_cca(nrf_802154_term_t term_lvl)
 {
-    REQUEST_FUNCTION(nrf_802154_core_cca, term_lvl)
+    REQUEST_FUNCTION_PARMS(nrf_802154_core_cca, term_lvl)
 }
 
 bool nrf_802154_request_continuous_carrier(nrf_802154_term_t term_lvl)
 {
-    REQUEST_FUNCTION(nrf_802154_core_continuous_carrier, term_lvl)
+    REQUEST_FUNCTION_PARMS(nrf_802154_core_continuous_carrier, term_lvl)
 }
 
 bool nrf_802154_request_modulated_carrier(nrf_802154_term_t term_lvl,
@@ -107,7 +115,7 @@ bool nrf_802154_request_modulated_carrier(nrf_802154_term_t term_lvl,
 
 bool nrf_802154_request_buffer_free(uint8_t * p_data)
 {
-    REQUEST_FUNCTION(nrf_802154_core_notify_buffer_free, p_data)
+    REQUEST_FUNCTION_PARMS(nrf_802154_core_notify_buffer_free, p_data)
 }
 
 bool nrf_802154_request_antenna_update(void)
@@ -132,5 +140,5 @@ bool nrf_802154_request_rssi_measure(void)
 
 bool nrf_802154_request_rssi_measurement_get(int8_t * p_rssi)
 {
-    REQUEST_FUNCTION(nrf_802154_core_last_rssi_measurement_get, p_rssi)
+    REQUEST_FUNCTION_PARMS(nrf_802154_core_last_rssi_measurement_get, p_rssi)
 }
