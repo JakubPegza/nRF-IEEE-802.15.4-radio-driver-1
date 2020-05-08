@@ -42,6 +42,7 @@
 #include <stdint.h>
 
 #include "compiler_abstraction.h"
+#include "nrf_802154.h"
 #include "nrf_802154_config.h"
 #include "nrf_802154_peripherals.h"
 #include "nrf_802154_utils.h"

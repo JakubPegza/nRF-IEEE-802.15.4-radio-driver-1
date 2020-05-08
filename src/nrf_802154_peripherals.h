@@ -411,21 +411,21 @@ extern "C" {
 #else // NRF_802154_DISABLE_BCC_MATCHING
 
 /**
- * @def NRF_802154_PPI_RADIO_HELPER1_TO_EGU_HELPER1
+ * @def NRF_802154_PPI_RADIO_SYNC_TO_EGU_SYNC
  *
- * The PPI channel that connects RADIO_HELPER1 event to EGU_HELPER1 task.
- * EGU_HELPER1 task belongs to one of EGU channels
+ * The PPI channel that connects RADIO_SYNC event to EGU_SYNC task.
+ * EGU_SYNC task belongs to one of EGU channels
  *
  * @note This configuration is used only when the NRF_RADIO_EVENT_BCMATCH event handling is enabled
  *       (see @ref NRF_802154_DISABLE_BCC_MATCHING).
  *
  */
-#ifndef NRF_802154_PPI_RADIO_HELPER1_TO_EGU_HELPER1
-#define NRF_802154_PPI_RADIO_HELPER1_TO_EGU_HELPER1 NRF_PPI_CHANNEL11
+#ifndef NRF_802154_PPI_RADIO_SYNC_TO_EGU_SYNC
+#define NRF_802154_PPI_RADIO_SYNC_TO_EGU_SYNC NRF_PPI_CHANNEL11
 #endif
 
 #define NRF_802154_DISABLE_BCC_MATCHING_PPI_CHANNELS_USED_MASK \
-    (1 << NRF_802154_PPI_RADIO_HELPER1_TO_EGU_HELPER1)
+    (1 << NRF_802154_PPI_RADIO_SYNC_TO_EGU_SYNC)
 
 #endif // NRF_802154_DISABLE_BCC_MATCHING
 

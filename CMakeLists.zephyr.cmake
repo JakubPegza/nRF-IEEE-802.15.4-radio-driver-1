@@ -25,8 +25,8 @@ zephyr_library_sources(
     src/mac_features/ack_generator/nrf_802154_imm_ack_generator.c
     src/platform/random/nrf_802154_random_zephyr.c
     src/platform/temperature/nrf_802154_temperature_none.c
-    src/nrf_802154_notification_direct.c
-    src/nrf_802154_request_direct.c
+    src/nrf_802154_notification_swi.c
+    src/nrf_802154_request_swi.c
     src/nrf_802154_swi.c
 )
 
@@ -49,6 +49,7 @@ zephyr_compile_definitions(
   # radio IRQ priority to 0, or the radio IRQ will ignore IRQ lock.
   NRF_802154_IRQ_PRIORITY=1
   NRF_802154_INTERNAL_RADIO_IRQ_HANDLING=0
+  NRF_802154_INTERNAL_SWI_IRQ_HANDLING=0
 
   # Radio driver shim layer uses raw api
   NRF_802154_USE_RAW_API=1
@@ -79,7 +80,12 @@ zephyr_compile_definitions(
   # Enable ack timeout
   NRF_802154_ACK_TIMEOUT_ENABLED=1
 
+  # Enable DTRX
+  NRF_802154_DELAYED_TRX_ENABLED=1
+
   # Disable unused radio driver features
   NRF_802154_FRAME_TIMESTAMP_ENABLED=0
-  NRF_802154_DELAYED_TRX_ENABLED=0
+
+  # Enable antenna diversity
+  ENABLE_ANT_DIVERSITY=1
 )
