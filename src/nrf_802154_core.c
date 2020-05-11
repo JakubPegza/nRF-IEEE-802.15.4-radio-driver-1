@@ -1359,6 +1359,17 @@ void nrf_802154_rsch_crit_sect_prio_changed(rsch_prio_t prio)
     else if (transition < 0)
     {
         on_preconditions_denied(m_state);
+
+        // After denying preconditions, TRX is disabled. However, it is possible that the existing
+        // preconditions are enough for the new state (entered due to denied preconditions) and TRX
+        // could be enabled for the new state. If this is the case, on_preconditions_approved() is
+        // called to fully switch to the new state.
+        radio_state_t new_state = m_state;
+
+        if (is_state_allowed_for_prio(prio, new_state))
+        {
+            on_preconditions_approved(new_state);
+        }
     }
     else
     {
