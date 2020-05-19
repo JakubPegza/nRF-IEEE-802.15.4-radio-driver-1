@@ -73,6 +73,7 @@
 #include "timer/nrf_802154_timer_coord.h"
 #include "timer/nrf_802154_timer_sched.h"
 #include "platform/hp_timer/nrf_802154_hp_timer.h"
+#include "platform/irq/nrf_802154_irq.h"
 
 #include "nrf_802154_core_hooks.h"
 #if ENABLE_ANT_DIVERSITY
@@ -431,21 +432,6 @@ static uint8_t * rx_buffer_get(void)
 static bool ack_is_requested(const uint8_t * p_frame)
 {
     return nrf_802154_frame_parser_ar_bit_is_set(p_frame);
-}
-
-/***************************************************************************************************
- * @section RADIO peripheral management
- **************************************************************************************************/
-
-/** Deinitialize interrupts for radio peripheral. */
-static void irq_deinit(void)
-{
-    NVIC_DisableIRQ(RADIO_IRQn);
-    NVIC_ClearPendingIRQ(RADIO_IRQn);
-    NVIC_SetPriority(RADIO_IRQn, 0);
-
-    __DSB();
-    __ISB();
 }
 
 /***************************************************************************************************
@@ -2341,7 +2327,8 @@ void nrf_802154_core_deinit(void)
 
     nrf_802154_fal_cleanup();
 
-    irq_deinit();
+    nrf_802154_irq_disable(RADIO_IRQn);
+    nrf_802154_irq_clear_pending(RADIO_IRQn);
 
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_LOW);
 }

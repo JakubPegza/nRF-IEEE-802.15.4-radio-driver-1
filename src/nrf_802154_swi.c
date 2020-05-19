@@ -46,6 +46,7 @@
 #include "nrf_802154_config.h"
 #include "nrf_802154_peripherals.h"
 #include "nrf_802154_utils.h"
+#include "platform/irq/nrf_802154_irq.h"
 
 #define SWI_EGU        NRF_802154_SWI_EGU_INSTANCE ///< Label of SWI peripheral.
 #define SWI_IRQn       NRF_802154_SWI_IRQN         ///< Symbol of SWI IRQ number.
@@ -54,24 +55,6 @@
 #else
 #define SWI_IRQHandler     nrf_802154_swi_irq_handler  ///< Symbol of SWI IRQ handler.
 #endif
-
-void nrf_802154_swi_init(void)
-{
-#if !NRF_IS_IRQ_PRIORITY_ALLOWED(NRF_802154_SWI_PRIORITY)
-#error NRF_802154_SWI_PRIORITY value out of the allowed range.
-#endif
-
-#if !NRF_802154_INTERNAL_SWI_IRQ_HANDLING
-#ifdef __ZEPHYR__
-    IRQ_CONNECT(SWI_IRQn, NRF_802154_SWI_PRIORITY,
-                nrf_802154_swi_irq_handler, NULL, 0);
-#endif
-#endif
-
-    NVIC_SetPriority(SWI_IRQn, NRF_802154_SWI_PRIORITY);
-    NVIC_ClearPendingIRQ(SWI_IRQn);
-    NVIC_EnableIRQ(SWI_IRQn);
-}
 
 __WEAK void nrf_802154_trx_swi_irq_handler(void)
 {
@@ -93,10 +76,25 @@ __WEAK void nrf_802154_request_swi_irq_handler(void)
     /* Implementation provided by other module if necessary */
 }
 
-void SWI_IRQHandler(void)
+static void swi_irq_handler(void)
 {
     nrf_802154_trx_swi_irq_handler();
     nrf_802154_notification_swi_irq_handler();
     nrf_802154_rsch_prio_drop_swi_irq_handler();
     nrf_802154_request_swi_irq_handler();
+}
+
+void nrf_802154_swi_init(void)
+{
+#if !NRF_802154_IRQ_PRIORITY_ALLOWED(NRF_802154_SWI_PRIORITY)
+#error NRF_802154_SWI_PRIORITY value out of the allowed range.
+#endif
+
+    nrf_802154_irq_init(SWI_IRQn, NRF_802154_SWI_PRIORITY, swi_irq_handler);
+    nrf_802154_irq_enable(SWI_IRQn);
+}
+
+void SWI_IRQHandler(void)
+{
+    swi_irq_handler();
 }

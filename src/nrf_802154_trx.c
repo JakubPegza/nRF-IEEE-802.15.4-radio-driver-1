@@ -49,6 +49,7 @@
 #include "nrf_802154_procedures_duration.h"
 #include "nrf_802154_critical_section.h"
 #include "fem/nrf_fem_protocol_api.h"
+#include "platform/irq/nrf_802154_irq.h"
 
 #if ENABLE_ANT_DIVERSITY
 #include "nrf_802154_ant_diversity.h"
@@ -87,6 +88,12 @@
 
 #ifdef RADIO_INTENSET_SYNC_Msk
 #define RADIO_SYNC_EVENT_AVAILABLE
+#endif
+
+#ifndef RADIO_SYNC_EVENT_AVAILABLE
+#if ENABLE_ANT_DIVERSITY
+#error Antenna diversity functionality is unavailable on this platform due to insufficient hardware resources
+#endif
 #endif
 
 #define PPI_NO_BCC_MATCHING_USED_MASK (1 << PPI_RADIO_SYNC_EGU_SYNC)
@@ -296,11 +303,10 @@ static void cca_configuration_update(void)
 /** Initialize interrupts for radio peripheral. */
 static void irq_init(void)
 {
-#if !NRF_IS_IRQ_PRIORITY_ALLOWED(NRF_802154_IRQ_PRIORITY)
+#if !NRF_802154_IRQ_PRIORITY_ALLOWED(NRF_802154_IRQ_PRIORITY)
 #error NRF_802154_IRQ_PRIORITY value out of the allowed range.
 #endif
-    NVIC_SetPriority(RADIO_IRQn, NRF_802154_IRQ_PRIORITY);
-    NVIC_ClearPendingIRQ(RADIO_IRQn);
+    nrf_802154_irq_init(RADIO_IRQn, NRF_802154_IRQ_PRIORITY, nrf_802154_radio_irq_handler);
 }
 
 /** Wait time needed to propagate event through PPI to EGU.
@@ -926,7 +932,11 @@ void nrf_802154_trx_receive_frame(uint8_t                                bcc,
         ints_to_enable |= NRF_RADIO_INT_ADDRESS_MASK;
     }
 
+#ifdef RADIO_SYNC_EVENT_AVAILABLE
     bool allow_sync_swi = (notifications_mask & TRX_RECEIVE_NOTIFICATION_PRESTARTED) != 0U;
+#else
+    bool allow_sync_swi = false;
+#endif
 
 #if ENABLE_ANT_DIVERSITY
     // Always allow for SYNC interrupts, as they are used by antenna diversity for preamble detection.
@@ -2657,7 +2667,7 @@ void nrf_802154_trx_swi_irq_handler(void)
         // Following will make it pending, and processing of RADIO_IRQ will start
         // when critical section is left.
 
-        NVIC_SetPendingIRQ(RADIO_IRQn);
+        nrf_802154_irq_set_pending(RADIO_IRQn);
     }
 }
 

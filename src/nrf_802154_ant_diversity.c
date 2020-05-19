@@ -52,6 +52,7 @@
 #include "hal/nrf_gpiote.h"
 #include "hal/nrf_ppi.h"
 #include "hal/nrf_timer.h"
+#include "platform/irq/nrf_802154_irq.h"
 #include "rsch/nrf_802154_rsch.h"
 
 #define ANT_DIV_TIMER NRF_802154_ANT_DIVERSITY_TIMER_INSTANCE
@@ -79,6 +80,9 @@ static bool       m_comparison_finished = false;             /// Flag indicating
 /// If this is set to false during frame reception, the algorithm didn't have enough time and current antenna has been selected at random.
 static nrf_802154_ant_diversity_antenna_t m_last_selected_antenna =
     NRF_802154_ANT_DIVERSITY_ANTENNA_NONE;                   /// Last antenna successfully used for reception.
+
+/**@brief Forward declaration of antenna diversity timer interrupt handler. */
+static void ad_timer_irq_handler(void);
 
 static void ad_timer_init()
 {
@@ -185,9 +189,8 @@ static void ad_timer_rssi_configure()
 
     nrf_timer_int_enable(ANT_DIV_TIMER, NRF_TIMER_INT_COMPARE0_MASK);
 
-    NVIC_SetPriority(NRF_802154_ANT_DIVERSITY_TIMER_IRQN, 1);
-    NVIC_ClearPendingIRQ(NRF_802154_ANT_DIVERSITY_TIMER_IRQN);
-    NVIC_EnableIRQ(NRF_802154_ANT_DIVERSITY_TIMER_IRQN);
+    nrf_802154_irq_init(NRF_802154_ANT_DIVERSITY_TIMER_IRQN, 1, ad_timer_irq_handler);
+    nrf_802154_irq_enable(NRF_802154_ANT_DIVERSITY_TIMER_IRQN);
 
     nrf_timer_task_trigger(ANT_DIV_TIMER, NRF_TIMER_TASK_CLEAR);
     nrf_timer_task_trigger(ANT_DIV_TIMER, NRF_TIMER_TASK_START);
@@ -203,9 +206,7 @@ static void ad_timer_rssi_deconfigure()
     // Anomaly 78: use SHUTDOWN instead of STOP.
     nrf_timer_task_trigger(ANT_DIV_TIMER, NRF_TIMER_TASK_SHUTDOWN);
 
-    NVIC_DisableIRQ(NRF_802154_ANT_DIVERSITY_TIMER_IRQN);
-    __DSB();
-    __ISB();
+    nrf_802154_irq_disable(NRF_802154_ANT_DIVERSITY_TIMER_IRQN);
 }
 
 static void ad_timer_toggle_configure()
@@ -221,9 +222,8 @@ static void ad_timer_toggle_configure()
 #if ANT_DIVERSITY_SW
     nrf_timer_int_enable(ANT_DIV_TIMER, NRF_TIMER_INT_COMPARE0_MASK);
 
-    NVIC_SetPriority(NRF_802154_ANT_DIVERSITY_TIMER_IRQN, 1);
-    NVIC_ClearPendingIRQ(NRF_802154_ANT_DIVERSITY_TIMER_IRQN);
-    NVIC_EnableIRQ(NRF_802154_ANT_DIVERSITY_TIMER_IRQN);
+    nrf_802154_irq_init(NRF_802154_ANT_DIVERSITY_TIMER_IRQN, 1, ad_timer_irq_handler);
+    nrf_802154_irq_enable(NRF_802154_ANT_DIVERSITY_TIMER_IRQN);
 #elif ANT_DIVERSITY_PPI
     nrf_gpiote_task_enable(NRF_GPIOTE, NRF_802154_ANT_DIVERSITY_GPIOTE_CHANNEL);
     nrf_ppi_channel_enable(NRF_PPI, ANT_DIV_PPI);
@@ -241,9 +241,7 @@ static void ad_timer_toggle_deconfigure()
                              NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK);
 #if ANT_DIVERSITY_SW
     nrf_timer_int_disable(ANT_DIV_TIMER, NRF_TIMER_INT_COMPARE0_MASK);
-    NVIC_DisableIRQ(NRF_802154_ANT_DIVERSITY_TIMER_IRQN);
-    __DSB();
-    __ISB();
+    nrf_802154_irq_disable(NRF_802154_ANT_DIVERSITY_TIMER_IRQN);
 #elif ANT_DIVERSITY_PPI
     // Set GPIO output pin value to the same as currently set by GPIOTE module
     // This prevents pin switching after control of the pin is ceded by GPIOTE
@@ -339,6 +337,39 @@ static void ad_rssi_second_measure()
     // m_comparison_finished flag is used to indicate whether RSSI was measured successfuly.
     ad_timer_rssi_deconfigure();
     m_ad_state = AD_STATE_SLEEP;
+}
+
+static void ad_timer_irq_handler(void)
+{
+    nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_LOW);
+
+    switch (m_ad_state)
+    {
+        case AD_STATE_DISABLED:
+        case AD_STATE_SLEEP:
+            // Intentionally empty
+            break;
+
+        case AD_STATE_TOGGLE:
+            nrf_802154_ant_diversity_antenna_toggle();
+            break;
+
+        case AD_STATE_SETTLE_1:
+            ad_rssi_first_measure();
+            break;
+
+        case AD_STATE_SETTLE_2:
+            ad_rssi_second_measure();
+            break;
+
+        default:
+            assert(false);
+            break;
+    }
+
+    nrf_timer_event_clear(ANT_DIV_TIMER, NRF_TIMER_EVENT_COMPARE0);
+
+    nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_LOW);
 }
 
 void nrf_802154_ant_diversity_enable_notify()
@@ -613,34 +644,7 @@ void nrf_802154_ant_diversity_preamble_timeout_notify()
 
 void NRF_802154_ANT_DIVERSITY_TIMER_IRQHANDLER()
 {
-    nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_LOW);
-
-    switch (m_ad_state)
-    {
-        case AD_STATE_DISABLED:
-        case AD_STATE_SLEEP:
-            // Intentionally empty
-            break;
-
-        case AD_STATE_TOGGLE:
-            nrf_802154_ant_diversity_antenna_toggle();
-            break;
-
-        case AD_STATE_SETTLE_1:
-            ad_rssi_first_measure();
-            break;
-
-        case AD_STATE_SETTLE_2:
-            ad_rssi_second_measure();
-            break;
-
-        default:
-            assert(false);
-            break;
-    }
-
-    nrf_timer_event_clear(ANT_DIV_TIMER, NRF_TIMER_EVENT_COMPARE0);
-    nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_LOW);
+    ad_timer_irq_handler();
 }
 
 #endif //ENABLE_ANT_DIVERSITY
