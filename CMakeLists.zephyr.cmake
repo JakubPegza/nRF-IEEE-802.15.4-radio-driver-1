@@ -85,7 +85,7 @@ zephyr_compile_definitions(
 
   # Disable unused radio driver features
   NRF_802154_FRAME_TIMESTAMP_ENABLED=0
-
-  # Enable antenna diversity
-  ENABLE_ANT_DIVERSITY=1
 )
+
+zephyr_compile_definitions_ifdef(CONFIG_SOC_NRF52811   ENABLE_ANT_DIVERSITY=1)
+zephyr_compile_definitions_ifdef(CONFIG_SOC_NRF52833   ENABLE_ANT_DIVERSITY=1)
