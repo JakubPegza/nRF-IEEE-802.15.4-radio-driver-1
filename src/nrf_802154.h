@@ -65,6 +65,7 @@ extern "C" {
  * This function initializes the RADIO peripheral in the @ref RADIO_STATE_SLEEP state.
  *
  * @note This function is to be called once, before any other functions from this module.
+ *       Only the functions setting the configuration can be called before this call.
  */
 void nrf_802154_init(void);
 
