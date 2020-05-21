@@ -6,7 +6,7 @@
 
 <target name="rd">
 
-  <jar destfile="ieee_radio_driver_v2.0.0-1.pre.jar"
+  <jar destfile="15.4_radio_driver_v2.0.0-1.pre.jar"
       basedir="html/html" 
       manifest="manifest/MANIFEST.MF.rd"
       excludes="*.jar">
