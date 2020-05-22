@@ -50,6 +50,7 @@
 #include "nrf_802154_critical_section.h"
 #include "nrf_802154_debug.h"
 #include "nrf_802154_notification.h"
+#include "nrf_802154_nrfx_addons.h"
 #include "nrf_802154_peripherals.h"
 #include "nrf_802154_pib.h"
 #include "nrf_802154_procedures_duration.h"
@@ -76,9 +77,7 @@
 #include "platform/irq/nrf_802154_irq.h"
 
 #include "nrf_802154_core_hooks.h"
-#if ENABLE_ANT_DIVERSITY
-#include "nrf_802154_ant_diversity.h"
-#endif // ENABLE_ANT_DIVERSITY
+#include "nrf_802154_sl_ant_div.h"
 
 /// Delay before first check of received frame: 24 bits is PHY header and MAC Frame Control field.
 #define BCC_INIT                    (3 * 8)
@@ -380,6 +379,12 @@ static void cca_notify(bool result)
 static bool timeslot_is_granted(void)
 {
     return m_rsch_timeslot_is_granted;
+}
+
+static bool antenna_diversity_is_enabled(void)
+{
+    return (NRF_802154_SL_ANT_DIV_MODE_DISABLED !=
+                nrf_802154_sl_ant_div_cfg_mode_get(NRF_802154_SL_ANT_DIV_OP_RX));
 }
 
 /***************************************************************************************************
@@ -812,10 +817,8 @@ static bool current_operation_terminate(nrf_802154_term_t term_lvl,
                  * have already been called. We need to stop counting timeout. */
                 nrf_802154_timer_sched_remove(&m_rx_prestarted_timer, NULL);
 
-#if ENABLE_ANT_DIVERSITY
                 /* Notify antenna diversity module that RX has been aborted. */
-                nrf_802154_ant_diversity_rx_aborted_notify();
-#endif // ENABLE_ANT_DIVERSITY
+                nrf_802154_sl_ant_div_rx_aborted_notify();
 
                 /* We might have boosted preconditions (to support coex) above level
                  * normally requested for current state by request_preconditions_for_state(m_state).
@@ -1406,8 +1409,7 @@ static void on_rx_prestarted_timeout(void * p_context)
 
     nrf_802154_critical_section_forcefully_enter();
 
-#if ENABLE_ANT_DIVERSITY
-    nrf_802154_ant_diversity_preamble_timeout_notify();
+    nrf_802154_sl_ant_div_rx_preamble_timeout_notify();
 
     /**
      * If timer is still running here, it means that timer handling has been preempted by HELPER1
@@ -1417,9 +1419,8 @@ static void on_rx_prestarted_timeout(void * p_context)
      */
     if (nrf_802154_timer_sched_is_running(&m_rx_prestarted_timer))
     {
-        nrf_802154_ant_diversity_preamble_detected_notify();
+        nrf_802154_sl_ant_div_rx_preamble_detected_notify();
     }
-#endif // ENABLE_ANT_DIVERSITY
 
     /* If nrf_802154_trx_receive_frame_prestarted boosted preconditions beyond those normally
      * required by current state, they need to be restored now.
@@ -1436,24 +1437,26 @@ void nrf_802154_trx_receive_frame_prestarted(void)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_LOW);
 
-// Antenna diversity uses this function for detecting possible preamble on air.
-// Do not assert even if notifications mask would not allow for calling this function.
-#if !defined(ENABLE_ANT_DIVERSITY)
-    assert((m_trx_receive_frame_notifications_mask & TRX_RECEIVE_NOTIFICATION_PRESTARTED) != 0U);
-#endif
+    if (!antenna_diversity_is_enabled())
+    {
+        // Only assert if notifications mask would not allow for calling this function.
+        assert((m_trx_receive_frame_notifications_mask & TRX_RECEIVE_NOTIFICATION_PRESTARTED) != 0U);
+    }
+    else
+    {
+        // Antenna diversity uses this function for detecting possible preamble on air.
+    }
+
     assert(m_state == RADIO_STATE_RX);
 
 #if (NRF_802154_STATS_COUNT_ENERGY_DETECTED_EVENTS)
     nrf_802154_stat_counter_increment(received_energy_events);
 #endif
 
-    bool rx_timeout_should_be_started = false;
+    nrf_802154_sl_ant_div_rx_preamble_detected_notify();
 
-#if ENABLE_ANT_DIVERSITY
-    nrf_802154_ant_diversity_preamble_detected_notify();
     // Antenna diversity module should be notified if framestart doesn't come.
-    rx_timeout_should_be_started = true;
-#endif // ENABLE_ANT_DIVERSITY
+    bool rx_timeout_should_be_started = antenna_diversity_is_enabled();
 
     if (nrf_802154_pib_coex_rx_request_mode_get() ==
         NRF_802154_COEX_RX_REQUEST_MODE_ENERGY_DETECTION)
@@ -1513,12 +1516,13 @@ void nrf_802154_trx_receive_frame_started(void)
             break;
     }
 
-#if ENABLE_ANT_DIVERSITY
-    /* If antenna diversity is enabled, rx_prestarted_timer would be started even
-       in different coex rx request modes than NRF_802154_COEX_RX_REQUEST_MODE_ENERGY_DETECTION */
-    nrf_802154_timer_sched_remove(&m_rx_prestarted_timer, NULL);
-    nrf_802154_ant_diversity_frame_started_notify();
-#endif // ENABLE_ANT_DIVERSITY
+    if (antenna_diversity_is_enabled())
+    {
+        // If antenna diversity is enabled, rx_prestarted_timer would be started even
+        // in different coex rx request modes than NRF_802154_COEX_RX_REQUEST_MODE_ENERGY_DETECTION
+        nrf_802154_timer_sched_remove(&m_rx_prestarted_timer, NULL);
+        nrf_802154_sl_ant_div_rx_frame_started_notify();
+    }
 
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_LOW);
 }
@@ -1824,9 +1828,8 @@ void nrf_802154_trx_receive_frame_received(void)
         nrf_802154_stat_timestamp_write(last_rx_end_timestamp, ts);
 #endif
 
-#if ENABLE_ANT_DIVERSITY
-        nrf_802154_ant_diversity_frame_received_notify();
-#endif // ENABLE_ANT_DIVERSITY
+        nrf_802154_sl_ant_div_rx_frame_received_notify();
+
         bool send_ack = false;
 
         if (m_flags.frame_filtered &&
@@ -2757,7 +2760,6 @@ bool nrf_802154_core_last_rssi_measurement_get(int8_t * p_rssi)
     return result;
 }
 
-#if ENABLE_ANT_DIVERSITY
 bool nrf_802154_core_antenna_update(void)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_LOW);
@@ -2779,4 +2781,38 @@ bool nrf_802154_core_antenna_update(void)
     return result;
 }
 
-#endif // ENABLE_ANT_DIVERSITY
+int8_t nrf_802154_sl_ant_div_rssi_measure_get(void)
+{
+    int8_t result = NRF_802154_RSSI_INVALID;
+
+    // This function is supposed to be called after detecting frame prestarted event, but before
+    // detecting valid frame address. This means that we're currently in critical section, but the
+    // timeslot is not yet extended due to detecting valid frame. To avoid invalid timeslot extension
+    // due to blocking rssi measurements, antenna check can be aborted here if timeslot is about to end.
+    // Antenna switching takes 200 ns (250 ns with safety margin), while rssi measurement - 250,
+    // which gives total time of 750 ns.
+    // 750 ns is less than safety margin, so timeslot us left different than 0 is sufficient.
+    if (!nrf_802154_rsch_timeslot_us_left_get())
+    {
+        return result;
+    }
+
+    nrf_802154_trx_rssi_measure();
+
+    if (nrf_802154_trx_rssi_measure_is_started())
+    {
+        while (!nrf_802154_trx_rssi_sample_is_available())
+        {
+            // Intentionally empty: This function is called from a critical section.
+            // WFE would not be waken up by a RADIO event.
+        }
+
+        uint8_t rssi_sample = nrf_802154_trx_rssi_last_sample_get();
+
+        rssi_sample = nrf_802154_rssi_sample_corrected_get(rssi_sample);
+
+        result = -((int8_t)rssi_sample);
+    }
+
+    return result;
+}

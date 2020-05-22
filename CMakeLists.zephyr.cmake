@@ -2,7 +2,6 @@ zephyr_include_directories(src)
 
 zephyr_library_sources(
     src/nrf_802154.c
-    src/nrf_802154_ant_diversity.c
     src/nrf_802154_core.c
     src/nrf_802154_core_hooks.c
     src/nrf_802154_critical_section.c
@@ -86,6 +85,3 @@ zephyr_compile_definitions(
   # Disable unused radio driver features
   NRF_802154_FRAME_TIMESTAMP_ENABLED=0
 )
-
-zephyr_compile_definitions_ifdef(CONFIG_SOC_NRF52811   ENABLE_ANT_DIVERSITY=1)
-zephyr_compile_definitions_ifdef(CONFIG_SOC_NRF52833   ENABLE_ANT_DIVERSITY=1)

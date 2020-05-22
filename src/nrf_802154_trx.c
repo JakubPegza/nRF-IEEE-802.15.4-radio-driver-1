@@ -36,6 +36,7 @@
 
 #include "nrf_802154_config.h"
 #include "nrf_802154_const.h"
+#include "nrf_802154_nrfx_addons.h"
 #include "nrf_802154_types.h"
 #include "nrf_802154_peripherals.h"
 #include "nrf_802154_pib.h"
@@ -51,9 +52,7 @@
 #include "fem/nrf_fem_protocol_api.h"
 #include "platform/irq/nrf_802154_irq.h"
 
-#if ENABLE_ANT_DIVERSITY
-#include "nrf_802154_ant_diversity.h"
-#endif // ENABLE_ANT_DIVERSITY
+#include "nrf_802154_sl_ant_div.h"
 
 #include "nrf_802154_trx.h"
 
@@ -85,16 +84,6 @@
                                        (1U << PPI_CRCERROR_COUNTER_CLEAR))
 #else
 #define PPI_RADIO_SYNC_EGU_SYNC NRF_802154_PPI_RADIO_SYNC_TO_EGU_SYNC ///!< PPI that connects RADIO SYNC event with EGU task for SYNC channel
-
-#ifdef RADIO_INTENSET_SYNC_Msk
-#define RADIO_SYNC_EVENT_AVAILABLE
-#endif
-
-#ifndef RADIO_SYNC_EVENT_AVAILABLE
-#if ENABLE_ANT_DIVERSITY
-#error Antenna diversity functionality is unavailable on this platform due to insufficient hardware resources
-#endif
-#endif
 
 #define PPI_NO_BCC_MATCHING_USED_MASK (1 << PPI_RADIO_SYNC_EGU_SYNC)
 #endif  // NRF_802154_DISABLE_BCC_MATCHING
@@ -156,6 +145,8 @@
 #define TXRU_TIME             40       ///< Transmitter ramp up time [us]
 #define EVENT_LAT             23       ///< END event latency [us]
 #define MAX_RXRAMPDOWN_CYCLES 32       ///< Maximum number of cycles that RX ramp-down might take
+
+#define RSSI_SETTLE_TIME_US   15       ///< Time required for RSSI measurements to become valid after signal level change.
 
 /// Common parameters for the FAL handling.
 static const nrf_802154_fal_event_t m_deactivate_on_disable =
@@ -670,27 +661,27 @@ void nrf_802154_trx_disable(void)
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_LOW);
 }
 
-#if ENABLE_ANT_DIVERSITY
 /**
- * Updates the antenna for reception, according to ant_diversity settings in PIB.
+ * Updates the antenna for reception, according to antenna diversity configuration.
  */
 static void rx_antenna_update(void)
 {
-    bool                            result = true;
-    nrf_802154_ant_diversity_mode_t mode   = nrf_802154_pib_ant_diversity_rx_mode_get();
+    bool                         result = true;
+    nrf_802154_sl_ant_div_mode_t mode   = nrf_802154_sl_ant_div_cfg_mode_get(
+                                              NRF_802154_SL_ANT_DIV_OP_RX);
 
     switch (mode)
     {
-        case NRF_802154_ANT_DIVERSITY_MODE_DISABLED:
+        case NRF_802154_SL_ANT_DIV_MODE_DISABLED:
             break;
 
-        case NRF_802154_ANT_DIVERSITY_MODE_MANUAL:
-            result =
-                nrf_802154_ant_diversity_antenna_set(nrf_802154_pib_ant_diversity_rx_antenna_get());
+        case NRF_802154_SL_ANT_DIV_MODE_MANUAL:
+            result = nrf_802154_sl_ant_div_antenna_set(
+                         nrf_802154_sl_ant_div_cfg_antenna_get(NRF_802154_SL_ANT_DIV_OP_RX));
             break;
 
-        case NRF_802154_ANT_DIVERSITY_MODE_AUTO:
-            nrf_802154_ant_diversity_rx_started_notify();
+        case NRF_802154_SL_ANT_DIV_MODE_AUTO:
+            nrf_802154_sl_ant_div_rx_started_notify();
             break;
 
         default:
@@ -702,28 +693,29 @@ static void rx_antenna_update(void)
 }
 
 /**
- * Updates the antenna for transmission, according to ant_diversity settings in PIB.
+ * Updates the antenna for transmission, according to antenna diversity configuration.
  *
- * Antenna diversity for tx is not currently supported. If antenna diversity is not in disabled state,
- * default antenna will always be used for transmission.
+ * Antenna diversity for tx is not currently supported. If antenna diversity is not
+ * in disabled state, default antenna will always be used for transmission.
  */
 static void tx_antenna_update(void)
 {
-    bool                            result = true;
-    nrf_802154_ant_diversity_mode_t mode   = nrf_802154_pib_ant_diversity_tx_mode_get();
+    bool                         result = true;
+    nrf_802154_sl_ant_div_mode_t mode   = nrf_802154_sl_ant_div_cfg_mode_get(
+                                              NRF_802154_SL_ANT_DIV_OP_TX);
 
     switch (mode)
     {
-        case NRF_802154_ANT_DIVERSITY_MODE_DISABLED:
+        case NRF_802154_SL_ANT_DIV_MODE_DISABLED:
             /* Intentionally empty. */
             break;
 
-        case NRF_802154_ANT_DIVERSITY_MODE_MANUAL:
-            result = nrf_802154_ant_diversity_antenna_set(
-                nrf_802154_pib_ant_diversity_tx_antenna_get());
+        case NRF_802154_SL_ANT_DIV_MODE_MANUAL:
+            result = nrf_802154_sl_ant_div_antenna_set(
+                         nrf_802154_sl_ant_div_cfg_antenna_get(NRF_802154_SL_ANT_DIV_OP_TX));
             break;
 
-        case NRF_802154_ANT_DIVERSITY_MODE_AUTO:
+        case NRF_802154_SL_ANT_DIV_MODE_AUTO:
         default:
             assert(false);
             break;
@@ -761,8 +753,6 @@ void nrf_802154_trx_antenna_update(void)
             break;
     }
 }
-
-#endif // ENABLE_ANT_DIVERSITY
 
 void nrf_802154_trx_channel_set(uint8_t channel)
 {
@@ -932,21 +922,20 @@ void nrf_802154_trx_receive_frame(uint8_t                                bcc,
         ints_to_enable |= NRF_RADIO_INT_ADDRESS_MASK;
     }
 
-#ifdef RADIO_SYNC_EVENT_AVAILABLE
-    bool allow_sync_swi = (notifications_mask & TRX_RECEIVE_NOTIFICATION_PRESTARTED) != 0U;
-#else
     bool allow_sync_swi = false;
-#endif
 
-#if ENABLE_ANT_DIVERSITY
-    // Always allow for SYNC interrupts, as they are used by antenna diversity for preamble detection.
-    allow_sync_swi = true;
+#ifdef RADIO_SYNC_EVENT_AVAILABLE
+    if (((notifications_mask & TRX_RECEIVE_NOTIFICATION_PRESTARTED) != 0U) ||
+            (NRF_802154_SL_ANT_DIV_MODE_DISABLED !=
+             nrf_802154_sl_ant_div_cfg_mode_get(NRF_802154_SL_ANT_DIV_OP_RX)))
+    {
+        allow_sync_swi = true;
+    }
 #endif
 
     if (allow_sync_swi)
     {
-#if (NRF_802154_DISABLE_BCC_MATCHING && !defined(ENABLE_ANT_DIVERSITY)) || \
-        !defined(RADIO_SYNC_EVENT_AVAILABLE)
+#if (NRF_802154_DISABLE_BCC_MATCHING || !defined(RADIO_SYNC_EVENT_AVAILABLE))
         assert(false);
 #else
         // The RADIO can't generate interrupt on EVENT_SYNC. Path to generate interrupt:
@@ -983,10 +972,8 @@ void nrf_802154_trx_receive_frame(uint8_t                                bcc,
 
     m_timer_value_on_radio_end_event = delta_time;
 
-#if ENABLE_ANT_DIVERSITY
     // Select antenna
     nrf_802154_trx_antenna_update();
-#endif // ENABLE_ANT_DIVERSITY
 
     // Let the TIMER stop on last event required by a FEM
     nrf_timer_shorts_enable(NRF_802154_TIMER_INSTANCE,
@@ -1113,10 +1100,8 @@ void nrf_802154_trx_receive_ack(void)
     // Set PPIs necessary in rx_ack state
     fem_for_lna_set();
 
-#if ENABLE_ANT_DIVERSITY
     // Select antenna
     nrf_802154_trx_antenna_update();
-#endif // ENABLE_ANT_DIVERSITY
 
     nrf_ppi_channel_and_fork_endpoint_setup(NRF_PPI, PPI_EGU_RAMP_UP,
                                             nrf_egu_event_address_get(
@@ -1267,10 +1252,8 @@ void nrf_802154_trx_transmit_frame(const void                            * p_tra
     // Set FEM
     fem_for_tx_set(cca);
 
-#if ENABLE_ANT_DIVERSITY
     // Select antenna
     nrf_802154_trx_antenna_update();
-#endif // ENABLE_ANT_DIVERSITY
 
     // Clr event EGU
     nrf_egu_event_clear(NRF_802154_SWI_EGU_INSTANCE, EGU_EVENT);
@@ -1353,10 +1336,8 @@ bool nrf_802154_trx_transmit_ack(const void * p_transmit_buffer, uint32_t delay_
         nrf_timer_shorts_enable(NRF_802154_TIMER_INSTANCE, NRF_TIMER_SHORT_COMPARE1_STOP_MASK);
     }
 
-#if ENABLE_ANT_DIVERSITY
     // Select antenna
     nrf_802154_trx_antenna_update();
-#endif // ENABLE_ANT_DIVERSITY
 
     nrf_radio_event_clear(NRF_RADIO, NRF_RADIO_EVENT_PHYEND);
 #if NRF_802154_TX_STARTED_NOTIFY_ENABLED
@@ -1834,10 +1815,8 @@ void nrf_802154_trx_standalone_cca(void)
     // Set FEM
     fem_for_lna_set();
 
-#if ENABLE_ANT_DIVERSITY
     // Select antenna
     nrf_802154_trx_antenna_update();
-#endif // ENABLE_ANT_DIVERSITY
 
     // Clr event EGU
     nrf_egu_event_clear(NRF_802154_SWI_EGU_INSTANCE, EGU_EVENT);
@@ -1895,10 +1874,8 @@ void nrf_802154_trx_continuous_carrier(void)
     // Set FEM
     fem_for_pa_set();
 
-#if ENABLE_ANT_DIVERSITY
     // Select antenna
     nrf_802154_trx_antenna_update();
-#endif // ENABLE_ANT_DIVERSITY
 
     // Clr event EGU
     nrf_egu_event_clear(NRF_802154_SWI_EGU_INSTANCE, EGU_EVENT);
@@ -1963,10 +1940,8 @@ void nrf_802154_trx_modulated_carrier(const void * p_transmit_buffer)
     // Set FEM
     fem_for_pa_set();
 
-#if ENABLE_ANT_DIVERSITY
     // Select antenna
     nrf_802154_trx_antenna_update();
-#endif // ENABLE_ANT_DIVERSITY
 
     // Clr event EGU
     nrf_egu_event_clear(NRF_802154_SWI_EGU_INSTANCE, EGU_EVENT);
@@ -2036,10 +2011,8 @@ void nrf_802154_trx_energy_detection(uint32_t ed_count)
     // Set FEM
     fem_for_lna_set();
 
-#if ENABLE_ANT_DIVERSITY
     // Select antenna
     nrf_802154_trx_antenna_update();
-#endif // ENABLE_ANT_DIVERSITY
 
     // Clr event EGU
     nrf_egu_event_clear(NRF_802154_SWI_EGU_INSTANCE, EGU_EVENT);

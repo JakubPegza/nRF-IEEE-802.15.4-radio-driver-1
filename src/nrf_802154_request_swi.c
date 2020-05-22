@@ -83,9 +83,7 @@ typedef enum
     REQ_TYPE_CCA_CFG_UPDATE,
     REQ_TYPE_RSSI_MEASURE,
     REQ_TYPE_RSSI_GET,
-#if ENABLE_ANT_DIVERSITY
     REQ_TYPE_ANTENNA_UPDATE,
-#endif // ENABLE_ANT_DIVERSITY
 } nrf_802154_req_type_t;
 
 /// Request data in request queue.
@@ -174,12 +172,10 @@ typedef struct
             bool   * p_result; ///< RSSI measurement status.
         } rssi_get;            ///< Details of the getter that retrieves the RSSI measurement result.
 
-#if ENABLE_ANT_DIVERSITY
         struct
         {
             bool * p_result; ///< Antenna update request result.
         } antenna_update;    ///< Antenna update request details.
-#endif  // ENABLE_ANT_DIVERSITY
     } data;                  ///< Request data depending on its type.
 } nrf_802154_req_data_t;
 
@@ -448,7 +444,6 @@ static void swi_buffer_free(uint8_t * p_data, bool * p_result)
     req_exit();
 }
 
-#if ENABLE_ANT_DIVERSITY
 /**
  * @brief Notifies the core module that the next higher layer has requested an antenna change.
  *
@@ -464,8 +459,6 @@ static void swi_antenna_update(bool * p_result)
 
     req_exit();
 }
-
-#endif // ENABLE_ANT_DIVERSITY
 
 /**
  * @brief Notifies the core module that the next higher layer has requested a channel change.
@@ -612,13 +605,10 @@ bool nrf_802154_request_buffer_free(uint8_t * p_data)
     REQUEST_FUNCTION(nrf_802154_core_notify_buffer_free, swi_buffer_free, p_data)
 }
 
-#if ENABLE_ANT_DIVERSITY
 bool nrf_802154_request_antenna_update(void)
 {
     REQUEST_FUNCTION_NO_ARGS(nrf_802154_core_antenna_update, swi_antenna_update)
 }
-
-#endif // ENABLE_ANT_DIVERSITY
 
 bool nrf_802154_request_channel_update(void)
 {
@@ -720,11 +710,9 @@ static void irq_handler_req_event(void)
                     nrf_802154_core_last_rssi_measurement_get(p_slot->data.rssi_get.p_rssi);
                 break;
 
-#if ENABLE_ANT_DIVERSITY
             case REQ_TYPE_ANTENNA_UPDATE:
                 *(p_slot->data.antenna_update.p_result) = nrf_802154_core_antenna_update();
                 break;
-#endif // ENABLE_ANT_DIVERSITY
 
             default:
                 assert(false);

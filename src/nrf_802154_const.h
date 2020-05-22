@@ -106,8 +106,6 @@
 
 #define PHR_OFFSET                   0                                            ///< Offset of the PHY header in a frame.
 
-#define RSSI_SETTLE_TIME_US          15                                           ///< Time required for RSSI measurements to be valid after signal level change.
-
 #define SECURITY_ENABLED_OFFSET      1                                            ///< Byte containing the Security Enabled bit.
 #define SECURITY_ENABLED_BIT         0x08                                         ///< Bits containing the Security Enabled field.
 #define SECURITY_LEVEL_MASK          0x07                                         ///< Mask of bits containing the Security level field.
@@ -154,16 +152,6 @@
 #define PHY_US_PER_SYMBOL            16                                           ///< Duration of a single symbol in microseconds (us).
 #define PHY_SYMBOLS_PER_OCTET        2                                            ///< Number of symbols in a single byte (octet).
 #define PHY_SHR_SYMBOLS              10                                           ///< Number of symbols in the Synchronization Header (SHR).
-
-#if defined (NRF52840_XXAA) || defined(NRF52811_XXAA) || defined(NRF5340_XXAA_NETWORK)
-#define ED_MIN_DBM                   (-92)                                        ///< dBm value corresponding to value 0 in the EDSAMPLE register.
-#define ED_RESULT_FACTOR             4                                            ///< Factor needed to calculate the ED result based on the data from the RADIO peripheral.
-#elif defined (NRF52833_XXAA) || defined(NRF52820_XXAA)
-#define ED_MIN_DBM                   (-93)                                        ///< dBm value corresponding to value 0 in the EDSAMPLE register.
-#define ED_RESULT_FACTOR             5                                            ///< Factor needed to calculate the ED result based on the data from the RADIO peripheral.
-#else
-#error "Selected chip is not supported."
-#endif
 
 #define ED_RESULT_MAX                0xff                                         ///< Maximal ED result.
 
