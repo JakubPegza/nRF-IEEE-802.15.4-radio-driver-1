@@ -1,0 +1,21 @@
+/**
+
+@page rd_architecture Driver architecture
+
+The architecture of the nRF IEEE 802.15.4 radio driver is independent of the operating system and the IEEE 802.15.4 MAC layer.
+It allows to use the driver in any stack that is based on IEEE 802.15.4 and implements protocols such as Thread, Zigbee, or RF4CE.
+
+In addition, the driver was designed to work with multiprotocol applications.
+The driver allows to share the RADIO peripheral with other PHY protocol drivers, for example, Bluetooth LE.
+
+Radio drivers request access to the peripheral from an arbiter.
+The arbiter grants or denies access.
+
+The nRF IEEE 802.15.4 radio driver cooperates with the radio arbiter included in the MPSL library.
+It allows 802.15.4-only operations or dynamic multiprotocol support with other protocols like Bluetooth LE.
+
+The following figure shows the architecture of the radio driver.
+
+@image html radio_driver_architecture.svg "nRF IEEE 802.15.4 radio driver architecture"
+
+*/

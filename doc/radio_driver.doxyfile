@@ -32,7 +32,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = "IEEE 802.15.4 Radio Driver Software"
+PROJECT_NAME           = "nRF IEEE 802.15.4 Radio Driver Software"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -40,7 +40,7 @@ PROJECT_NAME           = "IEEE 802.15.4 Radio Driver Software"
 
 ### EDIT THIS ###
 
-PROJECT_NUMBER         = 2.0.0-1.pre
+PROJECT_NUMBER         = 2.0.0-1.prealpha
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -1367,7 +1367,7 @@ GENERATE_ECLIPSEHELP   = YES
 # The default value is: org.doxygen.Project.
 # This tag requires that the tag GENERATE_ECLIPSEHELP is set to YES.
 
-ECLIPSE_DOC_ID         = ieee_radio_driver_v2.0.0-1.pre
+ECLIPSE_DOC_ID         = 15.4_radio_driver_v2.0.0-1.pre
 
 # If you want full control over the layout of the generated HTML pages it might
 # be necessary to disable the index and replace it with your own. The

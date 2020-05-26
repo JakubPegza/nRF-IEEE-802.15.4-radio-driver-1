@@ -1561,7 +1561,7 @@ nrf_802154_coex_tx_request_mode_t nrf_802154_coex_tx_request_mode_get(void);
 
 /**
  * @}
- * @defgroup nrf_802154_stats Statistics and measurements.
+ * @defgroup nrf_802154_stats Statistics and measurements
  * @{
  */
 
@@ -1616,11 +1616,9 @@ void nrf_802154_stat_counters_reset(void);
  */
 void nrf_802154_stat_totals_get(nrf_802154_stat_totals_t * p_stat_totals);
 
-/** @} */
-
 /**
  * @}
- * @defgroup nrf_802154_ifs Inter-frame spacing feature.
+ * @defgroup nrf_802154_ifs Inter-frame spacing feature
  * @{
  */
 #if NRF_802154_IFS_ENABLED

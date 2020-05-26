@@ -1,5 +1,8 @@
 INPUT += \
 dox/ \
+../src/nrf_802154.h \
+../src/nrf_802154_types.h \
+../src/nrf_802154_config.h \
 
 
 

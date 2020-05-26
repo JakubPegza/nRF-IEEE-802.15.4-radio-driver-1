@@ -1,0 +1,29 @@
+/**
+
+@mainpage Introduction
+
+The nRF IEEE 802.15.4 radio driver implements the IEEE 802.15.4 PHY layer on Nordic Semiconductor's nRF devices.
+
+@note
+This documentation is a work in progress. Only some of the features supported by the driver are documented.
+
+This driver implements only the __non-beacon mode__ of operation.
+It supports the following features:
+- Reception of unicast and broadcast frames (with filtering).
+- Automatic sending of ACK frames.
+- Setting a pending bit in the ACK frame according to pending data for the given destination.
+- Transmission of unicast and broadcast frames.
+- Automatic CCA procedure before transmission.
+- Automatic receiving of ACK frames.
+- Stand-alone CCA procedure.
+- Low power mode (sleep).
+- Energy detection.
+- Promiscuous mode.
+- Continuous carrier transmission (for radio testing).
+- Dynamic multiprotocol support.
+- Front-end modules support.
+- ACK time-out handling.
+- Automatic CSMA-CA procedure during transmission.
+- Providing diagnostic information (for example, CRC errors).
+
+*/
