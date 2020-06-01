@@ -53,35 +53,16 @@ zephyr_compile_definitions(
   # Radio driver shim layer uses raw api
   NRF_802154_USE_RAW_API=1
 
-  # Number of slots containing short addresses of nodes for which
-  # pending data is stored.
   NRF_802154_PENDING_SHORT_ADDRESSES=16
-
-  # Number of slots containing extended addresses of nodes for which
-  # pending data is stored.
   NRF_802154_PENDING_EXTENDED_ADDRESSES=16
-
-  # Number of buffers in receive queue.
   NRF_802154_RX_BUFFERS=8
-
-  # CCA mode
   NRF_802154_CCA_MODE_DEFAULT=${radio_cca_mode}
-
-  # CCA mode options
   NRF_802154_CCA_CORR_LIMIT_DEFAULT=${CONFIG_NRF_802154_CCA_CORR_LIMIT}
   NRF_802154_CCA_CORR_THRESHOLD_DEFAULT=${CONFIG_NRF_802154_CCA_CORR_THRESHOLD}
   NRF_802154_CCA_ED_THRESHOLD_DEFAULT=${CONFIG_NRF_802154_CCA_ED_THRESHOLD}
-
-  # Enable CSMA/CA
   NRF_802154_CSMA_CA_ENABLED=1
   NRF_802154_TX_STARTED_NOTIFY_ENABLED=1
-
-  # Enable ack timeout
   NRF_802154_ACK_TIMEOUT_ENABLED=1
-
-  # Enable DTRX
   NRF_802154_DELAYED_TRX_ENABLED=1
-
-  # Disable unused radio driver features
-  NRF_802154_FRAME_TIMESTAMP_ENABLED=0
+  NRF_802154_FRAME_TIMESTAMP_ENABLED=1
 )
