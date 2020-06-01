@@ -305,7 +305,7 @@ bool nrf_802154_antenna_diversity_tx_mode_set(nrf_802154_sl_ant_div_mode_t mode)
     bool result = false;
 
 #if defined(RADIO_SYNC_EVENT_AVAILABLE)
-    result = nrf_802154_sl_ant_div_cfg_mode_set(NRF_802154_SL_ANT_DIV_OP_RX, mode);
+    result = nrf_802154_sl_ant_div_cfg_mode_set(NRF_802154_SL_ANT_DIV_OP_TX, mode);
 #endif
 
     if (result)
