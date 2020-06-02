@@ -20,10 +20,17 @@ It supports the following features:
 - Energy detection.
 - Promiscuous mode.
 - Continuous carrier transmission (for radio testing).
+- Modulated carrier transmission.
 - Dynamic multiprotocol support.
 - Front-end modules support.
 - ACK time-out handling.
 - Automatic CSMA-CA procedure during transmission.
 - Providing diagnostic information (for example, CRC errors).
+- @ref ant_diversity
+- @ref rd_coex
+
+For more information about the features not linked in the list, see @ref rd_feature_description.
+
+You can also read about @ref rd_architecture "driver architecture" and its @ref rd_hw_resources "hardware resources".
 
 */
