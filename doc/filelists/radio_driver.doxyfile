@@ -1,5 +1,8 @@
 INPUT += \
-dox/ \
+dox/01_mainpage.dox \
+dox/architecture.dox \
+dox/antenna_diversity.dox \
+dox/radio_driver_coex.dox \
 ../src/nrf_802154.h \
 ../src/nrf_802154_types.h \
 ../src/nrf_802154_config.h \
