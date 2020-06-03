@@ -664,6 +664,32 @@ void nrf_802154_trx_disable(void)
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_LOW);
 }
 
+static void rx_automatic_antenna_handle(void)
+{
+    switch(m_trx_state)
+    {
+        case TRX_STATE_RXFRAME:
+        case TRX_STATE_RXFRAME_FINISHED:
+            nrf_802154_sl_ant_div_rx_started_notify();
+            break;
+
+        case TRX_STATE_ENERGY_DETECTION:
+            // Intentionally empty - notification is called from core when requesting energy detection.
+            // This is done due to possibility of nrf_802154_trx_energy_detection being called multiple times
+            // during one energy detection from the point of view of application, if the entire procedure does not
+            // fit in single timeslot.
+            break;
+
+        case TRX_STATE_TXACK:
+            nrf_802154_sl_ant_div_txack_notify();
+            break;
+
+        default:
+            assert(false);
+            break;
+    }
+}
+
 /**
  * Updates the antenna for reception, according to antenna diversity configuration.
  */
@@ -684,7 +710,7 @@ static void rx_antenna_update(void)
             break;
 
         case NRF_802154_SL_ANT_DIV_MODE_AUTO:
-            nrf_802154_sl_ant_div_rx_started_notify();
+            rx_automatic_antenna_handle();
             break;
 
         default:
