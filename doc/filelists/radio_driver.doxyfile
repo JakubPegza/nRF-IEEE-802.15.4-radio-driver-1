@@ -5,6 +5,7 @@ dox/features_description.dox \
 dox/hardware_resources.dox \
 dox/antenna_diversity.dox \
 dox/radio_driver_coex.dox \
+dox/front_end_module.dox \
 ../src/nrf_802154.h \
 ../src/nrf_802154_types.h \
 ../src/nrf_802154_config.h \

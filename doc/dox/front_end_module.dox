@@ -1,0 +1,38 @@
+/**
+
+@page rd_fem PA/LNA module (FEM support)
+
+The PA/LNA module increases the range of communication by providing APIs that act as interface for several types of front-end modules (FEMs).
+
+The radio driver library includes FEM support for @linkRFFEM21540 (PCA10112).
+The support is provided in a module called @c fem/three_pin_gpio.
+This name corresponds to the module source path in the radio driver library.
+
+The FEMs are controlled by the enable signals that turn on a Power Amplifier (PA), a Low Noise Amplifier (LNA), or turn off both to save energy.
+
+When the nRF21540 support is enabled, the radio driver toggles the three GPIO pins, based on the radio operation.
+The configuration structure allows to choose the pin polarity, and time differences between the pin toggle and the intended radio operation.
+
+@image html rd_pa_lna.svg "Interfacing nRF21540 with nRF52"
+
+---
+
+@section rd_fem_include Adding FEM support
+
+To enable the FEM support in the radio driver, use the @c nrf_fem_interface_configuration_set() function.
+
+You can configure the nRF21540 support module by using fields in the configuration structure passed to the @c nrf_fem_interface_configuration_set() function:
+- @p pa_pin_config.gpio_pin -- Pin number. Controls the Power Amplifier of the FEM.
+- @p lna_pin_config.gpio_pin -- Pin number. Controls the Low Noise Amplifier of the FEM.
+- @p pdn_pin_config.gpio_pin -- Pin number. Controls the Power Down control line of the FEM.
+
+The ANT_SEL pin may be managed by the @ref ant_diversity module.
+Other nRF21540 pins (MODE, MOSI, MISO, CLK, CSN) are not supported by the radio driver library and must be set to the safe state described in the @link21540PS.
+
+@note
+The current implementation of the FEM support does not implement the SPI interface or MODE pin support and does not change the transmission power after the initialization.
+
+When the FEM support is enabled and configured, there are additional peripherals required by the radio driver's PA/LNA module for toggling the GPIO pins.
+These peripherals are defined in the configuration structure passed to the @c nrf_fem_interface_configuration_set() function.
+
+*/
