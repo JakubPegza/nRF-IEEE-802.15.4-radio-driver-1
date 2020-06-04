@@ -1041,8 +1041,8 @@ static void ed_init(void)
 
     uint32_t trx_ed_count = 0U;
 
-    // Notify antenna diversity about energy detection request. Antenna diversity state will be updated, 
-    // and m_ed_time_left reduced accordingly.
+    // Notify antenna diversity about energy detection request. Antenna diversity state
+    // will be updated, and m_ed_time_left reduced accordingly.
     nrf_802154_sl_ant_div_energy_detection_requested_notify(&m_ed_time_left);
 
     if (!ed_iter_setup(&m_ed_time_left, &trx_ed_count))
