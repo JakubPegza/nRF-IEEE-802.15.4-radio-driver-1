@@ -147,25 +147,6 @@ int8_t nrf_802154_tx_power_get(void);
 /** Structure that contains the run-time configuration of the Frontend Module. */
 typedef nrf_fem_control_cfg_t nrf_802154_fem_control_cfg_t;
 
-/** Macro with the default configuration of the Frontend Module. */
-#define NRF_802154_FEM_DEFAULT_SETTINGS                                 \
-    ((nrf_802154_fem_control_cfg_t) {                                   \
-        .pa_cfg = {                                                     \
-            .enable = 1,                                                \
-            .active_high = 1,                                           \
-            .gpio_pin = NRF_FEM_CONTROL_DEFAULT_PA_PIN,                 \
-        },                                                              \
-        .lna_cfg = {                                                    \
-            .enable = 1,                                                \
-            .active_high = 1,                                           \
-            .gpio_pin = NRF_FEM_CONTROL_DEFAULT_LNA_PIN,                \
-        },                                                              \
-        .pa_gpiote_ch_id = NRF_FEM_CONTROL_DEFAULT_PA_GPIOTE_CHANNEL,   \
-        .lna_gpiote_ch_id = NRF_FEM_CONTROL_DEFAULT_LNA_GPIOTE_CHANNEL, \
-        .ppi_ch_id_set = NRF_FEM_CONTROL_DEFAULT_SET_PPI_CHANNEL,       \
-        .ppi_ch_id_clr = NRF_FEM_CONTROL_DEFAULT_CLR_PPI_CHANNEL,       \
-    })
-
 /**
  * @brief Sets the PA & LNA GPIO toggle configuration.
  *
