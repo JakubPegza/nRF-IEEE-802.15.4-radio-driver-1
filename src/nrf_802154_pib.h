@@ -302,6 +302,8 @@ uint16_t nrf_802154_pib_ifs_min_sifs_period_get(void);
  * @brief Sets Short IFS period in microseconds.
  *
  * @param[in] period Short IFS period in microseconds.
+ *
+ * @note The period cannot be smaller than aTurnaroundTime.
  */
 void nrf_802154_pib_ifs_min_sifs_period_set(uint16_t period);
 

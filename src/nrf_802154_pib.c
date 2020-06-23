@@ -477,6 +477,8 @@ uint16_t nrf_802154_pib_ifs_min_sifs_period_get(void)
 
 void nrf_802154_pib_ifs_min_sifs_period_set(uint16_t period)
 {
+    assert(period >= TURNAROUND_TIME);
+
     m_data.ifs.min_sifs_period_us = period;
 }
 
