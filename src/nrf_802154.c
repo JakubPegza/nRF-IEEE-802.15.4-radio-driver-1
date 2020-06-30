@@ -73,10 +73,6 @@
 #include "mac_features/nrf_802154_delayed_trx.h"
 #include "mac_features/ack_generator/nrf_802154_ack_data.h"
 
-#if ENABLE_FEM
-#include "fem/nrf_fem_protocol_api.h"
-#endif
-
 #include "nrf_802154_sl_ant_div.h"
 
 #define RAW_LENGTH_OFFSET  0
@@ -232,52 +228,6 @@ void nrf_802154_deinit(void)
     nrf_802154_clock_deinit();
     nrf_802154_core_deinit();
 }
-
-#if ENABLE_FEM
-void nrf_802154_fem_control_cfg_set(nrf_802154_fem_control_cfg_t const * const p_cfg)
-{
-    nrf_fem_interface_config_t config;
-
-    nrf_fem_interface_configuration_get(&config);
-
-    config.lna_pin_config.active_high  = p_cfg->lna_cfg.active_high;
-    config.lna_pin_config.enable       = p_cfg->lna_cfg.enable;
-    config.lna_pin_config.gpio_pin     = p_cfg->lna_cfg.gpio_pin;
-    config.lna_pin_config.gpiote_ch_id = p_cfg->lna_gpiote_ch_id;
-
-    config.pa_pin_config.active_high  = p_cfg->pa_cfg.active_high;
-    config.pa_pin_config.enable       = p_cfg->pa_cfg.enable;
-    config.pa_pin_config.gpio_pin     = p_cfg->pa_cfg.gpio_pin;
-    config.pa_pin_config.gpiote_ch_id = p_cfg->pa_gpiote_ch_id;
-
-    config.ppi_ch_id_set = p_cfg->ppi_ch_id_set;
-    config.ppi_ch_id_clr = p_cfg->ppi_ch_id_clr;
-
-    nrf_fem_interface_configuration_set(&config);
-}
-
-void nrf_802154_fem_control_cfg_get(nrf_802154_fem_control_cfg_t * p_cfg)
-{
-    nrf_fem_interface_config_t config;
-
-    nrf_fem_interface_configuration_get(&config);
-
-    p_cfg->lna_cfg.active_high = config.lna_pin_config.active_high;
-    p_cfg->lna_cfg.enable      = config.lna_pin_config.enable;
-    p_cfg->lna_cfg.gpio_pin    = config.lna_pin_config.gpio_pin;
-
-    p_cfg->pa_cfg.active_high = config.pa_pin_config.active_high;
-    p_cfg->pa_cfg.enable      = config.pa_pin_config.enable;
-    p_cfg->pa_cfg.gpio_pin    = config.pa_pin_config.gpio_pin;
-
-    p_cfg->lna_gpiote_ch_id = config.lna_pin_config.gpiote_ch_id;
-    p_cfg->pa_gpiote_ch_id  = config.pa_pin_config.gpiote_ch_id;
-
-    p_cfg->ppi_ch_id_clr = config.ppi_ch_id_clr;
-    p_cfg->ppi_ch_id_set = config.ppi_ch_id_set;
-}
-
-#endif // ENABLE_FEM
 
 bool nrf_802154_antenna_diversity_rx_mode_set(nrf_802154_sl_ant_div_mode_t mode)
 {

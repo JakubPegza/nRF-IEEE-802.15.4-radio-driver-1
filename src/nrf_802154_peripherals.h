@@ -416,22 +416,15 @@ extern "C" {
 #define NRF_802154_PPI_CORE_GROUP NRF_PPI_CHANNEL_GROUP0
 #endif
 
-#ifdef NRF_802154_FRAME_TIMESTAMP_ENABLED
-
 /**
- * @def NRF_802154_PPI_TIMESTAMP_GROUP
+ * @def NRF_802154_PPI_ABORT_GROUP
  *
- * The PPI channel group used to control PPIs used for timestamping.
- *
- * @note This option is used only when the timestamping feature is enabled
- *       (see @ref NRF_802154_FRAME_TIMESTAMP_ENABLED).
+ * The PPI channel group used to break PPI connections related with FEM, when the abort condition occurs.
  *
  */
-#ifndef NRF_802154_PPI_TIMESTAMP_GROUP
-#define NRF_802154_PPI_TIMESTAMP_GROUP NRF_PPI_CHANNEL_GROUP1
+#ifndef NRF_802154_PPI_ABORT_GROUP
+#define NRF_802154_PPI_ABORT_GROUP NRF_PPI_CHANNEL_GROUP1
 #endif
-
-#endif // NRF_802154_FRAME_TIMESTAMP_ENABLED
 
 /**
  * @def NRF_802154_TIMERS_USED_MASK
@@ -507,14 +500,8 @@ extern "C" {
  * Bit mask of PPI groups identifiers used by the 802.15.4 driver.
  */
 #ifndef NRF_802154_PPI_GROUPS_USED_MASK
-
-#ifdef NRF_802154_FRAME_TIMESTAMP_ENABLED
 #define NRF_802154_PPI_GROUPS_USED_MASK ((1 << NRF_802154_PPI_CORE_GROUP) | \
-                                         (1 << NRF_802154_PPI_TIMESTAMP_GROUP))
-#else // NRF_802154_FRAME_TIMESTAMP_ENABLED
-#define NRF_802154_PPI_GROUPS_USED_MASK (1 << NRF_802154_PPI_CORE_GROUP)
-#endif  // NRF_802154_FRAME_TIMESTAMP_ENABLED
-
+                                         (1 << NRF_802154_PPI_ABORT_GROUP)  )
 #endif // NRF_802154_PPI_GROUPS_USED_MASK
 
 #ifdef __cplusplus

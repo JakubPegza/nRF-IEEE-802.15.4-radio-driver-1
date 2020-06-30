@@ -46,6 +46,7 @@
 
 #include "hal/nrf_egu.h"
 #include "hal/nrf_radio.h"
+#include "hal/nrf_timer.h"
 
 #include "nrf_802154_procedures_duration.h"
 #include "nrf_802154_critical_section.h"
@@ -65,6 +66,8 @@
 
 #define PPI_CHGRP0                    NRF_802154_PPI_CORE_GROUP                      ///< PPI group used to disable self-disabling PPIs
 #define PPI_CHGRP0_DIS_TASK           NRF_PPI_TASK_CHG0_DIS                          ///< PPI task used to disable self-disabling PPIs
+
+#define PPI_FAL_ABORT_GROUP           NRF_802154_PPI_ABORT_GROUP
 
 #define PPI_DISABLED_EGU              NRF_802154_PPI_RADIO_DISABLED_TO_EGU           ///< PPI that connects RADIO DISABLED event with EGU task
 #define PPI_EGU_RAMP_UP               NRF_802154_PPI_EGU_TO_RADIO_RAMP_UP            ///< PPI that connects EGU event with RADIO TXEN or RXEN task
@@ -149,14 +152,6 @@
 #define RSSI_SETTLE_TIME_US   15       ///< Time required for RSSI measurements to become valid after signal level change.
 
 /// Common parameters for the FAL handling.
-static const nrf_802154_fal_event_t m_deactivate_on_disable =
-{
-    .type                           = NRF_802154_FAL_EVENT_TYPE_GENERIC,
-    .override_ppi                   = false,
-    .event.generic.register_address =
-        ((uint32_t)NRF_RADIO_BASE + (uint32_t)NRF_RADIO_EVENT_DISABLED)
-};
-
 static const nrf_802154_fal_event_t m_activate_rx_cc0 =
 {
     .type         = NRF_802154_FAL_EVENT_TYPE_TIMER,
@@ -377,7 +372,7 @@ static void fem_for_lna_set(void)
 /** Reset FEM configuration for LNA. */
 static void fem_for_lna_reset(void)
 {
-    nrf_802154_fal_lna_configuration_clear(&m_activate_rx_cc0, NULL);
+    nrf_802154_fal_lna_configuration_clear();
     nrf_timer_task_trigger(NRF_802154_TIMER_INSTANCE, NRF_TIMER_TASK_SHUTDOWN);
     nrf_timer_shorts_disable(NRF_802154_TIMER_INSTANCE, NRF_TIMER_SHORT_COMPARE0_STOP_MASK);
     nrf_ppi_channel_disable(NRF_PPI, PPI_EGU_TIMER_START);
@@ -403,7 +398,7 @@ static void fem_for_pa_set(void)
 /** Reset FEM configuration for PA. */
 static void fem_for_pa_reset(void)
 {
-    nrf_802154_fal_pa_configuration_clear(&m_activate_tx_cc0, NULL);
+    nrf_802154_fal_pa_configuration_clear();
     nrf_timer_task_trigger(NRF_802154_TIMER_INSTANCE, NRF_TIMER_TASK_SHUTDOWN);
     nrf_ppi_channel_disable(NRF_PPI, PPI_EGU_TIMER_START);
     nrf_802154_fal_deactivate_now(NRF_802154_FAL_PA);
@@ -447,6 +442,10 @@ static void fem_for_tx_set(bool cca)
                                                                         NRF_TIMER_TASK_START);
 
         nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_EGU_TIMER_START, egu_event_addr, timer_task_addr);
+        
+        nrf_802154_fal_abort_extend(PPI_EGU_RAMP_UP, PPI_FAL_ABORT_GROUP);
+        nrf_802154_fal_abort_extend(PPI_EGU_TIMER_START, PPI_FAL_ABORT_GROUP);
+        
         nrf_ppi_channel_enable(NRF_PPI, PPI_EGU_TIMER_START);
     }
 }
@@ -457,12 +456,12 @@ static void fem_for_tx_reset(bool cca, bool disable_ppi_egu_timer_start)
 
     if (cca)
     {
-        nrf_802154_fal_lna_configuration_clear(&m_activate_rx_cc0, &m_ccaidle);
-        nrf_802154_fal_pa_configuration_clear(&m_ccaidle, NULL);
+        nrf_802154_fal_lna_configuration_clear();
+        nrf_802154_fal_pa_configuration_clear();
     }
     else
     {
-        nrf_802154_fal_pa_configuration_clear(&m_activate_tx_cc0, NULL);
+        nrf_802154_fal_pa_configuration_clear();
     }
 
     if (disable_ppi_egu_timer_start)
@@ -562,8 +561,8 @@ void nrf_802154_trx_enable(void)
 
     assert(nrf_radio_shorts_get(NRF_RADIO) == SHORTS_IDLE);
 
-    nrf_802154_fal_pa_configuration_set(NULL, &m_deactivate_on_disable);
-    nrf_802154_fal_lna_configuration_set(NULL, &m_deactivate_on_disable);
+    nrf_802154_fal_abort_set(nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_DISABLED),
+                             PPI_FAL_ABORT_GROUP);
 
     nrf_802154_fal_deactivate_now(NRF_802154_FAL_ALL);
 
@@ -627,8 +626,7 @@ void nrf_802154_trx_disable(void)
 
         nrf_radio_power_set(NRF_RADIO, true);
 
-        nrf_802154_fal_pa_configuration_clear(NULL, &m_deactivate_on_disable);
-        nrf_802154_fal_lna_configuration_clear(NULL, &m_deactivate_on_disable);
+        nrf_802154_fal_abort_clear();
 
         nrf_802154_fal_deactivate_now(NRF_802154_FAL_ALL);
 
@@ -1433,7 +1431,7 @@ bool nrf_802154_trx_transmit_ack(const void * p_transmit_buffer, uint32_t delay_
         /* As the timer was running during operation, it is possible we were able to configure
          * FEM thus it may trigger in future or may started PA activation.
          */
-        nrf_802154_fal_pa_configuration_clear(&m_activate_tx_cc0_timeshifted, NULL);
+        nrf_802154_fal_pa_configuration_clear();
 
         nrf_802154_fal_deactivate_now(NRF_802154_FAL_PA);
 
@@ -1512,7 +1510,7 @@ static void rxframe_finish_disable_fem_activation(void)
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
     // Disable LNA activation
-    nrf_802154_fal_lna_configuration_clear(&m_activate_rx_cc0, NULL);
+    nrf_802154_fal_lna_configuration_clear();
     // Disable short used by LNA activation
     nrf_timer_shorts_disable(NRF_802154_TIMER_INSTANCE,
                              NRF_TIMER_SHORT_COMPARE0_STOP_MASK);
@@ -1566,7 +1564,7 @@ static void rxframe_finish(void)
      *
      * FEM's LNA mode is disabled by path:
      * RADIO.SHORT_END_DISABLE -> RADIO.TASKS_DISABLE -> RADIO.EVENTS_DISABLED -> (FEM's PPI triggering disable LNA operation,
-     *                                                                             see m_deactivate_on_disable)
+     *                                                                             see nrf_802154_fal_abort_set() )
      *
      * RADIO will not ramp up, as PPI_EGU_RAMP_UP channel is self-disabling, and
      * it was disabled when receive ramp-up was started.
@@ -1775,7 +1773,7 @@ static void rxack_finish_disable_fem_activation(void)
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
     // Disable LNA activation
-    nrf_802154_fal_lna_configuration_clear(&m_activate_rx_cc0, NULL);
+    nrf_802154_fal_lna_configuration_clear();
 
     // Disable short used by LNA activation
     nrf_timer_shorts_disable(NRF_802154_TIMER_INSTANCE,
@@ -2346,7 +2344,7 @@ static void txack_finish(void)
 
     nrf_radio_shorts_set(NRF_RADIO, SHORTS_IDLE);
 
-    nrf_802154_fal_pa_configuration_clear(&m_activate_tx_cc0_timeshifted, NULL);
+    nrf_802154_fal_pa_configuration_clear();
 
     nrf_timer_shorts_disable(NRF_802154_TIMER_INSTANCE,
                              NRF_TIMER_SHORT_COMPARE0_STOP_MASK |
@@ -2377,7 +2375,7 @@ static void transmit_ack_abort(void)
 
     nrf_radio_shorts_set(NRF_RADIO, SHORTS_IDLE);
 
-    nrf_802154_fal_pa_configuration_clear(&m_activate_tx_cc0_timeshifted, NULL);
+    nrf_802154_fal_pa_configuration_clear();
 
     nrf_timer_shorts_disable(NRF_802154_TIMER_INSTANCE,
                              NRF_TIMER_SHORT_COMPARE0_STOP_MASK |
