@@ -142,14 +142,18 @@
 #define SHORTS_CCA            (NRF_RADIO_SHORT_RXREADY_CCASTART_MASK | \
                                NRF_RADIO_SHORT_CCABUSY_DISABLE_MASK)
 
-#define CRC_LENGTH            2        ///< Length of CRC in 802.15.4 frames [bytes]
-#define CRC_POLYNOMIAL        0x011021 ///< Polynomial used for CRC calculation in 802.15.4 frames
+#define CRC_LENGTH            2          ///< Length of CRC in 802.15.4 frames [bytes]
+#define CRC_POLYNOMIAL        0x011021   ///< Polynomial used for CRC calculation in 802.15.4 frames
 
-#define TXRU_TIME             40       ///< Transmitter ramp up time [us]
-#define EVENT_LAT             23       ///< END event latency [us]
-#define MAX_RXRAMPDOWN_CYCLES 32       ///< Maximum number of cycles that RX ramp-down might take
+#define TXRU_TIME             40         ///< Transmitter ramp up time [us]
+#define EVENT_LAT             23         ///< END event latency [us]
+#define MAX_RXRAMPDOWN_CYCLES 32         ///< Maximum number of cycles that RX ramp-down might take
 
-#define RSSI_SETTLE_TIME_US   15       ///< Time required for RSSI measurements to become valid after signal level change.
+#define RSSI_SETTLE_TIME_US   15         ///< Time required for RSSI measurements to become valid after signal level change.
+
+#if NRF_802154_INTERNAL_RADIO_IRQ_HANDLING
+void nrf_802154_radio_irq_handler(void); ///< Prototype required by internal RADIO IRQ handler
+#endif // NRF_802154_INTERNAL_RADIO_IRQ_HANDLING
 
 /// Common parameters for the FAL handling.
 static const nrf_802154_fal_event_t m_activate_rx_cc0 =
