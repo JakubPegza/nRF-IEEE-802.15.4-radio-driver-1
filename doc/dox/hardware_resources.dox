@@ -2,17 +2,38 @@
 
 @page rd_hw_resources Hardware resources
 
+@tableofcontents
+
 The nRF IEEE 802.15.4 radio driver requires some hardware resources to operate correctly.
 
-@section rd_hw_resources_peripherals Peripherals used by the driver directly
+@section rd_hw_resources_peripherals_directly Peripherals used by the driver directly
 
 The driver uses several peripherals directly:
 - RADIO - Can be shared with arbitration in multiprotocol configuration.
-- 1 TIMER - Can be shared with arbitration in multiprotocol configuration.
+- 2 TIMER peripherals - TIMER0 can be shared with arbitration in multiprotocol configuration.
 - 1 EGU - Channel 15 (or all channels in multiprotocol configuration).
 - 7 PPI channels.
 - 1 PPI group.
-- 2 GPIOTE channels - if FEM support is enabled.
+
+
+---
+@section rd_hw_resources_peripherals_optional Peripherals used by optional driver modules
+
+There are several modules that can be enabled or disabled in the driver and that consume additional resources when enabled:
+- @ref ant_diversity
+    - 1 PPI channel
+    - 1 GPIOTE channel
+    - 1 GPIO pin
+    - 1 TIMER
+- @ref rd_fem "FEM"
+    - 3-pin GPIO variant
+        - 3 PPI channels
+        - 3 GPIOTE channel
+        - 3 GPIO pins
+    - simple GPIO variant
+        - 2 PPI channels
+        - 2 GPIOTE channel
+        - 2 GPIO pins
 
 
 ---
