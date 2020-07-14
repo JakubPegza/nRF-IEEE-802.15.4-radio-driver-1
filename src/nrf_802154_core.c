@@ -1713,6 +1713,7 @@ void nrf_802154_trx_receive_frame_crcerror(void)
 #endif
 
     assert(m_state == RADIO_STATE_RX);
+    rx_flags_clear();
 
     // We don't change receive buffer, receive will go to the same that was already used
 #if !NRF_802154_DISABLE_BCC_MATCHING
