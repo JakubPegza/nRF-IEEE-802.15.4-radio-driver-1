@@ -40,6 +40,7 @@
 #include <stdint.h>
 
 #include "nrf_802154_config.h"
+#include "nrf_802154_sl_log.h"
 #include "nrf_802154_debug_log.h"
 #include "nrf_802154_debug_core.h"
 

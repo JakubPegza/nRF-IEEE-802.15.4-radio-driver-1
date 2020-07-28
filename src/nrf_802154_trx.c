@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define NRF_802154_MODULE_ID NRF_802154_MODULE_ID_TRX
+#define NRF_802154_MODULE_ID NRF_802154_DRV_MODULE_ID_TRX
 
 #include <assert.h>
 #include <string.h>

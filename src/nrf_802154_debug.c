@@ -39,18 +39,35 @@
 
 #include <stdint.h>
 
+#include "nrf_802154_debug_log_codes.h"
+
 void nrf_802154_debug_gpio_init(void);
-void nrf_802154_debug_log_init(void);
 void nrf_802154_debug_assert_init(void);
 
 void nrf_802154_debug_init(void)
 {
+  
+#if NRF_802154_SL_ENABLE_DEBUG_LOG
+    // dummy_local is needed for only one purpose - to ensure the presence of typedef-s
+    // (used inside nrf_802154_drv_typedefs_to_save_in_elf_t union) in final .elf file.
+    // The original reason is that the information about particular 'typdef' is included 
+    // in the .elf file only if this 'typdef' is used for the actual operation in the code.
+    nrf_802154_drv_typedefs_to_save_in_elf_t volatile dummy_local;
+    dummy_local.dummy00tag = 0;
+    (void)dummy_local;
+#endif
+
 #if ENABLE_DEBUG_GPIO
     nrf_802154_debug_gpio_init();
 #endif // ENABLE_DEBUG_GPIO
+
 #if ENABLE_DEBUG_LOG
-    nrf_802154_debug_log_init();
+#warning attempt to use deprecated ENABLE_DEBUG_LOG switch
+// When linking with SL use NRF_802154_SL_ENABLE_DEBUG_LOG instead 
 #endif // ENABLE_DEBUG_LOG
+
+    nrf_802154_sl_log_init();
+
 #if ENABLE_DEBUG_ASSERT
     nrf_802154_debug_assert_init();
 #endif // ENABLE_DEBUG_ASSERT
