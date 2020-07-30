@@ -296,6 +296,16 @@ bool nrf_802154_antenna_diversity_init(void);
 void nrf_802154_antenna_diversity_timer_irq_handler(void);
 
 /**
+ * @brief Gets the current time.
+ *
+ * The time returned by this function is to be used to calculate timing parameters for
+ * @ref nrf_802154_transmit_at and @ref nrf_802154_receive_at functions.
+ *
+ * @returns Current time in microseconds.
+ */
+uint32_t nrf_802154_time_get(void);
+
+/**
  * @}
  * @defgroup nrf_802154_addresses Setting addresses and PAN ID of the device
  * @{

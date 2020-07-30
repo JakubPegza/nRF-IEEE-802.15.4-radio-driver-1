@@ -835,6 +835,11 @@ void nrf_802154_ifs_min_lifs_period_set(uint16_t period)
 
 #endif // NRF_802154_IFS_ENABLED
 
+uint32_t nrf_802154_time_get(void)
+{
+    return nrf_802154_timer_sched_time_get();
+}
+
 __WEAK void nrf_802154_tx_ack_started(const uint8_t * p_data)
 {
     (void)p_data;
