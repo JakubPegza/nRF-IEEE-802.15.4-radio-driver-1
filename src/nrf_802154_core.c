@@ -1918,6 +1918,7 @@ void nrf_802154_trx_receive_frame_received(void)
         // CRC is OK, but filtering operation did not end - it is invalid frame with valid CRC
         // or problem due to software latency (i.e. handled BCMATCH, CRCERROR, CRCOK from two
         // consecutively received frames).
+        request_preconditions_for_state(m_state);
         rx_init();
 
 #if NRF_802154_DISABLE_BCC_MATCHING
