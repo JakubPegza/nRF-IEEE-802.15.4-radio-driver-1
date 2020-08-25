@@ -1,0 +1,4 @@
+:defines:
+  :test:
+    - NRF52840_XXAA
+
