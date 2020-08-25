@@ -81,6 +81,7 @@
 #define __STATIC_INLINE static inline
 #define __ALIGN(n)      __attribute__((aligned(n)))
 #define __ASM           __asm
+#define __WEAK          __attribute__((weak))
 /* Undefine all hardware peripherals provided by MDK so that they can be mocked later */
 
 extern char g_periph_mem[];
@@ -90,6 +91,97 @@ extern char g_periph_mem[];
   #undef  NRF_RADIO_BASE
   #define NRF_RADIO_BASE              (g_periph_mem + 0x01000)
   #define NRF_RADIO                   ((NRF_RADIO_Type*)         NRF_RADIO_BASE)
+#endif
+
+#if defined(NRF_GPIOTE)
+  #undef  NRF_GPIOTE
+  #undef  NRF_GPIOTE_BASE
+  #define NRF_GPIOTE_BASE             (g_periph_mem + 0x06000)
+  #define NRF_GPIOTE                  ((NRF_GPIOTE_Type*)        NRF_GPIOTE_BASE)
+#endif
+
+#if defined(NRF_TIMER0)
+  #undef  NRF_TIMER0
+  #undef  NRF_TIMER0_BASE
+  #define NRF_TIMER0_BASE             (g_periph_mem + 0x08000)
+  #define NRF_TIMER0                  ((NRF_TIMER_Type*)         NRF_TIMER0_BASE)
+#endif
+
+#if defined(NRF_TIMER1)
+  #undef  NRF_TIMER1
+  #undef  NRF_TIMER1_BASE
+  #define NRF_TIMER1_BASE             (g_periph_mem + 0x09000)
+  #define NRF_TIMER1                  ((NRF_TIMER_Type*)         NRF_TIMER1_BASE)
+#endif
+
+#if defined(NRF_TIMER2)
+  #undef  NRF_TIMER2
+  #undef  NRF_TIMER2_BASE
+  #define NRF_TIMER2_BASE             (g_periph_mem + 0x0A000)
+  #define NRF_TIMER2                  ((NRF_TIMER_Type*)         NRF_TIMER2_BASE)
+#endif
+
+#if defined(NRF_EGU0)
+  #undef  NRF_EGU0
+  #undef  NRF_EGU0_BASE
+  #define NRF_EGU0_BASE               (g_periph_mem + 0x14000)
+  #define NRF_EGU0                    ((NRF_EGU_Type*)           NRF_EGU0_BASE)
+#endif
+
+#if defined(NRF_EGU1)
+  #undef  NRF_EGU1
+  #undef  NRF_EGU1_BASE
+  #define NRF_EGU1_BASE               (g_periph_mem + 0x15000)
+  #define NRF_EGU1                    ((NRF_EGU_Type*)           NRF_EGU1_BASE)
+#endif
+
+#if defined(NRF_EGU2)
+  #undef  NRF_EGU2
+  #undef  NRF_EGU2_BASE
+  #define NRF_EGU2_BASE               (g_periph_mem + 0x16000)
+  #define NRF_EGU2                    ((NRF_EGU_Type*)           NRF_EGU2_BASE)
+#endif
+
+#if defined(NRF_EGU3)
+  #undef  NRF_EGU3
+  #undef  NRF_EGU3_BASE
+  #define NRF_EGU3_BASE               (g_periph_mem + 0x17000)
+  #define NRF_EGU3                    ((NRF_EGU_Type*)           NRF_EGU3_BASE)
+#endif
+
+#if defined(NRF_EGU4)
+  #undef  NRF_EGU4
+  #undef  NRF_EGU4_BASE
+  #define NRF_EGU4_BASE               (g_periph_mem + 0x18000)
+  #define NRF_EGU4                    ((NRF_EGU_Type*)           NRF_EGU4_BASE)
+#endif
+
+#if defined(NRF_EGU5)
+  #undef  NRF_EGU5
+  #undef  NRF_EGU5_BASE
+  #define NRF_EGU5_BASE               (g_periph_mem + 0x19000)
+  #define NRF_EGU5                    ((NRF_EGU_Type*)           NRF_EGU5_BASE)
+#endif
+
+#if defined(NRF_TIMER3)
+  #undef  NRF_TIMER3
+  #undef  NRF_TIMER3_BASE
+  #define NRF_TIMER3_BASE             (g_periph_mem + 0x1A000)
+  #define NRF_TIMER3                  ((NRF_TIMER_Type*)         NRF_TIMER3_BASE)
+#endif
+
+#if defined(NRF_TIMER4)
+  #undef  NRF_TIMER4
+  #undef  NRF_TIMER4_BASE
+  #define NRF_TIMER4_BASE             (g_periph_mem + 0x1B000)
+  #define NRF_TIMER4                  ((NRF_TIMER_Type*)         NRF_TIMER4_BASE)
+#endif
+
+#if defined(NRF_PPI)
+  #undef  NRF_PPI
+  #undef  NRF_PPI_BASE
+  #define NRF_PPI_BASE                (g_periph_mem + 0x1F000)
+  #define NRF_PPI                     ((NRF_PPI_Type*)           NRF_PPI_BASE)
 #endif
 
 #endif /* NRF_H */

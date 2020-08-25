@@ -17,6 +17,7 @@
 #undef __STATIC_INLINE
 #endif
 #define __STATIC_INLINE static inline
+#define __STATIC_FORCEINLINE __STATIC_INLINE
 
 #include <stdint.h>
 
@@ -31,6 +32,19 @@ extern void __disable_irq(void);
 extern void __enable_irq(void);
 extern uint32_t __get_PRIMASK(void);
 /* core_cmFunc.h */
+
+/* cmsis_gcc.h */
+__STATIC_FORCEINLINE uint8_t __LDREXB(volatile uint8_t *addr)
+{
+    return *addr;
+}
+
+__STATIC_FORCEINLINE uint32_t __STREXB(uint8_t value, volatile uint8_t *addr)
+{
+    *addr = value;
+    return 0;
+}
+/* cmsis_gcc.h */
 
 #ifdef __cplusplus
   #define   __I     volatile             /*!< Defines 'read only' permissions                 */

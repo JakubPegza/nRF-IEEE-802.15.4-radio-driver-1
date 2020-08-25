@@ -90,12 +90,16 @@
   :plugins:
     - :ignore
     - :callback
+    - :ignore_arg
+    - :return_thru_ptr
   :treat_as:
     uint8:    HEX8
     uint16:   HEX16
     uint32:   UINT32
     int8:     INT8
     bool:     UINT8
+  :when_ptr: :compare_ptr
+
 
 # Add -gcov to the plugins list to make sure of the gcov plugin
 # You will need to have gcov and gcovr both installed to make it work.

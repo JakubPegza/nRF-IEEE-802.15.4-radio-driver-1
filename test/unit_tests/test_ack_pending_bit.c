@@ -909,9 +909,9 @@ void test_ShouldSetAckPendingBit(void)
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &src_addr_extended, test_addr_extended_1);
-    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
+    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &src_addr_extended, test_addr_extended_1);
+    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
 
     result = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_extended);
     TEST_ASSERT_FALSE(result);
@@ -921,9 +921,9 @@ void test_ShouldSetAckPendingBit(void)
     TEST_ASSERT_TRUE(result);
 
 
-    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &src_addr_extended, test_addr_extended_1);
-    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
+    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_extended, &src_addr_extended, test_addr_extended_1);
+    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
 
     result = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_extended);
     TEST_ASSERT_TRUE(result);
@@ -932,9 +932,9 @@ void test_ShouldSetAckPendingBit(void)
 
     src_addr_extended = false;
 
-    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &src_addr_extended, test_addr_short_1);
-    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
+    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &src_addr_extended, test_addr_short_1);
+    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
 
     result = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_FALSE(result);
@@ -944,12 +944,10 @@ void test_ShouldSetAckPendingBit(void)
     TEST_ASSERT_TRUE(result);
 
 
-    __wrap_nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &src_addr_extended, test_addr_short_1);
-    __wrap_nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
-    __wrap_nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
+    nrf_802154_frame_parser_src_addr_get_ExpectAndReturn(test_psdu_short, &src_addr_extended, test_addr_short_1);
+    nrf_802154_frame_parser_src_addr_get_IgnoreArg_p_src_addr_extended();
+    nrf_802154_frame_parser_src_addr_get_ReturnThruPtr_p_src_addr_extended(&src_addr_extended);
 
     result = nrf_802154_ack_data_pending_bit_should_be_set(test_psdu_short);
     TEST_ASSERT_TRUE(result);
 }
-
-UNITY_TEST_MAIN()
