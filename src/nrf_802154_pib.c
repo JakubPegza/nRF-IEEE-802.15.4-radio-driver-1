@@ -48,7 +48,7 @@
 #include "nrf_802154_utils.h"
 #include "fal/nrf_802154_fal.h"
 
-#define CSMACA_BE_MAXIMUM 8  ///< The maximum allowed CSMA-CA backoff exponent (BE) that results from the implementation
+#define CSMACA_BE_MAXIMUM 8 ///< The maximum allowed CSMA-CA backoff exponent (BE) that results from the implementation
 
 typedef struct
 {
@@ -91,12 +91,13 @@ typedef struct
 
 #if NRF_802154_CSMA_CA_ENABLED
     nrf_802154_pib_csmaca_t csmaca;                               ///< CSMA-CA related fields.
+
 #endif
 
 #if NRF_802154_IFS_ENABLED
     nrf_802154_pib_ifs_t ifs; ///< IFS-related fields.
-#endif
 
+#endif
 
 } nrf_802154_pib_data_t;
 
@@ -343,8 +344,8 @@ void nrf_802154_pib_cca_cfg_set(const nrf_802154_cca_cfg_t * p_cca_cfg)
     switch (p_cca_cfg->mode)
     {
         case NRF_RADIO_CCA_MODE_ED:
-            m_data.cca.mode           = p_cca_cfg->mode;
-            m_data.cca.ed_threshold   = p_cca_cfg->ed_threshold;
+            m_data.cca.mode         = p_cca_cfg->mode;
+            m_data.cca.ed_threshold = p_cca_cfg->ed_threshold;
             break;
 
         case NRF_RADIO_CCA_MODE_CARRIER:

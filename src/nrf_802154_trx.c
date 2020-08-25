@@ -64,39 +64,39 @@
 #define EGU_SYNC_TASK                 NRF_EGU_TASK_TRIGGER3
 #define EGU_SYNC_INTMASK              NRF_EGU_INT_TRIGGERED3
 
-#define PPI_CHGRP0                    NRF_802154_PPI_CORE_GROUP                      ///< PPI group used to disable self-disabling PPIs
-#define PPI_CHGRP0_DIS_TASK           NRF_PPI_TASK_CHG0_DIS                          ///< PPI task used to disable self-disabling PPIs
+#define PPI_CHGRP0                    NRF_802154_PPI_CORE_GROUP ///< PPI group used to disable self-disabling PPIs
+#define PPI_CHGRP0_DIS_TASK           NRF_PPI_TASK_CHG0_DIS     ///< PPI task used to disable self-disabling PPIs
 
 #define PPI_FAL_ABORT_GROUP           NRF_802154_PPI_ABORT_GROUP
 
-#define PPI_DISABLED_EGU              NRF_802154_PPI_RADIO_DISABLED_TO_EGU           ///< PPI that connects RADIO DISABLED event with EGU task
-#define PPI_EGU_RAMP_UP               NRF_802154_PPI_EGU_TO_RADIO_RAMP_UP            ///< PPI that connects EGU event with RADIO TXEN or RXEN task
-#define PPI_EGU_TIMER_START           NRF_802154_PPI_EGU_TO_TIMER_START              ///< PPI that connects EGU event with TIMER START task
-#define PPI_CCAIDLE_FEM               NRF_802154_PPI_RADIO_CCAIDLE_TO_FEM_GPIOTE     ///< PPI that connects RADIO CCAIDLE event with GPIOTE tasks used by FEM
-#define PPI_TIMER_TX_ACK              NRF_802154_PPI_TIMER_COMPARE_TO_RADIO_TXEN     ///< PPI that connects TIMER COMPARE event with RADIO TXEN task
+#define PPI_DISABLED_EGU              NRF_802154_PPI_RADIO_DISABLED_TO_EGU          ///< PPI that connects RADIO DISABLED event with EGU task
+#define PPI_EGU_RAMP_UP               NRF_802154_PPI_EGU_TO_RADIO_RAMP_UP           ///< PPI that connects EGU event with RADIO TXEN or RXEN task
+#define PPI_EGU_TIMER_START           NRF_802154_PPI_EGU_TO_TIMER_START             ///< PPI that connects EGU event with TIMER START task
+#define PPI_CCAIDLE_FEM               NRF_802154_PPI_RADIO_CCAIDLE_TO_FEM_GPIOTE    ///< PPI that connects RADIO CCAIDLE event with GPIOTE tasks used by FEM
+#define PPI_TIMER_TX_ACK              NRF_802154_PPI_TIMER_COMPARE_TO_RADIO_TXEN    ///< PPI that connects TIMER COMPARE event with RADIO TXEN task
 
 #if NRF_802154_DISABLE_BCC_MATCHING
-#define PPI_CRCOK_DIS_PPI             NRF_802154_PPI_RADIO_CRCOK_TO_PPI_GRP_DISABLE  ///< PPI that connects RADIO CRCOK event with task that disables PPI group
-#define PPI_CRCERROR_CLEAR            NRF_802154_PPI_RADIO_CRCERROR_TO_TIMER_CLEAR   ///< PPI that connects RADIO CRCERROR event with TIMER CLEAR task
-#define PPI_ADDRESS_COUNTER_COUNT     NRF_802154_PPI_RADIO_ADDR_TO_COUNTER_COUNT     ///< PPI that connects RADIO ADDRESS event with TIMER COUNT task
-#define PPI_CRCERROR_COUNTER_CLEAR    NRF_802154_PPI_RADIO_CRCERROR_COUNTER_CLEAR    ///< PPI that connects RADIO CRCERROR event with TIMER CLEAR task
+#define PPI_CRCOK_DIS_PPI             NRF_802154_PPI_RADIO_CRCOK_TO_PPI_GRP_DISABLE ///< PPI that connects RADIO CRCOK event with task that disables PPI group
+#define PPI_CRCERROR_CLEAR            NRF_802154_PPI_RADIO_CRCERROR_TO_TIMER_CLEAR  ///< PPI that connects RADIO CRCERROR event with TIMER CLEAR task
+#define PPI_ADDRESS_COUNTER_COUNT     NRF_802154_PPI_RADIO_ADDR_TO_COUNTER_COUNT    ///< PPI that connects RADIO ADDRESS event with TIMER COUNT task
+#define PPI_CRCERROR_COUNTER_CLEAR    NRF_802154_PPI_RADIO_CRCERROR_COUNTER_CLEAR   ///< PPI that connects RADIO CRCERROR event with TIMER CLEAR task
 
 #define PPI_NO_BCC_MATCHING_USED_MASK ((1U << PPI_CRCOK_DIS_PPI) |         \
                                        (1U << PPI_CRCERROR_CLEAR) |        \
                                        (1U << PPI_ADDRESS_COUNTER_COUNT) | \
                                        (1U << PPI_CRCERROR_COUNTER_CLEAR))
 #else
-#define PPI_RADIO_SYNC_EGU_SYNC NRF_802154_PPI_RADIO_SYNC_TO_EGU_SYNC ///!< PPI that connects RADIO SYNC event with EGU task for SYNC channel
+#define PPI_RADIO_SYNC_EGU_SYNC       NRF_802154_PPI_RADIO_SYNC_TO_EGU_SYNC ///!< PPI that connects RADIO SYNC event with EGU task for SYNC channel
 
 #define PPI_NO_BCC_MATCHING_USED_MASK (1 << PPI_RADIO_SYNC_EGU_SYNC)
 #endif  // NRF_802154_DISABLE_BCC_MATCHING
 
 /**@brief Mask of all PPI channels used directly by trx module. */
-#define PPI_ALL_USED_MASK ((1U << PPI_DISABLED_EGU) |     \
-                           (1U << PPI_EGU_RAMP_UP) |      \
-                           (1U << PPI_EGU_TIMER_START) |  \
-                           (1U << PPI_CCAIDLE_FEM) |      \
-                           (1U << PPI_TIMER_TX_ACK) |     \
+#define PPI_ALL_USED_MASK ((1U << PPI_DISABLED_EGU) |    \
+                           (1U << PPI_EGU_RAMP_UP) |     \
+                           (1U << PPI_EGU_TIMER_START) | \
+                           (1U << PPI_CCAIDLE_FEM) |     \
+                           (1U << PPI_TIMER_TX_ACK) |    \
                            PPI_NO_BCC_MATCHING_USED_MASK)
 
 #if ((PPI_ALL_USED_MASK & NRF_802154_PPI_CHANNELS_USED_MASK) != PPI_ALL_USED_MASK)
@@ -153,7 +153,7 @@
 
 #if NRF_802154_INTERNAL_RADIO_IRQ_HANDLING
 void nrf_802154_radio_irq_handler(void); ///< Prototype required by internal RADIO IRQ handler
-#endif // NRF_802154_INTERNAL_RADIO_IRQ_HANDLING
+#endif  // NRF_802154_INTERNAL_RADIO_IRQ_HANDLING
 
 /// Common parameters for the FAL handling.
 static const nrf_802154_fal_event_t m_activate_rx_cc0 =
@@ -164,7 +164,7 @@ static const nrf_802154_fal_event_t m_activate_rx_cc0 =
     {
         .p_timer_instance     = NRF_802154_TIMER_INSTANCE,
         .compare_channel_mask = ((1 << NRF_TIMER_CC_CHANNEL0) | (1 << NRF_TIMER_CC_CHANNEL2)),
-        .counter_period = {
+        .counter_period       = {
             .end = RX_RAMP_UP_TIME
         },
     },
@@ -178,7 +178,7 @@ static const nrf_802154_fal_event_t m_activate_tx_cc0 =
     {
         .p_timer_instance     = NRF_802154_TIMER_INSTANCE,
         .compare_channel_mask = ((1 << NRF_TIMER_CC_CHANNEL0) | (1 << NRF_TIMER_CC_CHANNEL2)),
-        .counter_period = {
+        .counter_period       = {
             .end = TX_RAMP_UP_TIME
         },
     },
@@ -211,7 +211,7 @@ typedef struct
 
 #endif  // NRF_802154_TX_STARTED_NOTIFY_ENABLED
 
-    bool rssi_started;
+    bool          rssi_started;
 
     volatile bool rssi_settled;
 } nrf_802154_flags_t;
@@ -362,9 +362,9 @@ static void fem_for_lna_set(void)
     if (nrf_802154_fal_lna_configuration_set(&m_activate_rx_cc0, NULL) == NRFX_SUCCESS)
     {
         uint32_t event_addr = nrf_egu_event_address_get(NRF_802154_SWI_EGU_INSTANCE,
-                                                                  EGU_EVENT);
+                                                        EGU_EVENT);
         uint32_t task_addr = nrf_timer_task_address_get(NRF_802154_TIMER_INSTANCE,
-                                                                  NRF_TIMER_TASK_START);
+                                                        NRF_TIMER_TASK_START);
 
         nrf_timer_shorts_enable(m_activate_rx_cc0.event.timer.p_timer_instance,
                                 NRF_TIMER_SHORT_COMPARE0_STOP_MASK);
@@ -388,9 +388,9 @@ static void fem_for_pa_set(void)
     if (nrf_802154_fal_pa_configuration_set(&m_activate_tx_cc0, NULL) == NRFX_SUCCESS)
     {
         uint32_t event_addr = nrf_egu_event_address_get(NRF_802154_SWI_EGU_INSTANCE,
-                                                                  EGU_EVENT);
+                                                        EGU_EVENT);
         uint32_t task_addr = nrf_timer_task_address_get(NRF_802154_TIMER_INSTANCE,
-                                                                  NRF_TIMER_TASK_START);
+                                                        NRF_TIMER_TASK_START);
 
         nrf_timer_shorts_enable(m_activate_tx_cc0.event.timer.p_timer_instance,
                                 NRF_TIMER_SHORT_COMPARE0_STOP_MASK);
@@ -441,15 +441,16 @@ static void fem_for_tx_set(bool cca)
         nrf_timer_shorts_enable(NRF_802154_TIMER_INSTANCE, NRF_TIMER_SHORT_COMPARE0_STOP_MASK);
 
         uint32_t egu_event_addr = nrf_egu_event_address_get(NRF_802154_SWI_EGU_INSTANCE,
-                                                                      EGU_EVENT);
+                                                            EGU_EVENT);
         uint32_t timer_task_addr = nrf_timer_task_address_get(NRF_802154_TIMER_INSTANCE,
-                                                                        NRF_TIMER_TASK_START);
+                                                              NRF_TIMER_TASK_START);
 
-        nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_EGU_TIMER_START, egu_event_addr, timer_task_addr);
-        
+        nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_EGU_TIMER_START, egu_event_addr,
+                                       timer_task_addr);
+
         nrf_802154_fal_abort_extend(PPI_EGU_RAMP_UP, PPI_FAL_ABORT_GROUP);
         nrf_802154_fal_abort_extend(PPI_EGU_TIMER_START, PPI_FAL_ABORT_GROUP);
-        
+
         nrf_ppi_channel_enable(NRF_PPI, PPI_EGU_TIMER_START);
     }
 }
@@ -491,7 +492,7 @@ static void ppis_for_egu_and_ramp_up_set(nrf_radio_task_t ramp_up_task, bool sel
                                                     EGU_EVENT),
                                                 nrf_radio_task_address_get(NRF_RADIO, ramp_up_task),
                                                 nrf_ppi_task_address_get(NRF_PPI,
-                                                    PPI_CHGRP0_DIS_TASK));
+                                                                         PPI_CHGRP0_DIS_TASK));
     }
     else
     {
@@ -668,7 +669,7 @@ void nrf_802154_trx_disable(void)
 
 static void rx_automatic_antenna_handle(void)
 {
-    switch(m_trx_state)
+    switch (m_trx_state)
     {
         case TRX_STATE_RXFRAME:
         case TRX_STATE_RXFRAME_FINISHED:
@@ -699,7 +700,7 @@ static void rx_antenna_update(void)
 {
     bool                         result = true;
     nrf_802154_sl_ant_div_mode_t mode   = nrf_802154_sl_ant_div_cfg_mode_get(
-                                              NRF_802154_SL_ANT_DIV_OP_RX);
+        NRF_802154_SL_ANT_DIV_OP_RX);
 
     switch (mode)
     {
@@ -708,7 +709,7 @@ static void rx_antenna_update(void)
 
         case NRF_802154_SL_ANT_DIV_MODE_MANUAL:
             result = nrf_802154_sl_ant_div_antenna_set(
-                         nrf_802154_sl_ant_div_cfg_antenna_get(NRF_802154_SL_ANT_DIV_OP_RX));
+                nrf_802154_sl_ant_div_cfg_antenna_get(NRF_802154_SL_ANT_DIV_OP_RX));
             break;
 
         case NRF_802154_SL_ANT_DIV_MODE_AUTO:
@@ -733,7 +734,7 @@ static void tx_antenna_update(void)
 {
     bool                         result = true;
     nrf_802154_sl_ant_div_mode_t mode   = nrf_802154_sl_ant_div_cfg_mode_get(
-                                              NRF_802154_SL_ANT_DIV_OP_TX);
+        NRF_802154_SL_ANT_DIV_OP_TX);
 
     switch (mode)
     {
@@ -743,7 +744,7 @@ static void tx_antenna_update(void)
 
         case NRF_802154_SL_ANT_DIV_MODE_MANUAL:
             result = nrf_802154_sl_ant_div_antenna_set(
-                         nrf_802154_sl_ant_div_cfg_antenna_get(NRF_802154_SL_ANT_DIV_OP_TX));
+                nrf_802154_sl_ant_div_cfg_antenna_get(NRF_802154_SL_ANT_DIV_OP_TX));
             break;
 
         case NRF_802154_SL_ANT_DIV_MODE_AUTO:
@@ -957,8 +958,8 @@ void nrf_802154_trx_receive_frame(uint8_t                                bcc,
 
 #ifdef RADIO_INTENSET_SYNC_Msk
     if (((notifications_mask & TRX_RECEIVE_NOTIFICATION_PRESTARTED) != 0U) ||
-            (NRF_802154_SL_ANT_DIV_MODE_DISABLED !=
-             nrf_802154_sl_ant_div_cfg_mode_get(NRF_802154_SL_ANT_DIV_OP_RX)))
+        (NRF_802154_SL_ANT_DIV_MODE_DISABLED !=
+         nrf_802154_sl_ant_div_cfg_mode_get(NRF_802154_SL_ANT_DIV_OP_RX)))
     {
         allow_sync_swi = true;
     }
@@ -974,7 +975,7 @@ void nrf_802154_trx_receive_frame(uint8_t                                bcc,
         // SWI_IRQHandler (in nrf_802154_swi.c), calls nrf_802154_trx_swi_irq_handler
         nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_RADIO_SYNC_EGU_SYNC,
                                        nrf_radio_event_address_get(NRF_RADIO,
-                                           NRF_RADIO_EVENT_SYNC),
+                                                                   NRF_RADIO_EVENT_SYNC),
                                        nrf_egu_task_address_get(
                                            NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_TASK));
         nrf_ppi_channel_enable(NRF_PPI, PPI_RADIO_SYNC_EGU_SYNC);
@@ -993,7 +994,7 @@ void nrf_802154_trx_receive_frame(uint8_t                                bcc,
     if (nrf_802154_fal_lna_configuration_set(&m_activate_rx_cc0, NULL) == NRFX_SUCCESS)
     {
         delta_time = nrf_timer_cc_get(NRF_802154_TIMER_INSTANCE,
-                                       NRF_TIMER_CC_CHANNEL0);
+                                      NRF_TIMER_CC_CHANNEL0);
     }
     else
     {
@@ -1050,9 +1051,9 @@ void nrf_802154_trx_receive_frame(uint8_t                                bcc,
                                                 NRF_802154_SWI_EGU_INSTANCE,
                                                 EGU_EVENT),
                                             nrf_radio_task_address_get(NRF_RADIO,
-                                                NRF_RADIO_TASK_RXEN),
+                                                                       NRF_RADIO_TASK_RXEN),
                                             nrf_ppi_task_address_get(NRF_PPI,
-                                                PPI_CHGRP0_DIS_TASK));
+                                                                     PPI_CHGRP0_DIS_TASK));
     nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_EGU_TIMER_START,
                                    nrf_egu_event_address_get(
                                        NRF_802154_SWI_EGU_INSTANCE,
@@ -1139,9 +1140,9 @@ void nrf_802154_trx_receive_ack(void)
                                                 NRF_802154_SWI_EGU_INSTANCE,
                                                 EGU_EVENT),
                                             nrf_radio_task_address_get(NRF_RADIO,
-                                                NRF_RADIO_TASK_RXEN),
+                                                                       NRF_RADIO_TASK_RXEN),
                                             nrf_ppi_task_address_get(NRF_PPI,
-                                                PPI_CHGRP0_DIS_TASK));
+                                                                     PPI_CHGRP0_DIS_TASK));
     nrf_ppi_channel_include_in_group(NRF_PPI, PPI_EGU_RAMP_UP, PPI_CHGRP0);
 
     nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_DISABLED_EGU,
@@ -1256,7 +1257,7 @@ void nrf_802154_trx_transmit_frame(const void                            * p_tra
     if (cca)
     {
         nrf_radio_event_clear(NRF_RADIO, NRF_RADIO_EVENT_CCABUSY);
-        
+
         ints_to_enable |= NRF_RADIO_INT_CCABUSY_MASK;
 
         if ((notifications_mask & TRX_TRANSMIT_NOTIFICATION_CCAIDLE) != 0U)
@@ -1327,8 +1328,8 @@ bool nrf_802154_trx_transmit_ack(const void * p_transmit_buffer, uint32_t delay_
                                       EVENT_LAT;
 
     nrf_timer_cc_set(NRF_802154_TIMER_INSTANCE,
-                       NRF_TIMER_CC_CHANNEL1,
-                       timer_cc_ramp_up_start);
+                     NRF_TIMER_CC_CHANNEL1,
+                     timer_cc_ramp_up_start);
 
     nrf_radio_packetptr_set(NRF_RADIO, p_transmit_buffer);
 
@@ -1344,7 +1345,7 @@ bool nrf_802154_trx_transmit_ack(const void * p_transmit_buffer, uint32_t delay_
                                        NRF_802154_TIMER_INSTANCE,
                                        NRF_TIMER_EVENT_COMPARE1),
                                    nrf_radio_task_address_get(NRF_RADIO,
-                                       NRF_RADIO_TASK_TXEN));
+                                                              NRF_RADIO_TASK_TXEN));
 
     // Set FEM PPIs
     // Note: the TIMER is running, ramp up will start in timer_cc_ramp_up_start tick
@@ -1352,7 +1353,8 @@ bool nrf_802154_trx_transmit_ack(const void * p_transmit_buffer, uint32_t delay_
     m_activate_tx_cc0_timeshifted = m_activate_tx_cc0;
 
     // Set the moment for FEM at which real transmission starts.
-    m_activate_tx_cc0_timeshifted.event.timer.counter_period.end = timer_cc_ramp_up_start + TXRU_TIME;
+    m_activate_tx_cc0_timeshifted.event.timer.counter_period.end = timer_cc_ramp_up_start +
+                                                                   TXRU_TIME;
 
     if (nrf_802154_fal_pa_configuration_set(&m_activate_tx_cc0_timeshifted, NULL) == NRFX_SUCCESS)
     {
@@ -1382,9 +1384,9 @@ bool nrf_802154_trx_transmit_ack(const void * p_transmit_buffer, uint32_t delay_
     // Detect if PPI will work in future or has just worked.
     nrf_timer_task_trigger(NRF_802154_TIMER_INSTANCE, NRF_TIMER_TASK_CAPTURE3);
     uint32_t timer_cc_now = nrf_timer_cc_get(NRF_802154_TIMER_INSTANCE,
-                                              NRF_TIMER_CC_CHANNEL3);
+                                             NRF_TIMER_CC_CHANNEL3);
     uint32_t timer_cc_fem_start = nrf_timer_cc_get(NRF_802154_TIMER_INSTANCE,
-                                                    NRF_TIMER_CC_CHANNEL0);
+                                                   NRF_TIMER_CC_CHANNEL0);
 
     // When external PA uses a timer, it should be configured to a time later than ramp up time. In
     // such case, the timer stops with shorts on PA timer. But if external PA does not use a timer,
@@ -1767,7 +1769,8 @@ static void rxack_finish_disable_ints(void)
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
     nrf_radio_int_disable(NRF_RADIO,
-        NRF_RADIO_INT_ADDRESS_MASK | NRF_RADIO_INT_CRCERROR_MASK | NRF_RADIO_INT_CRCOK_MASK);
+                          NRF_RADIO_INT_ADDRESS_MASK | NRF_RADIO_INT_CRCERROR_MASK |
+                          NRF_RADIO_INT_CRCOK_MASK);
 
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);
 }

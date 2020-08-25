@@ -384,7 +384,7 @@ static bool timeslot_is_granted(void)
 static bool antenna_diversity_is_enabled(void)
 {
     return (NRF_802154_SL_ANT_DIV_MODE_DISABLED !=
-                nrf_802154_sl_ant_div_cfg_mode_get(NRF_802154_SL_ANT_DIV_OP_RX));
+            nrf_802154_sl_ant_div_cfg_mode_get(NRF_802154_SL_ANT_DIV_OP_RX));
 }
 
 /***************************************************************************************************
@@ -976,7 +976,8 @@ static void rx_init(void)
         nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_END));
 #else
     // Configure the timer coordinator to get a timestamp of the CRCOK event.
-    nrf_802154_timer_coord_timestamp_prepare(nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_CRCOK));
+    nrf_802154_timer_coord_timestamp_prepare(nrf_radio_event_address_get(NRF_RADIO,
+                                                                         NRF_RADIO_EVENT_CRCOK));
 #endif
 #endif
 
@@ -1009,12 +1010,14 @@ static bool tx_init(const uint8_t * p_data, bool cca)
         // Configure the timer coordinator to get a time stamp of the READY event.
         // Note: This event triggers CCASTART, so the time stamp of READY event
         // is the time stamp when CCA started.
-        nrf_802154_timer_coord_timestamp_prepare(nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_READY));
+        nrf_802154_timer_coord_timestamp_prepare(nrf_radio_event_address_get(NRF_RADIO,
+                                                                             NRF_RADIO_EVENT_READY));
     }
     else
     {
         // Configure the timer coordinator to get a time stamp of the PHYEND event.
-        nrf_802154_timer_coord_timestamp_prepare(nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_PHYEND));
+        nrf_802154_timer_coord_timestamp_prepare(nrf_radio_event_address_get(NRF_RADIO,
+                                                                             NRF_RADIO_EVENT_PHYEND));
     }
 #endif
 
@@ -1408,11 +1411,11 @@ static void on_rx_prestarted_timeout(void * p_context)
      * - The only related interrupt that can preempt this handler while it owns critical section
      * is from raal timeslot margin, which will fail to enter critical section and schedule
      * priority change to be called by nrf_802154_critical_section_exit.
-     * 
-     * Critical section is entered forcefully here nonetheless, due to a rare issue with 
-     * nrf_802154_critical_section_exit being preempted before the nested critical section counter 
+     *
+     * Critical section is entered forcefully here nonetheless, due to a rare issue with
+     * nrf_802154_critical_section_exit being preempted before the nested critical section counter
      * could be decremented. Allowing for critical section nesting here resolves the problem.
-     * TODO: After the bug is fixed, change to nrf_802154_critical_section_enter and check if 
+     * TODO: After the bug is fixed, change to nrf_802154_critical_section_enter and check if
      * critical section was successfully entered.
      */
 
@@ -1449,7 +1452,8 @@ void nrf_802154_trx_receive_frame_prestarted(void)
     if (!antenna_diversity_is_enabled())
     {
         // Only assert if notifications mask would not allow for calling this function.
-        assert((m_trx_receive_frame_notifications_mask & TRX_RECEIVE_NOTIFICATION_PRESTARTED) != 0U);
+        assert((m_trx_receive_frame_notifications_mask & TRX_RECEIVE_NOTIFICATION_PRESTARTED) !=
+               0U);
     }
     else
     {
@@ -2044,7 +2048,8 @@ void nrf_802154_trx_transmit_frame_transmitted(void)
             nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_END));
 #else
         // Configure the timer coordinator to get a timestamp of the CRCOK event.
-        nrf_802154_timer_coord_timestamp_prepare(nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_CRCOK));
+        nrf_802154_timer_coord_timestamp_prepare(nrf_radio_event_address_get(NRF_RADIO,
+                                                                             NRF_RADIO_EVENT_CRCOK));
 #endif
 #endif
 
@@ -2244,7 +2249,8 @@ void nrf_802154_trx_transmit_frame_ccaidle(void)
     uint32_t ts = timer_coord_timestamp_get();
 
     // Configure the timer coordinator to get a timestamp of the PHYEND event.
-    nrf_802154_timer_coord_timestamp_prepare(nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_PHYEND));
+    nrf_802154_timer_coord_timestamp_prepare(nrf_radio_event_address_get(NRF_RADIO,
+                                                                         NRF_RADIO_EVENT_PHYEND));
 
     // Update stat timestamp of CCASTART event
     nrf_802154_stat_timestamp_write(last_cca_start_timestamp, ts);

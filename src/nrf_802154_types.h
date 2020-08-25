@@ -40,7 +40,8 @@
 #if !defined(UNIT_TEST)
     #include "hal/nrf_radio.h"
 #else
-    typedef uint8_t nrf_radio_cca_mode_t;
+typedef uint8_t nrf_radio_cca_mode_t;
+
 #endif
 
 /**

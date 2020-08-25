@@ -51,9 +51,9 @@
 #define SWI_EGU        NRF_802154_SWI_EGU_INSTANCE ///< Label of SWI peripheral.
 #define SWI_IRQn       NRF_802154_SWI_IRQN         ///< Symbol of SWI IRQ number.
 #if NRF_802154_INTERNAL_SWI_IRQ_HANDLING
-#define SWI_IRQHandler     NRF_802154_SWI_IRQ_HANDLER  ///< Symbol of SWI IRQ handler.
+#define SWI_IRQHandler NRF_802154_SWI_IRQ_HANDLER  ///< Symbol of SWI IRQ handler.
 #else
-#define SWI_IRQHandler     nrf_802154_swi_irq_handler  ///< Symbol of SWI IRQ handler.
+#define SWI_IRQHandler nrf_802154_swi_irq_handler  ///< Symbol of SWI IRQ handler.
 #endif
 
 __WEAK void nrf_802154_trx_swi_irq_handler(void)

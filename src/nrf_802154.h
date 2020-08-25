@@ -242,9 +242,9 @@ nrf_802154_sl_ant_div_antenna_t nrf_802154_antenna_diversity_last_rx_best_antenn
  *
  * @note If antenna diversity feature is to be used, this function must be called before
  * @ref nrf_802154_antenna_diversity_init.
- * 
+ *
  * @note This function must be called only once.
- * 
+ *
  * @param[in] p_cfg Pointer to antenna diversity interface configuration.
  */
 void nrf_802154_antenna_diversity_config_set(const nrf_802154_sl_ant_div_cfg_t * p_cfg);
@@ -253,7 +253,7 @@ void nrf_802154_antenna_diversity_config_set(const nrf_802154_sl_ant_div_cfg_t *
  * @brief Gets the antenna diversity interface configuration.
  *
  * @param[out] p_cfg  Antenna diversity interface configuration.
- * 
+ *
  * @retval true  The configuration was retrieved successfully.
  * @retval false The configuration could not be retrieved.
  */
@@ -266,22 +266,22 @@ bool nrf_802154_antenna_diversity_config_get(nrf_802154_sl_ant_div_cfg_t * p_cfg
  * after driver initialization. In order for it to succeed, antenna diversity interface
  * configuration must be provided before it's called with
  * @ref nrf_802154_antenna_diversity_config_set. Example usage:
- * 
+ *
  * @code
  * nrf_802154_init();
- * 
- * nrf_802154_sl_ant_div_cfg_t cfg = 
+ *
+ * nrf_802154_sl_ant_div_cfg_t cfg =
  * {
  *     // Set the configuration parameters accordingly
  * };
- * 
+ *
  * nrf_802154_antenna_config_set(&cfg);
  * nrf_802154_antenna_diversity_init();
- * 
+ *
  * // At any later time
  * nrf_802154_receive();
  * @endcode
- * 
+ *
  * @retval true   Initialization was successful.
  * @retval false  Initialization could not be performed due to unconfigured interface.
  */
@@ -289,7 +289,7 @@ bool nrf_802154_antenna_diversity_init(void);
 
 /**
  * @brief Handles TIMER IRQ of the antenna diversity interface.
- * 
+ *
  * This function should be called when the timer instance provided to the antenna diversity
  * interface reports an interrupt.
  */
