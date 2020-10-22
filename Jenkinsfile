@@ -36,17 +36,6 @@ pipeline {
                 }
             }
         }
-        stage('Wipe-out workspace') {
-            steps {
-                echo "Wiping-out workspace on node: ${NODE_NAME}"
-                sh 'find . -name . -o -prune -exec rm -rf -- {} +'
-            }
-        }
-        stage('Checkout') {
-            steps {
-                checkout_repo(CI_STATE, 'nrf802154')
-            }
-        }
         stage('Build and host tests') {
             parallel {
                 stage('Check pretty') {
@@ -69,9 +58,7 @@ pipeline {
                         }
                         stage('Check Radio Driver style') {
                             steps {
-                                dir('nrf802154') {
-                                    sh 'PATH=${WORKSPACE}/uncrustify-uncrustify-0.69.0/build:$PATH scripts/pretty.sh check'
-                                }
+                                sh 'PATH=${WORKSPACE}/uncrustify-uncrustify-0.69.0/build:$PATH scripts/pretty.sh check'
                             }
                         }
                     }
@@ -83,39 +70,36 @@ pipeline {
                                 sh '''
                                     export PATH=/home/.gem/ruby/2.5.0/bin:$PATH
                                     gem install --user-install ceedling
-                                    ceedling version
                                 '''
                             }
                         }
                         stage('Checkout dependencies') {
                             steps {
                                 dir('sl') {
-                                    checkout_refspec('master', 'ssh://git@bitbucket.nordicsemi.no:7999/krknwk/nrf-802.15.4-sl.git')
+                                    checkout_refspec('master', 'https://projecttools.nordicsemi.no/bitbucket/scm/krknwk/nrf-802.15.4-sl.git')
                                 }
                                 dir('nrfx') {
-                                    checkout_refspec(nrfx_refspec, 'ssh://git@bitbucket.nordicsemi.no:7999/nrffosdk/nrfx.git')
+                                    checkout_refspec(nrfx_refspec, 'https://github.com/NordicSemiconductor/nrfx')
                                 }
                             }
                         }
                         stage('Run tests') {
                             steps {
-                                dir('nrf802154') {
-                                    sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=../sl NRFX_PATH=../nrfx ceedling options:nrf52840 test:all'
-                                    sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52840.xml'
+                                sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52840 test:all'
+                                sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52840.xml'
 
-                                    sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=../sl NRFX_PATH=../nrfx ceedling options:nrf52833 test:all'
-                                    sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52833.xml'
+                                sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52833 test:all'
+                                sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52833.xml'
 
-                                    sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=../sl NRFX_PATH=../nrfx ceedling options:nrf52820 test:all'
-                                    sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52820.xml'
+                                sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52820 test:all'
+                                sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52820.xml'
 
-                                    sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=../sl NRFX_PATH=../nrfx ceedling options:nrf52811 test:all'
-                                    sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52811.xml'
-                                }
+                                sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52811 test:all'
+                                sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52811.xml'
                             }
                             post {
                                 always {
-                                    xunit tools: [Custom(customXSL: 'nrf802154/test/unit_tests/unity.xsl', pattern: 'nrf802154/build/artifacts/test/report*.xml', skipNoTestFiles: false, stopProcessingIfError: true)]
+                                    xunit tools: [Custom(customXSL: 'test/unit_tests/unity.xsl', pattern: 'build/artifacts/test/report*.xml', skipNoTestFiles: false, stopProcessingIfError: true)]
                                 }
                             }
                         }
@@ -143,35 +127,14 @@ pipeline {
     }
 }
 
-// TODO: Revmoe this function when lib_Main.checkoutRepo() supports submodules
 def checkout_refspec(String refspec, String url) {
     checkout([$class: 'GitSCM',
         branches: [[name: 'FETCH_HEAD']],
         doGenerateSubmoduleConfigurations: false,
-        extensions: [[$class: 'SubmoduleOption',
-            disableSubmodules: false,
-            parentCredentials: true,
-            recursiveSubmodules: true,
-            reference: '',
-            shallow: false,
-            trackingSubmodules: false
-        ]],
-        submoduleCfg: [],
         userRemoteConfigs: [[
             refspec: "${refspec}",
-            credentialsId: 'swdev_build-ssh-priv-key',
+            credentialsId: 'buran_ci',
             url: "${url}"
         ]]
     ])
-}
-
-def checkout_repo(HashMap CI_STATE, String subdir) {
-    refspec=lib_State.getGitRef('NRF802154', CI_STATE)
-    echo "Checking-out ${CI_STATE.SELF.GIT_URL}:${refspec} on node: ${NODE_NAME}"
-
-    // TODO: Use lib_Main checkout if it supports submodules
-    //return lib_Main.checkoutRepo( CI_STATE.SELF.GIT_URL, subdir, CI_STATE.SELF, true )
-    dir(subdir) {
-        checkout_refspec(refspec, 'ssh://git@bitbucket.nordicsemi.no:7999/krknwk/nrf-802.15.4-driver.git')
-    }
 }
