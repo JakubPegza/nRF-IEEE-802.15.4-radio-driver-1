@@ -152,7 +152,7 @@ extern "C" {
  *
  */
 #ifndef NRF_802154_SWI_PRIORITY
-#define NRF_802154_SWI_PRIORITY 5
+#define NRF_802154_SWI_PRIORITY 4
 #endif
 
 /**
@@ -260,57 +260,6 @@ extern "C" {
  */
 #ifndef NRF_802154_DELAYED_TRX_ENABLED
 #define NRF_802154_DELAYED_TRX_ENABLED 1
-#endif
-
-/**
- * @}
- * @defgroup nrf_802154_config_clock Clock driver configuration
- * @{
- */
-
-/**
- * @def NRF_802154_CLOCK_IRQ_PRIORITY
- *
- * The priority of clock interrupt used in the standalone clock driver implementation.
- *
- * @note This configuration is only applicable for the Clock Abstraction Layer implementation
- *       in nrf_802154_clock_nodrv.c.
- *
- */
-#ifndef NRF_802154_CLOCK_IRQ_PRIORITY
-#define NRF_802154_CLOCK_IRQ_PRIORITY 7
-#endif
-
-/**
- * @def NRF_802154_CLOCK_LFCLK_SOURCE
- *
- * The low-frequency clock source used in the standalone clock driver implementation.
- *
- * @note This configuration is only applicable for the Clock Abstraction Layer implementation
- *       in nrf_802154_clock_nodrv.c.
- *
- */
-#ifndef NRF_802154_CLOCK_LFCLK_SOURCE
-#define NRF_802154_CLOCK_LFCLK_SOURCE NRF_CLOCK_LFCLK_Xtal
-#endif
-
-/**
- * @}
- * @defgroup nrf_802154_config_rtc RTC driver configuration
- * @{
- */
-
-/**
- * @def NRF_802154_RTC_IRQ_PRIORITY
- *
- * The priority of RTC interrupt used in the standalone timer driver implementation.
- *
- * @note This configuration is only applicable for the Low Power Timer Abstraction Layer
- *       implementation in nrf_802154_lp_timer_nodrv.c.
- *
- */
-#ifndef NRF_802154_RTC_IRQ_PRIORITY
-#define NRF_802154_RTC_IRQ_PRIORITY 6
 #endif
 
 /**
