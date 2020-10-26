@@ -40,7 +40,7 @@
 
 #include "nrf_802154_config.h"
 #include "nrf_802154_peripherals.h"
-#include "nrf_802154_rsch_prio_drop.h"
+#include "rsch/nrf_802154_rsch_prio_drop.h"
 
 #include "nrf_802154_swi.h"
 #include "hal/nrf_egu.h"
