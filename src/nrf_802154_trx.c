@@ -617,6 +617,7 @@ void nrf_802154_trx_disable(void)
 
 #if defined(RADIO_INTENSET_SYNC_Msk)
         nrf_egu_int_disable(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_INTMASK);
+        nrf_egu_event_clear(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_EVENT);
 #endif
 #else
         nrf_ppi_fork_endpoint_setup(NRF_PPI, PPI_EGU_TIMER_START, 0);
@@ -2660,6 +2661,12 @@ void RADIO_IRQHandler(void)
 #if defined(RADIO_INTENSET_SYNC_Msk)
 void nrf_802154_trx_swi_irq_handler(void)
 {
+    // If this handler is preempted by MARGIN, RADIO IRQ might be set to pending
+    // and executed after MARGIN processing is finished, i.e. after the end of a timeslot.
+    // To prevent that from happening, the handler is executed with disabled interrupts.
+    nrf_802154_mcu_critical_state_t mcu_crit_state;
+    nrf_802154_mcu_critical_enter(mcu_crit_state);
+
     if (nrf_egu_int_enable_check(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_INTMASK) &&
         nrf_egu_event_check(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_EVENT))
     {
@@ -2677,6 +2684,8 @@ void nrf_802154_trx_swi_irq_handler(void)
 
         nrf_802154_irq_set_pending(RADIO_IRQn);
     }
+
+    nrf_802154_mcu_critical_exit(mcu_crit_state);
 }
 
 #endif
