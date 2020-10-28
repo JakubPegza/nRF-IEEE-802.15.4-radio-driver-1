@@ -607,6 +607,7 @@ void nrf_802154_trx_disable(void)
     if (m_trx_state != TRX_STATE_DISABLED)
     {
         nrf_radio_power_set(NRF_RADIO, false);
+        nrf_802154_irq_clear_pending(RADIO_IRQn);
 
         /* While the RADIO is powered off deconfigure any PPIs used directly by trx module */
         nrf_ppi_channels_disable(NRF_PPI, PPI_ALL_USED_MASK);
