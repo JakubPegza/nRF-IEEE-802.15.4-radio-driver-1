@@ -11,11 +11,11 @@ The driver allows to share the RADIO peripheral with other PHY protocol drivers,
 Radio drivers request access to the peripheral from an arbiter.
 The arbiter grants or denies access.
 
-The nRF IEEE 802.15.4 radio driver cooperates with the radio arbiter included in the MPSL library.
-It allows 802.15.4-only operations or dynamic multiprotocol support with other protocols like Bluetooth LE.
+The nRF IEEE 802.15.4 radio driver cooperates with the radio arbiter included in SoftDevice (Nordic Bluetooth stack)
+when dynamic multiprotocol with BLE is in use.
 
-The following figure shows the architecture of the radio driver.
+@image html radio_driver_architecture_1.6.svg "nRF IEEE 802.15.4 radio driver architecture"
 
-@image html radio_driver_architecture.svg "nRF IEEE 802.15.4 radio driver architecture"
+The radio driver can also cooperate with a dummy arbiter included in the driver when the device is an 802.15.4-only node without the multiprotocol feature.
 
 */

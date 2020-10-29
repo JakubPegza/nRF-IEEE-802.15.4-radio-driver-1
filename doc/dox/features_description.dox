@@ -2,9 +2,9 @@
 
 @page rd_feature_description Feature description
 
-This page describes the nRF IEEE 802.15.4 radio driver features.
-
 @tableofcontents
+
+This page describes the nRF IEEE 802.15.4 radio driver features.
 
 @section features_description_frames_filtering Receiving frames and frames filtering
 

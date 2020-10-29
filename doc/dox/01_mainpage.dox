@@ -2,13 +2,16 @@
 
 @mainpage Introduction
 
+@tableofcontents
+
 The nRF IEEE 802.15.4 radio driver implements the IEEE 802.15.4 PHY layer on Nordic Semiconductor's nRF devices.
 
-@note
-This documentation is a work in progress. Only some of the features supported by the driver are documented.
-
 This driver implements only the __non-beacon mode__ of operation.
-It supports the following features:
+
+---
+@section intro_supported_features Supported features
+
+The driver supports the following features:
 - Reception of unicast and broadcast frames (with filtering).
 - Automatic sending of ACK frames.
 - Setting a pending bit in the ACK frame according to pending data for the given destination.
@@ -29,8 +32,19 @@ It supports the following features:
 - @ref ant_diversity
 - @ref rd_coex
 
-For more information about the features not linked in the list, see @ref rd_feature_description.
 
-You can also read about @ref rd_architecture "driver architecture" and its @ref rd_hw_resources "hardware resources".
+---
+@section intro_pages Documentation pages
+
+This radio driver documentation contains the following pages:
+- @ref rd_feature_description - with information about the features not linked in the list.
+- @ref rd_architecture
+- @ref rd_hw_resources
+- @ref rd_debug_mode
+- @ref rd_multiprotocol_support
+- @ref rd_source_files
+- @ref ant_diversity
+- @ref rd_coex
+- @ref rd_fem
 
 */

@@ -2,6 +2,8 @@
 
 @page rd_fem PA/LNA module (FEM support)
 
+@tableofcontents
+
 The PA/LNA module increases the range of communication by providing APIs that act as interface for several types of front-end modules (FEMs).
 
 The radio driver library includes FEM support for @linkRFFEM21540 (PCA10112).

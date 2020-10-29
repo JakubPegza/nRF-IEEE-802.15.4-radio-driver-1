@@ -1,6 +1,13 @@
-## Transmitter
+﻿/**
 
-```c
+@page rd_sample_app Sample application
+
+This page includes code snippets of two radio driver sample applications.
+
+---
+@section rd_sample_app_tx Transmitter
+
+@code
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -66,11 +73,12 @@ void nrf_802154_transmitted(const uint8_t * p_frame, uint8_t * p_ack, uint8_t le
         nrf_802154_buffer_free(p_ack);
     }
 }
-```
+@endcode
 
-## Receiver
+---
+@section rd_sample_app_rx Receiver
 
-```c
+@code
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -128,4 +136,7 @@ exit:
 
     return;
 }
-```
+@endcode
+
+
+*/
