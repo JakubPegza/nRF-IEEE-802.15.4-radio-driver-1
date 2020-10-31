@@ -107,6 +107,10 @@ extern "C" {
 #define NRF_802154_COUNTER_TIMER_INSTANCE \
     NRFX_CONCAT_2(NRF_TIMER, NRF_802154_COUNTER_TIMER_INSTANCE_NO)
 
+#if defined(NRF52840_XXAA) || \
+    defined(NRF52833_XXAA) || \
+    defined(NRF52820_XXAA) || \
+    defined(NRF52811_XXAA)
 /**
  * @def NRF_802154_SWI_EGU_INSTANCE_NO
  *
@@ -116,7 +120,7 @@ extern "C" {
  */
 #ifndef NRF_802154_SWI_EGU_INSTANCE_NO
 
-#ifdef NRF52811_XXAA
+#if defined(NRF52811_XXAA)
 #define NRF_802154_SWI_EGU_INSTANCE_NO 0
 #else
 #define NRF_802154_SWI_EGU_INSTANCE_NO 3
@@ -160,6 +164,56 @@ extern "C" {
     NRFX_CONCAT_3(NRFX_CONCAT_3(SWI, NRF_802154_SWI_EGU_INSTANCE_NO, _EGU), \
                   NRF_802154_SWI_EGU_INSTANCE_NO,                           \
                   _IRQn)
+
+#elif defined(NRF5340_XXAA)
+
+/**
+ * @def NRF_802154_EGU_INSTANCE_NO
+ *
+ * Id of the EGU instance used by the driver to synchronize DPPIs and for requests and
+ * notifications if SWI is in use.
+ *
+ */
+#ifndef NRF_802154_EGU_INSTANCE_NO
+#define NRF_802154_EGU_INSTANCE_NO 0
+#endif
+
+/**
+ * @def NRF_802154_SWI_EGU_INSTANCE
+ *
+ * The EGU instance used by the driver to synchronize PPIs and for requests and notifications if
+ * SWI is in use.
+ *
+ * @note This option is used by the core module regardless of the driver configuration.
+ *
+ */
+#define NRF_802154_SWI_EGU_INSTANCE NRFX_CONCAT_2(NRF_EGU, NRF_802154_EGU_INSTANCE_NO)
+
+/**
+ * @def NRF_802154_SWI_IRQ_HANDLER
+ *
+ * The SWI EGU IRQ handler used by the driver for requests and notifications if SWI is in use.
+ *
+ * @note This option is used when the driver uses SWI to process requests and notifications.
+ *
+ */
+#define NRF_802154_SWI_IRQ_HANDLER \
+    NRFX_CONCAT_3(EGU, NRF_802154_EGU_INSTANCE_NO, _IRQHandler)
+
+/**
+ * @def NRF_802154_SWI_IRQN
+ *
+ * The SWI EGU IRQ number used by the driver for requests and notifications if SWI is in use.
+ *
+ * @note This option is used when the driver uses SWI to process requests and notifications.
+ *
+ */
+#define NRF_802154_SWI_IRQN \
+    NRFX_CONCAT_3(EGU, NRF_802154_EGU_INSTANCE_NO, _IRQn)
+
+#else
+#error Unsupported chip family
+#endif // Chip family for EGU
 
 /**
  * @def NRF_802154_RTC_INSTANCE_NO
@@ -210,6 +264,10 @@ extern "C" {
  */
 #define NRF_802154_RTC_IRQN        NRFX_CONCAT_3(RTC, NRF_802154_RTC_INSTANCE_NO, _IRQn)
 
+#if defined(NRF52840_XXAA) || \
+    defined(NRF52833_XXAA) || \
+    defined(NRF52820_XXAA) || \
+    defined(NRF52811_XXAA)
 /**
  * @def NRF_802154_PPI_RADIO_DISABLED_TO_EGU
  *
@@ -424,6 +482,8 @@ extern "C" {
 #define NRF_802154_PPI_ABORT_GROUP NRF_PPI_CHANNEL_GROUP1
 #endif
 
+#endif // NRF52 family
+
 /**
  * @def NRF_802154_TIMERS_USED_MASK
  *
@@ -435,6 +495,10 @@ extern "C" {
                                      (1 << NRF_802154_COUNTER_TIMER_INSTANCE_NO))
 #endif // NRF_802154_TIMERS_USED_MASK
 
+#if defined(NRF52840_XXAA) || \
+    defined(NRF52833_XXAA) || \
+    defined(NRF52820_XXAA) || \
+    defined(NRF52811_XXAA)
 /**
  * @def NRF_802154_SWI_EGU_USED_MASK
  *
@@ -443,6 +507,8 @@ extern "C" {
 #ifndef NRF_802154_SWI_EGU_USED_MASK
 #define NRF_802154_SWI_EGU_USED_MASK (1 << NRF_802154_SWI_EGU_INSTANCE_NO)
 #endif
+
+#endif // nRF52 family
 
 /**
  * @def NRF_802154_RTC_USED_MASK
@@ -473,6 +539,10 @@ extern "C" {
                                               NRF_802154_DEBUG_GPIOTE_CHANNELS_USED_MASK)
 #endif // NRF_802154_GPIOTE_CHANNELS_USED_MASK
 
+#if defined(NRF52840_XXAA) || \
+    defined(NRF52833_XXAA) || \
+    defined(NRF52820_XXAA) || \
+    defined(NRF52811_XXAA)
 /**
  * @def NRF_80254_PPI_CHANNELS_USED_MASK
  *
@@ -501,6 +571,8 @@ extern "C" {
 #define NRF_802154_PPI_GROUPS_USED_MASK ((1 << NRF_802154_PPI_CORE_GROUP) | \
                                          (1 << NRF_802154_PPI_ABORT_GROUP)  )
 #endif // NRF_802154_PPI_GROUPS_USED_MASK
+
+#endif // nRF52 family
 
 #ifdef __cplusplus
 }

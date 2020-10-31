@@ -58,11 +58,20 @@
 
 #include "nrf_802154_sl_ant_div.h"
 
-#define EGU_SYNC_EVENT        NRF_EGU_EVENT_TRIGGERED3
-#define EGU_SYNC_TASK         NRF_EGU_TASK_TRIGGER3
-#define EGU_SYNC_INTMASK      NRF_EGU_INT_TRIGGERED3
+#define EGU_SYNC_EVENT   NRF_EGU_EVENT_TRIGGERED3
+#define EGU_SYNC_TASK    NRF_EGU_TASK_TRIGGER3
+#define EGU_SYNC_INTMASK NRF_EGU_INT_TRIGGERED3
 
-#define PPI_CCAIDLE_FEM       NRF_802154_PPI_RADIO_CCAIDLE_TO_FEM_GPIOTE ///< PPI that connects RADIO CCAIDLE event with GPIOTE tasks used by FEM
+#if defined(NRF52840_XXAA) || \
+    defined(NRF52833_XXAA) || \
+    defined(NRF52820_XXAA) || \
+    defined(NRF52811_XXAA)
+#define PPI_CCAIDLE_FEM  NRF_802154_PPI_RADIO_CCAIDLE_TO_FEM_GPIOTE ///< PPI that connects RADIO CCAIDLE event with GPIOTE tasks used by FEM
+#define RADIO_BASE       NRF_RADIO_BASE
+#elif defined(NRF5340_XXAA)
+#define PPI_CCAIDLE_FEM  0
+#define RADIO_BASE       NRF_RADIO_NS_BASE
+#endif
 
 #if NRF_802154_DISABLE_BCC_MATCHING
 #define SHORT_ADDRESS_BCSTART 0UL
@@ -150,7 +159,7 @@ static const nrf_802154_fal_event_t m_ccaidle =
     .type                           = NRF_802154_FAL_EVENT_TYPE_GENERIC,
     .override_ppi                   = true,
     .ppi_ch_id                      = PPI_CCAIDLE_FEM,
-    .event.generic.register_address = ((uint32_t)NRF_RADIO_BASE + (uint32_t)NRF_RADIO_EVENT_CCAIDLE)
+    .event.generic.register_address = ((uint32_t)RADIO_BASE + (uint32_t)NRF_RADIO_EVENT_CCAIDLE)
 };
 
 /**@brief Fal event used by @ref nrf_802154_trx_transmit_ack and @ref txack_finish */
@@ -414,8 +423,14 @@ void nrf_802154_trx_enable(void)
 
     assert(nrf_radio_shorts_get(NRF_RADIO) == SHORTS_IDLE);
 
+#if defined(NRF52840_XXAA) || \
+    defined(NRF52833_XXAA) || \
+    defined(NRF52820_XXAA) || \
+    defined(NRF52811_XXAA)
+    // TODO: Uncomment it when FEM API is cross-family
     nrf_802154_fal_abort_set(nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_DISABLED),
                              nrf_802154_trx_ppi_group_for_abort_get());
+#endif
 
     nrf_802154_fal_deactivate_now(NRF_802154_FAL_ALL);
 
@@ -472,7 +487,13 @@ void nrf_802154_trx_disable(void)
 
         nrf_radio_power_set(NRF_RADIO, true);
 
+#if defined(NRF52840_XXAA) ||     \
+        defined(NRF52833_XXAA) || \
+        defined(NRF52820_XXAA) || \
+        defined(NRF52811_XXAA)
+        // TODO: Uncomment this code when FEM API supports nRF53
         nrf_802154_fal_abort_clear();
+#endif
 
         nrf_802154_fal_deactivate_now(NRF_802154_FAL_ALL);
 

@@ -176,6 +176,7 @@ bool nrf_802154_trx_ppi_for_ramp_up_was_triggered(void)
     {
         // If RADIO state is not DISABLED, it means that RADIO is still ramping down or already
         // started ramping up.
+        nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);
         return true;
     }
 
@@ -185,14 +186,12 @@ bool nrf_802154_trx_ppi_for_ramp_up_was_triggered(void)
     if (nrf_egu_event_check(NRF_802154_SWI_EGU_INSTANCE, EGU_EVENT))
     {
         // If EGU event is set, procedure is running.
+        nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);
         return true;
-    }
-    else
-    {
-        return false;
     }
 
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);
+    return false;
 }
 
 void nrf_802154_trx_ppi_for_ack_tx_set(void)
