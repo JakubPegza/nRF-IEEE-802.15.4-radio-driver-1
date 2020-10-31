@@ -82,7 +82,6 @@
 #define __ALIGN(n)      __attribute__((aligned(n)))
 #define __ASM           __asm
 #define __WEAK          __attribute__((weak))
-/* Undefine all hardware peripherals provided by MDK so that they can be mocked later */
 
 extern char g_periph_mem[];
 

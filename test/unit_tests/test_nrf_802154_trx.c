@@ -2,6 +2,17 @@
 
 #include "nrf_802154_trx.h"
 
+#if defined(NRF52840_XXAA) || \
+    defined(NRF52833_XXAA) || \
+    defined(NRF52820_XXAA) || \
+    defined(NRF52811_XXAA)
+#include "nrf_802154_trx_ppi.h"
+
+#elif defined(NRF5340_XXAA)
+#include "nrf_802154_trx_dppi.h"
+
+#endif
+
 // HW mocks
 #include "nrf_mock.h"
 

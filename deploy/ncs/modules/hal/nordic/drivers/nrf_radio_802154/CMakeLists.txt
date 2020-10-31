@@ -28,6 +28,10 @@ zephyr_library_sources(
   src/platform/temperature/nrf_802154_temperature_none.c
   )
 
+zephyr_library_sources(
+  src/nrf_802154_trx_ppi.c
+  )
+
 if (CONFIG_NRF_802154_SL_OPENSOURCE)
 zephyr_library_sources(
   src/nrf_802154_notification_direct.c
