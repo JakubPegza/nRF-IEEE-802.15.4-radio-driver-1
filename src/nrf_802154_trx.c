@@ -44,7 +44,7 @@
 #include "nrf_802154_pib.h"
 #include "nrf_802154_rssi.h"
 #include "nrf_802154_swi.h"
-#include "nrf_802154_trx_ppi.h"
+#include "nrf_802154_trx_ppi_api.h"
 #include "nrf_802154_utils.h"
 
 #include "hal/nrf_egu.h"
@@ -389,11 +389,21 @@ static void fem_for_tx_reset(bool cca)
     nrf_timer_task_trigger(NRF_802154_TIMER_INSTANCE, NRF_TIMER_TASK_SHUTDOWN);
 }
 
+void nrf_802154_trx_module_reset(void)
+{
+    m_trx_state                      = TRX_STATE_DISABLED;
+    m_timer_value_on_radio_end_event = 0;
+    m_transmit_with_cca              = false;
+    mp_receive_buffer                = NULL;
+
+    memset(&m_flags, 0, sizeof(m_flags));
+}
+
 void nrf_802154_trx_init(void)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_LOW);
 
-    m_trx_state = TRX_STATE_DISABLED;
+    nrf_802154_trx_module_reset();
 
     nrf_timer_init();
 #if defined(RADIO_INTENSET_SYNC_Msk)

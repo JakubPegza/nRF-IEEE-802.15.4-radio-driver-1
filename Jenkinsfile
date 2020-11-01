@@ -85,6 +85,10 @@ pipeline {
                         }
                         stage('Run tests') {
                             steps {
+                                // TODO: Uncomment when dependencies support nRF53
+                                //sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf5340 test:all'
+                                //sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf5340.xml'
+
                                 sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52840 test:all'
                                 sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52840.xml'
 

@@ -101,6 +101,10 @@ void nrf_802154_trx_ppi_for_fem_clear(void);
  * @param[in] p_instance Timer instance that is used to schedule the transition to the Power Down state.
  * @param[in] compare_channel Compare channel to hold a value for the timer.
  *
+ * @note This function and @ref nrf_802154_trx_ppi_for_fem_powerdown_clear looks not symetrical.
+ *       It seems it could be better designed. We shall refactor it when porting FEM support to
+ *       nRF53 family.
+ *
  * @retval true   FEM powerdown procedure has started.
  * @retval false  FEM powerdown procedure is not needed.
  */

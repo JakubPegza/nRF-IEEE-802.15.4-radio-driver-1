@@ -31,7 +31,7 @@
 
 #define NRF_802154_MODULE_ID NRF_802154_DRV_MODULE_ID_TRX_PPI
 
-#include "nrf_802154_trx_ppi.h"
+#include "nrf_802154_trx_ppi_api.h"
 
 #include "nrf_802154_debug_log.h"
 #include "nrf_802154_peripherals.h"
@@ -47,10 +47,10 @@
 #define DPPI_CHGRP_RAMP_UP          NRF_DPPI_CHANNEL_GROUP0 ///< PPI group used to disable self-disabling PPIs
 #define DPPI_CHGRP_RAMP_UP_DIS_TASK NRF_DPPI_TASK_CHG0_DIS  ///< PPI task used to disable self-disabling PPIs
 
-#define PPI_DISABLED_EGU            6
-#define PPI_EGU_RAMP_UP             7
-#define PPI_TIMER_TX_ACK            7
-#define PPI_RADIO_SYNC_EGU_SYNC     8
+#define PPI_DISABLED_EGU            NRF_802154_DPPI_RADIO_DISABLED_TO_EGU
+#define PPI_EGU_RAMP_UP             NRF_802154_DPPI_EGU_TO_RADIO_RAMP_UP
+#define PPI_TIMER_TX_ACK            NRF_802154_DPPI_TIMER_COMPARE_TO_RADIO_TXEN
+#define PPI_RADIO_SYNC_EGU_SYNC     NRF_802154_DPPI_RADIO_SYNC_TO_EGU_SYNC
 
 void nrf_802154_trx_ppi_for_ramp_up_set(nrf_radio_task_t ramp_up_task, bool start_timer)
 {

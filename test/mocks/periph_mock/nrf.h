@@ -85,6 +85,11 @@
 
 extern char g_periph_mem[];
 
+#if defined(NRF52840_XXAA) || \
+    defined(NRF52833_XXAA) || \
+    defined(NRF52820_XXAA) || \
+    defined(NRF52811_XXAA)
+
 #if defined(NRF_RADIO)
   #undef  NRF_RADIO
   #undef  NRF_RADIO_BASE
@@ -181,6 +186,61 @@ extern char g_periph_mem[];
   #undef  NRF_PPI_BASE
   #define NRF_PPI_BASE                (g_periph_mem + 0x1F000)
   #define NRF_PPI                     ((NRF_PPI_Type*)           NRF_PPI_BASE)
+#endif
+
+#elif defined(NRF5340_XXAA_NETWORK)
+
+#if defined(NRF_RADIO_NS)
+  #undef  NRF_RADIO_NS
+  #undef  NRF_RADIO_NS_BASE
+  #define NRF_RADIO_NS_BASE              (g_periph_mem + 0x08000)
+  #define NRF_RADIO_NS                   ((NRF_RADIO_Type*)         NRF_RADIO_NS_BASE)
+#endif
+
+#if defined(NRF_GPIOTE_NS)
+  #undef  NRF_GPIOTE_NS
+  #undef  NRF_GPIOTE_NS_BASE
+  #define NRF_GPIOTE_NS_BASE             (g_periph_mem + 0x0A000)
+  #define NRF_GPIOTE_NS                  ((NRF_GPIOTE_Type*)        NRF_GPIOTE_NS_BASE)
+#endif
+
+#if defined(NRF_TIMER0_NS)
+  #undef  NRF_TIMER0_NS
+  #undef  NRF_TIMER0_NS_BASE
+  #define NRF_TIMER0_NS_BASE             (g_periph_mem + 0x0C000)
+  #define NRF_TIMER0_NS                  ((NRF_TIMER_Type*)         NRF_TIMER0_NS_BASE)
+#endif
+
+#if defined(NRF_DPPIC_NS)
+  #undef  NRF_DPPIC_NS
+  #undef  NRF_DPPIC_NS_BASE
+  #define NRF_DPPIC_NS_BASE              (g_periph_mem + 0x0F000)
+  #define NRF_DPPIC_NS                   ((NRF_DPPIC_Type*)         NRF_DPPIC_NS_BASE)
+#endif
+
+#if defined(NRF_EGU0_NS)
+  #undef  NRF_EGU0_NS
+  #undef  NRF_EGU0_NS_BASE
+  #define NRF_EGU0_NS_BASE               (g_periph_mem + 0x14000)
+  #define NRF_EGU0_NS                    ((NRF_EGU_Type*)           NRF_EGU0_NS_BASE)
+#endif
+
+#if defined(NRF_TIMER1_NS)
+  #undef  NRF_TIMER1_NS
+  #undef  NRF_TIMER1_NS_BASE
+  #define NRF_TIMER1_NS_BASE             (g_periph_mem + 0x18000)
+  #define NRF_TIMER1_NS                  ((NRF_TIMER_Type*)         NRF_TIMER1_NS_BASE)
+#endif
+
+#if defined(NRF_TIMER2_NS)
+  #undef  NRF_TIMER2_NS
+  #undef  NRF_TIMER2_NS_BASE
+  #define NRF_TIMER2_NS_BASE             (g_periph_mem + 0x19000)
+  #define NRF_TIMER2_NS                  ((NRF_TIMER_Type*)         NRF_TIMER2_NS_BASE)
+#endif
+
+#else
+#error Cannot mock peripherals of unknown SoC
 #endif
 
 #endif /* NRF_H */

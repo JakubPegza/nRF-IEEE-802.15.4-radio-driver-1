@@ -31,7 +31,7 @@
 
 #define NRF_802154_MODULE_ID NRF_802154_DRV_MODULE_ID_TRX_PPI
 
-#include "nrf_802154_trx_ppi.h"
+#include "nrf_802154_trx_ppi_api.h"
 
 #include <stdbool.h>
 

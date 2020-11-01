@@ -483,7 +483,58 @@ extern "C" {
 #define NRF_802154_PPI_ABORT_GROUP NRF_PPI_CHANNEL_GROUP1
 #endif
 
-#endif // NRF52 family
+#elif defined(NRF5340_XXAA)
+
+/**
+ * @def NRF_802154_DPPI_RADIO_DISABLED_TO_EGU
+ *
+ * The DPPI channel that connects RADIO_DISABLED event to EGU task.
+ *
+ * @note This option is used by the core module regardless of the driver configuration.
+ *
+ */
+#ifndef NRF_802154_DPPI_RADIO_DISABLED_TO_EGU
+#define NRF_802154_DPPI_RADIO_DISABLED_TO_EGU 6U
+#endif
+
+/**
+ * @def NRF_802154_DPPI_EGU_TO_RADIO_RAMP_UP
+ *
+ * The DPPI channel that connects EGU event to RADIO_TXEN or RADIO_RXEN task.
+ *
+ * @note This option is used by the core module regardless of the driver configuration.
+ *       The peripheral is shared with @ref NRF_802154_DPPI_EGU_TO_RADIO_RAMP_UP.
+ *
+ */
+#ifndef NRF_802154_DPPI_EGU_TO_RADIO_RAMP_UP
+#define NRF_802154_DPPI_EGU_TO_RADIO_RAMP_UP 7U
+#endif
+
+/**
+ * @def NRF_802154_DPPI_TIMER_COMPARE_TO_RADIO_TXEN
+ *
+ * The DPPI channel that connects TIMER_COMPARE event to RADIO_TXEN task.
+ *
+ * @note This option is used by the core module regardless of the driver configuration.
+ *       The peripheral is shared with @ref NRF_802154_DPPI_EGU_TO_RADIO_RAMP_UP.
+ *
+ */
+#ifndef NRF_802154_DPPI_TIMER_COMPARE_TO_RADIO_TXEN
+#define NRF_802154_DPPI_TIMER_COMPARE_TO_RADIO_TXEN 7U
+#endif
+
+/**
+ * @def NRF_802154_DPPI_RADIO_SYNC_TO_EGU_SYNC
+ *
+ * The DPPI channel that connects RADIO_SYNC event to EGU_SYNC task.
+ * EGU_SYNC task belongs to one of EGU channels
+ *
+ */
+#ifndef NRF_802154_DPPI_RADIO_SYNC_TO_EGU_SYNC
+#define NRF_802154_DPPI_RADIO_SYNC_TO_EGU_SYNC 8U
+#endif
+
+#endif // SoC family
 
 /**
  * @def NRF_802154_TIMERS_USED_MASK

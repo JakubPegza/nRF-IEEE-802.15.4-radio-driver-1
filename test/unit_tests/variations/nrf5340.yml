@@ -1,0 +1,5 @@
+:defines:
+  :test:
+    - NRF5340_XXAA
+    - NRF5340_XXAA_NETWORK
+
