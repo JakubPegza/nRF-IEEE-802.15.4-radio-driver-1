@@ -40,17 +40,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "hal/nrf_egu.h"
 #include "hal/nrf_radio.h"
-
-/**
- * @brief Clear all PPIs configured by this module.
- *
- * Cleared PPIs are used:
- *  - to connect RADIO DISABLED event with tasks needed to ramp up
- *  - by FEM
- *  - to enable RADIO SYNC event IRQ
- */
-void nrf_802154_trx_ppi_all_clear(void);
 
 /**
  * @brief Set PPIs to connect RADIO DISABLED event with tasks needed to ramp up.
@@ -63,9 +54,10 @@ void nrf_802154_trx_ppi_for_ramp_up_set(nrf_radio_task_t ramp_up_task, bool star
 /**
  * @brief Clear PPIs to connect RADIO DISABLED event with tasks needed to ramp up.
  *
+ * @param[in]  ramp_up_task  Task triggered to start ramp up procedure.
  * @param[in]  start_timer   If timer is started on RADIO DISABLED event.
  */
-void nrf_802154_trx_ppi_for_ramp_up_clear(bool start_timer);
+void nrf_802154_trx_ppi_for_ramp_up_clear(nrf_radio_task_t ramp_up_task, bool start_timer);
 
 /**
  * @brief Wait until PPIs configured to ramp up radio are propagated through PPI system.
@@ -128,11 +120,11 @@ uint32_t nrf_802154_trx_ppi_group_for_abort_get(void);
 /**
  * @brief Configure PPIs needed to trigger IRQ from RADIO event SYNC.
  */
-void nrf_802154_trx_ppi_for_radio_sync_set(uint32_t task);
+void nrf_802154_trx_ppi_for_radio_sync_set(nrf_egu_task_t task);
 
 /**
  * @brief Unconfigure PPIs needed to trigger IRQ from RADIO event SYNC.
  */
-void nrf_802154_trx_ppi_for_radio_sync_clear(void);
+void nrf_802154_trx_ppi_for_radio_sync_clear(nrf_egu_task_t task);
 
 #endif /* NRF_802154_TRX_PPI_H_ */

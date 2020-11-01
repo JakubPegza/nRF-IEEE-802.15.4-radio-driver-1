@@ -179,7 +179,7 @@ extern "C" {
 #endif
 
 /**
- * @def NRF_802154_SWI_EGU_INSTANCE
+ * @def NRF_802154_EGU_INSTANCE
  *
  * The EGU instance used by the driver to synchronize PPIs and for requests and notifications if
  * SWI is in use.
@@ -187,28 +187,29 @@ extern "C" {
  * @note This option is used by the core module regardless of the driver configuration.
  *
  */
-#define NRF_802154_SWI_EGU_INSTANCE NRFX_CONCAT_2(NRF_EGU, NRF_802154_EGU_INSTANCE_NO)
+#define NRF_802154_EGU_INSTANCE     NRFX_CONCAT_2(NRF_EGU, NRF_802154_EGU_INSTANCE_NO)
+#define NRF_802154_SWI_EGU_INSTANCE NRF_802154_EGU_INSTANCE
 
 /**
- * @def NRF_802154_SWI_IRQ_HANDLER
+ * @def NRF_802154_EGU_IRQ_HANDLER
  *
  * The SWI EGU IRQ handler used by the driver for requests and notifications if SWI is in use.
  *
  * @note This option is used when the driver uses SWI to process requests and notifications.
  *
  */
-#define NRF_802154_SWI_IRQ_HANDLER \
+#define NRF_802154_EGU_IRQ_HANDLER \
     NRFX_CONCAT_3(EGU, NRF_802154_EGU_INSTANCE_NO, _IRQHandler)
 
 /**
- * @def NRF_802154_SWI_IRQN
+ * @def NRF_802154_EGU_IRQN
  *
  * The SWI EGU IRQ number used by the driver for requests and notifications if SWI is in use.
  *
  * @note This option is used when the driver uses SWI to process requests and notifications.
  *
  */
-#define NRF_802154_SWI_IRQN \
+#define NRF_802154_EGU_IRQN \
     NRFX_CONCAT_3(EGU, NRF_802154_EGU_INSTANCE_NO, _IRQn)
 
 #else

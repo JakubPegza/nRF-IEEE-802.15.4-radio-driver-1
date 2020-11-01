@@ -48,13 +48,32 @@
 #include "nrf_802154_utils.h"
 #include "platform/irq/nrf_802154_irq.h"
 
+#if defined(NRF52840_XXAA) || \
+    defined(NRF52833_XXAA) || \
+    defined(NRF52820_XXAA) || \
+    defined(NRF52811_XXAA)
 #define SWI_EGU        NRF_802154_SWI_EGU_INSTANCE ///< Label of SWI peripheral.
 #define SWI_IRQn       NRF_802154_SWI_IRQN         ///< Symbol of SWI IRQ number.
+
 #if NRF_802154_INTERNAL_SWI_IRQ_HANDLING
 #define SWI_IRQHandler NRF_802154_SWI_IRQ_HANDLER  ///< Symbol of SWI IRQ handler.
 #else
 #define SWI_IRQHandler nrf_802154_swi_irq_handler  ///< Symbol of SWI IRQ handler.
 #endif
+
+#elif defined(NRF5340_XXAA)
+#define SWI_EGU        NRF_802154_EGU_INSTANCE    ///< Label of SWI peripheral.
+#define SWI_IRQn       NRF_802154_EGU_IRQN        ///< Symbol of SWI IRQ number.
+
+#if NRF_802154_INTERNAL_SWI_IRQ_HANDLING
+#define SWI_IRQHandler NRF_802154_EGU_IRQ_HANDLER ///< Symbol of SWI IRQ handler.
+#else
+#define SWI_IRQHandler nrf_802154_swi_irq_handler ///< Symbol of SWI IRQ handler.
+#endif
+
+#else
+#error Unknown SoC
+#endif // SoC family
 
 __WEAK void nrf_802154_trx_swi_irq_handler(void)
 {

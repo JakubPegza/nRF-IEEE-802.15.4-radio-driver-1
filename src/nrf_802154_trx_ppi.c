@@ -57,28 +57,6 @@
 #define PPI_TIMER_TX_ACK           NRF_802154_PPI_TIMER_COMPARE_TO_RADIO_TXEN ///< PPI that connects TIMER COMPARE event with RADIO TXEN task
 #define PPI_RADIO_SYNC_EGU_SYNC    NRF_802154_PPI_RADIO_SYNC_TO_EGU_SYNC      ///< PPI that connects RADIO SYNC event with EGU task for SYNC channel
 
-void nrf_802154_trx_ppi_all_clear(void)
-{
-    nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
-
-    nrf_ppi_channels_disable(NRF_PPI,
-                             (1UL << PPI_DISABLED_EGU) |        // For radio ramp up
-                             (1UL << PPI_EGU_RAMP_UP) |         // For radio ramp up
-                             (1UL << PPI_TIMER_TX_ACK) |        // For TX ACK
-                             (1UL << PPI_EGU_TIMER_START) |     // For FEM
-                             (1UL << PPI_RADIO_SYNC_EGU_SYNC)); // For SYNC event
-
-    nrf_ppi_channel_and_fork_endpoint_setup(NRF_PPI, PPI_EGU_RAMP_UP, 0, 0, 0);
-    nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_DISABLED_EGU, 0, 0);
-    nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_TIMER_TX_ACK, 0, 0);        // Configured by TX ACK procedure
-    nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_EGU_TIMER_START, 0, 0);     // Configured by FEM
-    nrf_ppi_channel_endpoint_setup(NRF_PPI, PPI_RADIO_SYNC_EGU_SYNC, 0, 0); // Configured by SYNC
-
-    nrf_ppi_channel_remove_from_group(NRF_PPI, PPI_EGU_RAMP_UP, PPI_CHGRP_RAMP_UP);
-
-    nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);
-}
-
 void nrf_802154_trx_ppi_for_ramp_up_set(nrf_radio_task_t ramp_up_task, bool start_timer)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
@@ -123,8 +101,9 @@ void nrf_802154_trx_ppi_for_ramp_up_set(nrf_radio_task_t ramp_up_task, bool star
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);
 }
 
-void nrf_802154_trx_ppi_for_ramp_up_clear(bool start_timer)
+void nrf_802154_trx_ppi_for_ramp_up_clear(nrf_radio_task_t ramp_up_task, bool start_timer)
 {
+    (void)ramp_up_task;
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
     uint32_t ppi_mask = (1UL << PPI_EGU_RAMP_UP) |
@@ -271,21 +250,22 @@ uint32_t nrf_802154_trx_ppi_group_for_abort_get(void)
 }
 
 #if defined(RADIO_INTENSET_SYNC_Msk)
-void nrf_802154_trx_ppi_for_radio_sync_set(uint32_t task_address)
+void nrf_802154_trx_ppi_for_radio_sync_set(nrf_egu_task_t task)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
     nrf_ppi_channel_endpoint_setup(NRF_PPI,
                                    PPI_RADIO_SYNC_EGU_SYNC,
                                    nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_SYNC),
-                                   task_address);
+                                   nrf_egu_task_address_get(NRF_802154_SWI_EGU_INSTANCE, task));
     nrf_ppi_channel_enable(NRF_PPI, PPI_RADIO_SYNC_EGU_SYNC);
 
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);
 }
 
-void nrf_802154_trx_ppi_for_radio_sync_clear(void)
+void nrf_802154_trx_ppi_for_radio_sync_clear(nrf_egu_task_t task)
 {
+    (void)task;
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
     nrf_ppi_channel_disable(NRF_PPI, PPI_RADIO_SYNC_EGU_SYNC);

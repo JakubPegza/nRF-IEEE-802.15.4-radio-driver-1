@@ -192,6 +192,10 @@ static nrf_802154_flags_t m_flags; ///< Flags used to store the current driver s
 static volatile uint32_t m_timer_value_on_radio_end_event;
 static volatile bool     m_transmit_with_cca;
 
+static void rxframe_finish_disable_ppis(void);
+static void rxack_finish_disable_ppis(void);
+static void txframe_finish_disable_ppis(bool cca);
+
 static void go_idle_abort(void);
 static void receive_frame_abort(void);
 static void receive_ack_abort(void);
@@ -269,6 +273,7 @@ static void irq_init(void)
 
 #if NRF_802154_INTERNAL_RADIO_IRQ_HANDLING
     nrf_802154_irq_init(RADIO_IRQn, NRF_802154_IRQ_PRIORITY, nrf_802154_radio_irq_handler);
+    nrf_802154_irq_enable(RADIO_IRQn);
 #endif
 }
 
@@ -301,7 +306,10 @@ static void fem_for_lna_reset(void)
     nrf_802154_trx_ppi_for_fem_clear();
 }
 
-/** Configure FEM to set PA at appropriate time. */
+/** Configure FEM to set PA at appropriate time.
+ *
+ * @note This function must be called before ramp up PPIs are configured.
+ */
 static void fem_for_pa_set(void)
 {
     if (nrf_802154_fal_pa_configuration_set(&m_activate_tx_cc0, NULL) == NRFX_SUCCESS)
@@ -312,7 +320,10 @@ static void fem_for_pa_set(void)
     }
 }
 
-/** Reset FEM configuration for PA. */
+/** Reset FEM configuration for PA.
+ *
+ * @note This function must be called before ramp up PPIs are configured.
+ */
 static void fem_for_pa_reset(void)
 {
     nrf_802154_fal_pa_configuration_clear();
@@ -321,7 +332,10 @@ static void fem_for_pa_reset(void)
     nrf_802154_fal_deactivate_now(NRF_802154_FAL_PA);
 }
 
-/** Configure FEM for TX procedure. */
+/** Configure FEM for TX procedure.
+ *
+ * @note This function must be called before ramp up PPIs are configured.
+ */
 static void fem_for_tx_set(bool cca)
 {
     bool success;
@@ -439,6 +453,62 @@ void nrf_802154_trx_enable(void)
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_LOW);
 }
 
+static void ppi_all_clear(void)
+{
+    switch (m_trx_state)
+    {
+        case TRX_STATE_IDLE:
+        case TRX_STATE_GOING_IDLE:
+        case TRX_STATE_RXFRAME_FINISHED:
+        case TRX_STATE_FINISHED:
+            // Intentionally empty. PPIs are not configured in this state.
+            break;
+
+        case TRX_STATE_RXFRAME:
+            rxframe_finish_disable_ppis();
+            break;
+
+        case TRX_STATE_RXACK:
+            rxack_finish_disable_ppis();
+            nrf_802154_trx_ppi_for_fem_clear();
+            break;
+
+        case TRX_STATE_TXFRAME:
+            txframe_finish_disable_ppis(m_transmit_with_cca);
+            nrf_802154_trx_ppi_for_fem_clear();
+            break;
+
+        case TRX_STATE_TXACK:
+            nrf_802154_trx_ppi_for_ack_tx_clear();
+            // FEM PPIs are not configured for this state. TIMER was started in TRX_STATE_RXFRAME
+            // and PPIs starting timer were cleared when exiting TRX_STATE_RXFRAME.
+            break;
+
+        case TRX_STATE_STANDALONE_CCA:
+            nrf_802154_trx_ppi_for_ramp_up_clear(NRF_RADIO_TASK_RXEN, false);
+            nrf_802154_trx_ppi_for_fem_clear();
+            break;
+
+        case TRX_STATE_CONTINUOUS_CARRIER:
+            nrf_802154_trx_ppi_for_ramp_up_clear(NRF_RADIO_TASK_TXEN, false);
+            nrf_802154_trx_ppi_for_fem_clear();
+            break;
+
+        case TRX_STATE_MODULATED_CARRIER:
+            nrf_802154_trx_ppi_for_ramp_up_clear(NRF_RADIO_TASK_TXEN, false);
+            nrf_802154_trx_ppi_for_fem_clear();
+            break;
+
+        case TRX_STATE_ENERGY_DETECTION:
+            nrf_802154_trx_ppi_for_ramp_up_clear(NRF_RADIO_TASK_RXEN, false);
+            nrf_802154_trx_ppi_for_fem_clear();
+            break;
+
+        default:
+            assert(false);
+    }
+}
+
 static void fem_power_down_now(void)
 {
     nrf_802154_fal_deactivate_now(NRF_802154_FAL_ALL);
@@ -472,7 +542,7 @@ void nrf_802154_trx_disable(void)
         nrf_802154_irq_clear_pending(RADIO_IRQn);
 
         /* While the RADIO is powered off deconfigure any PPIs used directly by trx module */
-        nrf_802154_trx_ppi_all_clear();
+        ppi_all_clear();
 
 #if !NRF_802154_DISABLE_BCC_MATCHING && defined(RADIO_INTENSET_SYNC_Msk)
         nrf_egu_int_disable(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_INTMASK);
@@ -495,6 +565,7 @@ void nrf_802154_trx_disable(void)
         nrf_802154_fal_abort_clear();
 #endif
 
+        // TODO: Deconfigure FAL PA and LNA here?
         nrf_802154_fal_deactivate_now(NRF_802154_FAL_ALL);
 
         if (m_trx_state != TRX_STATE_IDLE)
@@ -835,8 +906,7 @@ void nrf_802154_trx_receive_frame(uint8_t                                bcc,
         // The RADIO can't generate interrupt on EVENT_SYNC. Path to generate interrupt:
         // RADIO.EVENT_SYNC -> PPI_RADIO_SYNC_EGU_SYNC -> EGU.TASK_SYNC -> EGU.EVENT_SYNC ->
         // SWI_IRQHandler (in nrf_802154_swi.c), calls nrf_802154_trx_swi_irq_handler
-        nrf_802154_trx_ppi_for_radio_sync_set(
-            nrf_egu_task_address_get(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_TASK));
+        nrf_802154_trx_ppi_for_radio_sync_set(EGU_SYNC_TASK);
 
         nrf_radio_event_clear(NRF_RADIO, NRF_RADIO_EVENT_SYNC);
         nrf_egu_event_clear(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_EVENT);
@@ -1225,9 +1295,9 @@ static void rxframe_finish_disable_ppis(void)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
-    nrf_802154_trx_ppi_for_ramp_up_clear(true);
+    nrf_802154_trx_ppi_for_ramp_up_clear(NRF_RADIO_TASK_RXEN, true);
 #if defined(RADIO_INTENSET_SYNC_Msk)
-    nrf_802154_trx_ppi_for_radio_sync_clear();
+    nrf_802154_trx_ppi_for_radio_sync_clear(EGU_SYNC_TASK);
 #endif
 
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);
@@ -1477,7 +1547,7 @@ static void rxack_finish_disable_ppis(void)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
-    nrf_802154_trx_ppi_for_ramp_up_clear(false);
+    nrf_802154_trx_ppi_for_ramp_up_clear(NRF_RADIO_TASK_RXEN, false);
 
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);
 }
@@ -1499,6 +1569,9 @@ static void rxack_finish_disable_fem_activation(void)
 
     // Disable LNA activation
     nrf_802154_fal_lna_configuration_clear();
+
+    // Clear LNA PPIs
+    nrf_802154_trx_ppi_for_fem_clear();
 
     // Disable short used by LNA activation
     nrf_timer_shorts_disable(NRF_802154_TIMER_INSTANCE,
@@ -1582,7 +1655,7 @@ static void standalone_cca_finish(void)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
-    nrf_802154_trx_ppi_for_ramp_up_clear(false);
+    nrf_802154_trx_ppi_for_ramp_up_clear(NRF_RADIO_TASK_RXEN, false);
 
     nrf_radio_shorts_set(NRF_RADIO, SHORTS_IDLE);
 
@@ -1651,7 +1724,7 @@ static void continuous_carrier_abort(void)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
-    nrf_802154_trx_ppi_for_ramp_up_clear(false);
+    nrf_802154_trx_ppi_for_ramp_up_clear(NRF_RADIO_TASK_TXEN, false);
 
     fem_for_pa_reset();
 
@@ -1713,7 +1786,7 @@ static void modulated_carrier_abort()
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
-    nrf_802154_trx_ppi_for_ramp_up_clear(false);
+    nrf_802154_trx_ppi_for_ramp_up_clear(NRF_RADIO_TASK_TXEN, false);
 
     nrf_radio_shorts_set(NRF_RADIO, SHORTS_IDLE);
 
@@ -1765,7 +1838,7 @@ static void energy_detection_finish(void)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
-    nrf_802154_trx_ppi_for_ramp_up_clear(false);
+    nrf_802154_trx_ppi_for_ramp_up_clear(NRF_RADIO_TASK_RXEN, false);
     fem_for_lna_reset();
 
     nrf_radio_int_disable(NRF_RADIO, NRF_RADIO_INT_EDEND_MASK);
@@ -1938,11 +2011,11 @@ static void irq_handler_crcok(void)
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_LOW);
 }
 
-static void txframe_finish_disable_ppis(void)
+static void txframe_finish_disable_ppis(bool cca)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
-    nrf_802154_trx_ppi_for_ramp_up_clear(false);
+    nrf_802154_trx_ppi_for_ramp_up_clear(cca ? NRF_RADIO_TASK_RXEN : NRF_RADIO_TASK_TXEN, false);
 
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);
 }
@@ -1977,7 +2050,7 @@ static void txframe_finish(void)
      * are set in the past so even if TIMER started no spurious FEM PA activation will occur.
      * We need to disable PPI_EGU_TIMER_START and then shutdown TIMER as it is not used.
      */
-    txframe_finish_disable_ppis();
+    txframe_finish_disable_ppis(m_transmit_with_cca);
 
     fem_for_tx_reset(m_transmit_with_cca);
 
@@ -2004,7 +2077,7 @@ static void transmit_frame_abort(void)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
-    txframe_finish_disable_ppis();
+    txframe_finish_disable_ppis(m_transmit_with_cca);
     nrf_radio_shorts_set(NRF_RADIO, SHORTS_IDLE);
 
     fem_for_tx_reset(m_transmit_with_cca);
