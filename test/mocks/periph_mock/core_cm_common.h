@@ -28,9 +28,10 @@ extern void __SEV(void);
 /* core_cmInstr.h */
 
 /* core_cmFunc.h */
-extern void __disable_irq(void);
-extern void __enable_irq(void);
-extern uint32_t __get_PRIMASK(void);
+static inline void __disable_irq(void) {}
+static inline void __enable_irq(void) {}
+static inline uint32_t __get_PRIMASK(void) { return 0; }
+static inline void __set_PRIMASK(uint32_t v) { (void)v; }
 /* core_cmFunc.h */
 
 /* cmsis_gcc.h */
