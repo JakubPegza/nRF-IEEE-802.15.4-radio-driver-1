@@ -2665,6 +2665,7 @@ void nrf_802154_trx_swi_irq_handler(void)
     // and executed after MARGIN processing is finished, i.e. after the end of a timeslot.
     // To prevent that from happening, the handler is executed with disabled interrupts.
     nrf_802154_mcu_critical_state_t mcu_crit_state;
+
     nrf_802154_mcu_critical_enter(mcu_crit_state);
 
     if (nrf_egu_int_enable_check(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_INTMASK) &&
