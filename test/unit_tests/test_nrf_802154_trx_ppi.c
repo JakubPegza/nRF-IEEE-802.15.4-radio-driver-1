@@ -37,7 +37,7 @@ void test_nrf_802154_trx_ppi_for_ramp_up_set_Shall_configure_ppis_when_timer_is_
     uint32_t expected_task_address;
     uint32_t expected_fork_address;
 
-    expected_event_address = nrf_egu_event_address_get(NRF_802154_SWI_EGU_INSTANCE, NRF_EGU_EVENT_TRIGGERED15);
+    expected_event_address = nrf_egu_event_address_get(NRF_802154_EGU_INSTANCE, NRF_EGU_EVENT_TRIGGERED15);
     expected_task_address = nrf_radio_task_address_get(NRF_RADIO, NRF_RADIO_TASK_RXEN);
     expected_fork_address = nrf_ppi_task_address_get(NRF_PPI, NRF_PPI_TASK_CHG0_DIS);
     TEST_ASSERT_EQUAL(expected_event_address, NRF_PPI->CH[NRF_802154_PPI_EGU_TO_RADIO_RAMP_UP].EEP);
@@ -45,7 +45,7 @@ void test_nrf_802154_trx_ppi_for_ramp_up_set_Shall_configure_ppis_when_timer_is_
     TEST_ASSERT_EQUAL(expected_fork_address, NRF_PPI->FORK[NRF_802154_PPI_EGU_TO_RADIO_RAMP_UP].TEP);
 
     expected_event_address = nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_DISABLED);
-    expected_task_address  = nrf_egu_task_address_get(NRF_802154_SWI_EGU_INSTANCE, NRF_EGU_TASK_TRIGGER15);
+    expected_task_address  = nrf_egu_task_address_get(NRF_802154_EGU_INSTANCE, NRF_EGU_TASK_TRIGGER15);
     TEST_ASSERT_EQUAL(expected_event_address, NRF_PPI->CH[NRF_802154_PPI_RADIO_DISABLED_TO_EGU].EEP);
     TEST_ASSERT_EQUAL(expected_task_address, NRF_PPI->CH[NRF_802154_PPI_RADIO_DISABLED_TO_EGU].TEP);
     TEST_ASSERT_EQUAL(0, NRF_PPI->FORK[NRF_802154_PPI_RADIO_DISABLED_TO_EGU].TEP);
@@ -72,7 +72,7 @@ void test_nrf_802154_trx_ppi_for_ramp_up_set_Shall_configure_ppis_when_timer_is_
     uint32_t expected_task_address;
     uint32_t expected_fork_address;
 
-    expected_event_address = nrf_egu_event_address_get(NRF_802154_SWI_EGU_INSTANCE, NRF_EGU_EVENT_TRIGGERED15);
+    expected_event_address = nrf_egu_event_address_get(NRF_802154_EGU_INSTANCE, NRF_EGU_EVENT_TRIGGERED15);
     expected_task_address = nrf_radio_task_address_get(NRF_RADIO, NRF_RADIO_TASK_TXEN);
     expected_fork_address = nrf_ppi_task_address_get(NRF_PPI, NRF_PPI_TASK_CHG0_DIS);
     TEST_ASSERT_EQUAL(expected_event_address, NRF_PPI->CH[NRF_802154_PPI_EGU_TO_RADIO_RAMP_UP].EEP);
@@ -80,12 +80,12 @@ void test_nrf_802154_trx_ppi_for_ramp_up_set_Shall_configure_ppis_when_timer_is_
     TEST_ASSERT_EQUAL(expected_fork_address, NRF_PPI->FORK[NRF_802154_PPI_EGU_TO_RADIO_RAMP_UP].TEP);
 
     expected_event_address = nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_DISABLED);
-    expected_task_address  = nrf_egu_task_address_get(NRF_802154_SWI_EGU_INSTANCE, NRF_EGU_TASK_TRIGGER15);
+    expected_task_address  = nrf_egu_task_address_get(NRF_802154_EGU_INSTANCE, NRF_EGU_TASK_TRIGGER15);
     TEST_ASSERT_EQUAL(expected_event_address, NRF_PPI->CH[NRF_802154_PPI_RADIO_DISABLED_TO_EGU].EEP);
     TEST_ASSERT_EQUAL(expected_task_address, NRF_PPI->CH[NRF_802154_PPI_RADIO_DISABLED_TO_EGU].TEP);
     TEST_ASSERT_EQUAL(0, NRF_PPI->FORK[NRF_802154_PPI_RADIO_DISABLED_TO_EGU].TEP);
 
-    expected_event_address = nrf_egu_event_address_get(NRF_802154_SWI_EGU_INSTANCE, NRF_EGU_EVENT_TRIGGERED15);
+    expected_event_address = nrf_egu_event_address_get(NRF_802154_EGU_INSTANCE, NRF_EGU_EVENT_TRIGGERED15);
     expected_task_address  = nrf_timer_task_address_get(NRF_802154_TIMER_INSTANCE, NRF_TIMER_TASK_START);
     TEST_ASSERT_EQUAL(expected_event_address, NRF_PPI->CH[NRF_802154_PPI_EGU_TO_TIMER_START].EEP);
     TEST_ASSERT_EQUAL(expected_task_address, NRF_PPI->CH[NRF_802154_PPI_EGU_TO_TIMER_START].TEP);
@@ -228,7 +228,7 @@ void test_nrf_802154_trx_ppi_for_ramp_up_was_triggered_Shall_return_true_if_egu_
     uint32_t * p_radio_state_reg = (uint32_t *)&NRF_RADIO->STATE; // Make this register RW to mock it
     *p_radio_state_reg = RADIO_STATE_STATE_Disabled;
 
-    NRF_802154_SWI_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 1;
+    NRF_802154_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 1;
     
     // Trigger
     bool result = nrf_802154_trx_ppi_for_ramp_up_was_triggered();
@@ -243,7 +243,7 @@ void test_nrf_802154_trx_ppi_for_ramp_up_was_triggered_Shall_return_false_if_rad
     uint32_t * p_radio_state_reg = (uint32_t *)&NRF_RADIO->STATE; // Make this register RW to mock it
     *p_radio_state_reg = RADIO_STATE_STATE_Disabled;
 
-    NRF_802154_SWI_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 0;
+    NRF_802154_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 0;
     
     // Trigger
     bool result = nrf_802154_trx_ppi_for_ramp_up_was_triggered();
@@ -258,7 +258,7 @@ void test_nrf_802154_trx_ppi_for_ramp_up_was_triggered_Shall_return_false_if_egu
     uint32_t * p_radio_state_reg = (uint32_t *)&NRF_RADIO->STATE; // Make this register RW to mock it
     *p_radio_state_reg = RADIO_STATE_STATE_Disabled;
 
-    NRF_802154_SWI_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 1;
+    NRF_802154_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 1;
 
     nrf_802154_trx_ppi_for_ramp_up_set(NRF_RADIO_TASK_RXEN, false);
     
@@ -277,7 +277,7 @@ void test_nrf_802154_trx_ppi_for_ramp_up_was_triggered_Shall_return_true_if_egu_
 
     nrf_802154_trx_ppi_for_ramp_up_set(NRF_RADIO_TASK_RXEN, false);
 
-    NRF_802154_SWI_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 1;
+    NRF_802154_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 1;
     
     // Trigger
     bool result = nrf_802154_trx_ppi_for_ramp_up_was_triggered();
@@ -333,7 +333,7 @@ void test_nrf_802154_trx_ppi_for_fem_set_Shall_configure_ppis(void)
     uint32_t expected_event_address;
     uint32_t expected_task_address;
 
-    expected_event_address = nrf_egu_event_address_get(NRF_802154_SWI_EGU_INSTANCE, NRF_EGU_EVENT_TRIGGERED15);
+    expected_event_address = nrf_egu_event_address_get(NRF_802154_EGU_INSTANCE, NRF_EGU_EVENT_TRIGGERED15);
     expected_task_address = nrf_timer_task_address_get(NRF_802154_TIMER_INSTANCE, NRF_TIMER_TASK_START);
     TEST_ASSERT_EQUAL(expected_event_address, NRF_PPI->CH[NRF_802154_PPI_EGU_TO_TIMER_START].EEP);
     TEST_ASSERT_EQUAL(expected_task_address, NRF_PPI->CH[NRF_802154_PPI_EGU_TO_TIMER_START].TEP);
@@ -415,7 +415,7 @@ void test_nrf_802154_trx_ppi_for_radio_sync_set_Shall_configure_ppis(void)
     uint32_t expected_task_address;
 
     expected_event_address = nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_SYNC);
-    expected_task_address = nrf_egu_task_address_get(NRF_802154_SWI_EGU_INSTANCE, task);
+    expected_task_address = nrf_egu_task_address_get(NRF_802154_EGU_INSTANCE, task);
     TEST_ASSERT_EQUAL(expected_event_address, NRF_PPI->CH[NRF_802154_PPI_RADIO_SYNC_TO_EGU_SYNC].EEP);
     TEST_ASSERT_EQUAL(expected_task_address, NRF_PPI->CH[NRF_802154_PPI_RADIO_SYNC_TO_EGU_SYNC].TEP);
     TEST_ASSERT_EQUAL(0, NRF_PPI->FORK[NRF_802154_PPI_RADIO_SYNC_TO_EGU_SYNC].TEP);

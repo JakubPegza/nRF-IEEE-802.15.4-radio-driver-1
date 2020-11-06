@@ -555,8 +555,8 @@ void nrf_802154_trx_disable(void)
         ppi_all_clear();
 
 #if !NRF_802154_DISABLE_BCC_MATCHING && defined(RADIO_INTENSET_SYNC_Msk)
-        nrf_egu_int_disable(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_INTMASK);
-        nrf_egu_event_clear(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_EVENT);
+        nrf_egu_int_disable(NRF_802154_EGU_INSTANCE, EGU_SYNC_INTMASK);
+        nrf_egu_event_clear(NRF_802154_EGU_INSTANCE, EGU_SYNC_EVENT);
 #endif
 
         /* Stop & deconfigure timer */
@@ -919,8 +919,8 @@ void nrf_802154_trx_receive_frame(uint8_t                                bcc,
         nrf_802154_trx_ppi_for_radio_sync_set(EGU_SYNC_TASK);
 
         nrf_radio_event_clear(NRF_RADIO, NRF_RADIO_EVENT_SYNC);
-        nrf_egu_event_clear(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_EVENT);
-        nrf_egu_int_enable(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_INTMASK);
+        nrf_egu_event_clear(NRF_802154_EGU_INSTANCE, EGU_SYNC_EVENT);
+        nrf_egu_int_enable(NRF_802154_EGU_INSTANCE, EGU_SYNC_INTMASK);
 #endif
     }
 
@@ -1341,7 +1341,7 @@ static void rxframe_finish_disable_ints(void)
     nrf_radio_int_disable(NRF_RADIO, ints_to_disable);
 
 #if !NRF_802154_DISABLE_BCC_MATCHING && defined(RADIO_INTENSET_SYNC_Msk)
-    nrf_egu_int_disable(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_INTMASK);
+    nrf_egu_int_disable(NRF_802154_EGU_INSTANCE, EGU_SYNC_INTMASK);
 #endif
 
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);
@@ -2323,11 +2323,11 @@ void nrf_802154_radio_irq_handler(void)
     // Note: For NRF_RADIO_EVENT_SYNC we enable interrupt through EGU.
     // That's why we check here EGU's EGU_SYNC_INTMASK.
     // The RADIO does not have interrupt from SYNC event.
-    if (nrf_egu_int_enable_check(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_INTMASK) &&
+    if (nrf_egu_int_enable_check(NRF_802154_EGU_INSTANCE, EGU_SYNC_INTMASK) &&
         nrf_radio_event_check(NRF_RADIO, NRF_RADIO_EVENT_SYNC))
     {
         nrf_radio_event_clear(NRF_RADIO, NRF_RADIO_EVENT_SYNC);
-        nrf_egu_event_clear(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_EVENT);
+        nrf_egu_event_clear(NRF_802154_EGU_INSTANCE, EGU_SYNC_EVENT);
 
         irq_handler_sync();
     }
@@ -2442,10 +2442,10 @@ void nrf_802154_trx_swi_irq_handler(void)
 
     nrf_802154_mcu_critical_enter(mcu_crit_state);
 
-    if (nrf_egu_int_enable_check(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_INTMASK) &&
-        nrf_egu_event_check(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_EVENT))
+    if (nrf_egu_int_enable_check(NRF_802154_EGU_INSTANCE, EGU_SYNC_INTMASK) &&
+        nrf_egu_event_check(NRF_802154_EGU_INSTANCE, EGU_SYNC_EVENT))
     {
-        nrf_egu_event_clear(NRF_802154_SWI_EGU_INSTANCE, EGU_SYNC_EVENT);
+        nrf_egu_event_clear(NRF_802154_EGU_INSTANCE, EGU_SYNC_EVENT);
 
         // We are in SWI_IRQHandler, which priority is usually lower than RADIO_IRQHandler.
         // To avoid problems with critical sections, trigger RADIO_IRQ manually.

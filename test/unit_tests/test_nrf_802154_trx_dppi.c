@@ -197,7 +197,7 @@ void test_nrf_802154_trx_ppi_for_ramp_up_was_triggered_Shall_return_true_if_egu_
     uint32_t * p_radio_state_reg = (uint32_t *)&NRF_RADIO->STATE; // Make this register RW to mock it
     *p_radio_state_reg = RADIO_STATE_STATE_Disabled;
 
-    NRF_802154_SWI_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 1;
+    NRF_802154_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 1;
     
     // Trigger
     bool result = nrf_802154_trx_ppi_for_ramp_up_was_triggered();
@@ -212,7 +212,7 @@ void test_nrf_802154_trx_ppi_for_ramp_up_was_triggered_Shall_return_false_if_rad
     uint32_t * p_radio_state_reg = (uint32_t *)&NRF_RADIO->STATE; // Make this register RW to mock it
     *p_radio_state_reg = RADIO_STATE_STATE_Disabled;
 
-    NRF_802154_SWI_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 0;
+    NRF_802154_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 0;
     
     // Trigger
     bool result = nrf_802154_trx_ppi_for_ramp_up_was_triggered();
@@ -227,7 +227,7 @@ void test_nrf_802154_trx_ppi_for_ramp_up_was_triggered_Shall_return_false_if_egu
     uint32_t * p_radio_state_reg = (uint32_t *)&NRF_RADIO->STATE; // Make this register RW to mock it
     *p_radio_state_reg = RADIO_STATE_STATE_Disabled;
 
-    NRF_802154_SWI_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 1;
+    NRF_802154_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 1;
 
     nrf_802154_trx_ppi_for_ramp_up_set(NRF_RADIO_TASK_RXEN, false);
     
@@ -246,7 +246,7 @@ void test_nrf_802154_trx_ppi_for_ramp_up_was_triggered_Shall_return_true_if_egu_
 
     nrf_802154_trx_ppi_for_ramp_up_set(NRF_RADIO_TASK_RXEN, false);
 
-    NRF_802154_SWI_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 1;
+    NRF_802154_EGU_INSTANCE->EVENTS_TRIGGERED[15] = 1;
     
     // Trigger
     bool result = nrf_802154_trx_ppi_for_ramp_up_was_triggered();
