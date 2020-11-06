@@ -64,10 +64,10 @@ void nrf_802154_trx_ppi_for_ramp_up_set(nrf_radio_task_t ramp_up_task, bool star
     // Clr event EGU (needed for nrf_802154_trx_ppi_for_ramp_up_was_triggered)
     nrf_egu_event_clear(NRF_802154_EGU_INSTANCE, EGU_EVENT);
 
+    nrf_dppi_channels_include_in_group(NRF_DPPIC, 1UL << PPI_EGU_RAMP_UP, DPPI_CHGRP_RAMP_UP);
     nrf_egu_publish_set(NRF_802154_EGU_INSTANCE, EGU_EVENT, PPI_EGU_RAMP_UP);
     nrf_radio_subscribe_set(NRF_RADIO, ramp_up_task, PPI_EGU_RAMP_UP);
     nrf_dppi_subscribe_set(NRF_DPPIC, DPPI_CHGRP_RAMP_UP_DIS_TASK, PPI_EGU_RAMP_UP);
-    nrf_dppi_channels_include_in_group(NRF_DPPIC, 1UL << PPI_EGU_RAMP_UP, DPPI_CHGRP_RAMP_UP);
 
     if (start_timer)
     {
