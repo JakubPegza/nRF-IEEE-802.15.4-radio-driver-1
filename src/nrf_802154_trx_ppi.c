@@ -129,13 +129,6 @@ void nrf_802154_trx_ppi_for_ramp_up_clear(nrf_radio_task_t ramp_up_task, bool st
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);
 }
 
-/** Wait time needed to propagate event through PPI to EGU.
- *
- * During detection if trigger of DISABLED event caused start of hardware procedure, detecting
- * function needs to wait until event is propagated from RADIO through PPI to EGU. This delay is
- * required to make sure EGU event is set if hardware was prepared before DISABLED event was
- * triggered.
- */
 void nrf_802154_trx_ppi_for_ramp_up_propagation_delay_wait(void)
 {
     __ASM("nop");
@@ -150,7 +143,6 @@ bool nrf_802154_trx_ppi_for_ramp_up_was_triggered(void)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
-    // Detect if PPIs were set before DISABLED event was notified. If not trigger DISABLE
     if (nrf_radio_state_get(NRF_RADIO) != NRF_RADIO_STATE_DISABLED)
     {
         // If RADIO state is not DISABLED, it means that RADIO is still ramping down or already
@@ -228,6 +220,8 @@ bool nrf_802154_trx_ppi_for_fem_powerdown_set(NRF_TIMER_Type * p_instance,
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
+    // PPI_EGU_TIMER_START is reused here on purpose, to save resources,
+    // as fem powerdown cannot be scheduled simultaneously with fem ramp-up.
     bool result = nrf_fem_prepare_powerdown(p_instance, compare_channel, PPI_EGU_TIMER_START);
 
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);

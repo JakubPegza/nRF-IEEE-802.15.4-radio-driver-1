@@ -56,11 +56,6 @@ void nrf_802154_trx_ppi_for_ramp_up_set(nrf_radio_task_t ramp_up_task, bool star
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
-    // | RADIO_DISABLED ----> EGU -----> ramp_up_task
-    // |                 |          \--> self disable
-    // |          if (start_timer)
-    // |                 \-------------> TIMER_START
-
     // Clr event EGU (needed for nrf_802154_trx_ppi_for_ramp_up_was_triggered)
     nrf_egu_event_clear(NRF_802154_EGU_INSTANCE, EGU_EVENT);
 
@@ -108,13 +103,6 @@ void nrf_802154_trx_ppi_for_ramp_up_clear(nrf_radio_task_t ramp_up_task, bool st
     nrf_802154_log_function_exit(NRF_802154_LOG_VERBOSITY_HIGH);
 }
 
-/** Wait time needed to propagate event through PPI to EGU.
- *
- * During detection if trigger of DISABLED event caused start of hardware procedure, detecting
- * function needs to wait until event is propagated from RADIO through PPI to EGU. This delay is
- * required to make sure EGU event is set if hardware was prepared before DISABLED event was
- * triggered.
- */
 void nrf_802154_trx_ppi_for_ramp_up_propagation_delay_wait(void)
 {
     __ASM("nop");
@@ -129,7 +117,6 @@ bool nrf_802154_trx_ppi_for_ramp_up_was_triggered(void)
 {
     nrf_802154_log_function_enter(NRF_802154_LOG_VERBOSITY_HIGH);
 
-    // Detect if DPPIs were set before DISABLED event was notified. If not trigger DISABLE
     if (nrf_radio_state_get(NRF_RADIO) != NRF_RADIO_STATE_DISABLED)
     {
         // If RADIO state is not DISABLED, it means that RADIO is still ramping down or already

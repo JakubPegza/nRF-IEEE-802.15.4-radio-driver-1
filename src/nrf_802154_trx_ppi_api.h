@@ -46,8 +46,22 @@
 /**
  * @brief Set PPIs to connect RADIO DISABLED event with tasks needed to ramp up.
  *
+ * Connections created by this function in DPPI variant:
+ *
+ *       RADIO_DISABLED ----> EGU -----> ramp_up_task
+ *                      |          \--> self disable
+ *               if (start_timer)
+ *                      \-------------> TIMER_START
+ *
+ * Connections created by this function in PPI variant:
+ *
+ *      RADIO_DISABLED ----> EGU -----> ramp_up_task
+ *                                 \--> self disable
+ *
+ *      EGU ---> if (start_timer) ----> TIMER_START
+ *
  * @param[in]  ramp_up_task  Task triggered to start ramp up procedure.
- * @param[in]  start_timer   If timer is started on RADIO DISABLED event.
+ * @param[in]  start_timer   If timer is to be started on RADIO DISABLED event.
  */
 void nrf_802154_trx_ppi_for_ramp_up_set(nrf_radio_task_t ramp_up_task, bool start_timer);
 
@@ -55,12 +69,17 @@ void nrf_802154_trx_ppi_for_ramp_up_set(nrf_radio_task_t ramp_up_task, bool star
  * @brief Clear PPIs to connect RADIO DISABLED event with tasks needed to ramp up.
  *
  * @param[in]  ramp_up_task  Task triggered to start ramp up procedure.
- * @param[in]  start_timer   If timer is started on RADIO DISABLED event.
+ * @param[in]  start_timer   If timer start on RADIO DISABLED event is to be deconfigured as well. See @ref nrf_802154_trx_ppi_for_ramp_up_set.
  */
 void nrf_802154_trx_ppi_for_ramp_up_clear(nrf_radio_task_t ramp_up_task, bool start_timer);
 
 /**
  * @brief Wait until PPIs configured to ramp up radio are propagated through PPI system.
+ *
+ * During detection if trigger of DISABLED event caused start of hardware procedure, detecting
+ * function needs to wait until event is propagated from RADIO through PPI to EGU. This delay is
+ * required to make sure EGU event is set if hardware was prepared before DISABLED event was
+ * triggered.
  */
 void nrf_802154_trx_ppi_for_ramp_up_propagation_delay_wait(void);
 
@@ -71,27 +90,28 @@ void nrf_802154_trx_ppi_for_ramp_up_propagation_delay_wait(void);
  * and PPIs status.
  *
  * @retval  true   PPIs were triggered.
- * @retval  false  PPIs were not triggered. RADIO DISABLE task shall be called to trigger them.
+ * @retval  false  PPIs were not triggered. To trigger them, the caller must trigger RADIO DISABLE task.
  */
 bool nrf_802154_trx_ppi_for_ramp_up_was_triggered(void);
 
 /**
- * @brief Set PPIs to connect TIMER event with tasks needed to ramp up ACK TX.
+ * @brief Set PPIs to connect TIMER event with radio TXEN task, needed to ramp up for ACK TX.
  */
 void nrf_802154_trx_ppi_for_ack_tx_set(void);
 
 /**
- * @brief Clear PPIs to connect TIMER event with tasks needed to ramp up ACK TX.
+ * @brief Clear PPIs to connect TIMER event with radio TXEN task, needed to ramp up for ACK TX. See @ref void nrf_802154_trx_ppi_for_ack_tx_set
  */
 void nrf_802154_trx_ppi_for_ack_tx_clear(void);
 
 /**
- * @brief Configure PPIs needed for external LNA or PA.
+ * @brief Configure PPIs needed for external LNA or PA. Radio DISABLED event will be connected to timer START task.
+ * As a result, FEM ramp-up will be scheduled during the radio ramp-up period, with timing based on FEM implementation used.
  */
 void nrf_802154_trx_ppi_for_fem_set(void);
 
 /**
- * @brief Unconfigure PPIs needed for external LNA or PA.
+ * @brief Deconfigure PPIs needed for external LNA or PA. See @ref nrf_802154_trx_ppi_for_fem_set
  */
 void nrf_802154_trx_ppi_for_fem_clear(void);
 
@@ -117,17 +137,21 @@ bool nrf_802154_trx_ppi_for_fem_powerdown_set(NRF_TIMER_Type * p_instance,
 void nrf_802154_trx_ppi_for_fem_powerdown_clear(void);
 
 /**
- * @brief Get PPI group id that is disalbed when external event aborts radio operation.
+ * @brief Get PPI group id used for disabling radio operations by an external event.
  */
 uint32_t nrf_802154_trx_ppi_group_for_abort_get(void);
 
 /**
  * @brief Configure PPIs needed to trigger IRQ from RADIO event SYNC.
+ *
+ * @param[in] task EGU task used for triggering IRQ on radio SYNC event.
  */
 void nrf_802154_trx_ppi_for_radio_sync_set(nrf_egu_task_t task);
 
 /**
  * @brief Unconfigure PPIs needed to trigger IRQ from RADIO event SYNC.
+ *
+ * @param[in] task EGU task used for triggering IRQ on radio SYNC event. See @ref nrf_802154_trx_ppi_for_radio_sync_set
  */
 void nrf_802154_trx_ppi_for_radio_sync_clear(nrf_egu_task_t task);
 
