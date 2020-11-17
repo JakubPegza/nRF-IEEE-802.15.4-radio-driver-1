@@ -1,0 +1,134 @@
+From 9ec8aec7945c92e6ebe6ad939e1879c0505aa27b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hubert=20Mi=C5=9B?= <hubert.mis@nordicsemi.no>
+Date: Fri, 6 Nov 2020 22:34:29 +0100
+Subject: [PATCH] samples: boards: nrf: ieee802154: New serialization sample
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+A new sample exposing IEEE 802.15.4 radio controller using serialization
+over IPM drivers.
+
+Signed-off-by: Hubert Miś <hubert.mis@nordicsemi.no>
+---
+ modules/Kconfig.nordic                        |  1 +
+ .../ieee802154/802154_rpmsg/CMakeLists.txt    |  8 +++++
+ .../nrf/ieee802154/802154_rpmsg/README.rst    | 32 +++++++++++++++++++
+ .../nrf/ieee802154/802154_rpmsg/prj.conf      |  6 ++++
+ .../nrf/ieee802154/802154_rpmsg/sample.yaml   |  4 +++
+ .../nrf/ieee802154/802154_rpmsg/src/main.c    | 16 ++++++++++
+ 6 files changed, 67 insertions(+)
+ create mode 100644 samples/boards/nrf/ieee802154/802154_rpmsg/CMakeLists.txt
+ create mode 100644 samples/boards/nrf/ieee802154/802154_rpmsg/README.rst
+ create mode 100644 samples/boards/nrf/ieee802154/802154_rpmsg/prj.conf
+ create mode 100644 samples/boards/nrf/ieee802154/802154_rpmsg/sample.yaml
+ create mode 100644 samples/boards/nrf/ieee802154/802154_rpmsg/src/main.c
+
+diff --git a/modules/Kconfig.nordic b/modules/Kconfig.nordic
+index 4f268bc82516..bef8b1d2f6c3 100644
+--- a/modules/Kconfig.nordic
++++ b/modules/Kconfig.nordic
+@@ -11,6 +11,7 @@ menuconfig NRF_802154_RADIO_DRIVER
+ 	bool "Enable nRF IEEE 802.15.4 radio driver"
+ 	depends on HAS_HW_NRF_RADIO_IEEE802154
+ 	select DYNAMIC_INTERRUPTS
++	select ENTROPY_GENERATOR
+ 	help
+ 	  This option enables nRF IEEE 802.15.4 radio driver in Zephyr. Note,
+ 	  that beside the radio peripheral itself, this drivers occupies several
+diff --git a/samples/boards/nrf/ieee802154/802154_rpmsg/CMakeLists.txt b/samples/boards/nrf/ieee802154/802154_rpmsg/CMakeLists.txt
+new file mode 100644
+index 000000000000..6e3bbd49d669
+--- /dev/null
++++ b/samples/boards/nrf/ieee802154/802154_rpmsg/CMakeLists.txt
+@@ -0,0 +1,8 @@
++# SPDX-License-Identifier: Apache-2.0
++
++cmake_minimum_required(VERSION 3.13.1)
++
++find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
++project(802154_rpmsg)
++
++target_sources(app PRIVATE src/main.c)
+diff --git a/samples/boards/nrf/ieee802154/802154_rpmsg/README.rst b/samples/boards/nrf/ieee802154/802154_rpmsg/README.rst
+new file mode 100644
+index 000000000000..aab3a6b2496d
+--- /dev/null
++++ b/samples/boards/nrf/ieee802154/802154_rpmsg/README.rst
+@@ -0,0 +1,32 @@
++.. _nrf-ieee802154-rpmsg-sample:
++
++nRF IEEE 802.15.4: Serialization RPMsg
++######################################
++
++Overview
++********
++
++This sample exposes IEEE 802.15.4 radio driver support
++to another device or CPU using the RPMsg transport which is
++a part of `OpenAMP <https://github.com/OpenAMP/open-amp/>`__.
++
++Requirements
++************
++
++* A board with nRF53 SoC
++
++Building and Running
++********************
++
++This sample can be found under :zephyr_file:`samples/boards/nrf/ieee802154/802154_rpmsg`
++in the Zephyr tree.
++
++To use this application, you need a board with nRF53 SoC.
++You can then build this application and flash it onto your board in
++the usual way. See :ref:`boards` for board-specific building and
++programming information.
++
++To test this sample, you need a separate device/CPU that acts as 802.15.4
++serialization RPMsg peer.
++This sample is compatible with the Nordic 802.15.4 serialization. See the
++:option:`CONFIG_NRF_802154_SER_HOST` configuration option for more information.
+diff --git a/samples/boards/nrf/ieee802154/802154_rpmsg/prj.conf b/samples/boards/nrf/ieee802154/802154_rpmsg/prj.conf
+new file mode 100644
+index 000000000000..192208531c4b
+--- /dev/null
++++ b/samples/boards/nrf/ieee802154/802154_rpmsg/prj.conf
+@@ -0,0 +1,6 @@
++CONFIG_OPENAMP=y
++CONFIG_OPENAMP_MASTER=n
++CONFIG_OPENAMP_SLAVE=y
++
++CONFIG_NRF_802154_SER_RADIO=y
++CONFIG_NRF_802154_SL_OPENSOURCE=y
+diff --git a/samples/boards/nrf/ieee802154/802154_rpmsg/sample.yaml b/samples/boards/nrf/ieee802154/802154_rpmsg/sample.yaml
+new file mode 100644
+index 000000000000..4a1b65e6db41
+--- /dev/null
++++ b/samples/boards/nrf/ieee802154/802154_rpmsg/sample.yaml
+@@ -0,0 +1,4 @@
++sample:
++  description: Allows Zephyr to provide 802.15.4 connectivity
++    for nRF devices via RPMsg.
++  name: 802.15.4 RPMsg serialization
+diff --git a/samples/boards/nrf/ieee802154/802154_rpmsg/src/main.c b/samples/boards/nrf/ieee802154/802154_rpmsg/src/main.c
+new file mode 100644
+index 000000000000..7a8db0e6111f
+--- /dev/null
++++ b/samples/boards/nrf/ieee802154/802154_rpmsg/src/main.c
+@@ -0,0 +1,16 @@
++/*
++ * Copyright (c) 2020 Nordic Semiconductor ASA
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++#include <sys/__assert.h>
++#include <zephyr.h>
++
++#include <nrf_802154_serialization_error.h>
++
++void nrf_802154_serialization_error(const nrf_802154_ser_err_data_t *err)
++{
++	(void)err;
++	__ASSERT(false, "802.15.4 serialization error");
++}
