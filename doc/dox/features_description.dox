@@ -171,6 +171,8 @@ to stop continuous carrier transmission.
 
 Continuous carrier is transmitted when the RADIO peripheral is in the TXIDLE state.
 
+In case of nRF53, serialization of this function between APP and NET cores is not supported, only applications
+ran entirely on NET core will be able to call this function.
 ---
 
 @section features_description_mc_transmission Modulated carrier transmission
@@ -187,6 +189,9 @@ by the driver to stop continuous carrier transmission.
 
 Modulated carrier is transmitted when RADIO peripheral is in the TX state with PHYEND_START short enabled.
 
+In case of nRF53, serialization of this function between APP and NET cores is not supported, only applications
+ran entirely on NET core will be able to call this function.
+
 ---
 
 @section features_description_csma CSMA-CA
@@ -197,6 +202,8 @@ The MAC layer must call 'csma_ca()' to initiate this procedure.
 The end of the procedure is notified by the 'tx_started()' or 'transmit_failed()' function.
 The driver @ref features_description_receiving "receives ACK frames" like after any other transmission procedure.
 
+This feature requires using nordic proprietary 802.15.4 Service Layer, and as such is currently
+not supported by nRF53 chips.
 ---
 
 @section features_description_delayed_ops Delayed operations
@@ -210,6 +217,8 @@ This means that there can be one transmission and one reception scheduled at the
 On the other hand, the driver does not check if the operations are conflicting.
 As a result, delayed operations may interrupt each other.
 
+This feature requires using nordic proprietary 802.15.4 Service Layer, and as such is currently
+not supported by nRF53 chips.
 ---
 
 @section features_description_delayed_rx Delayed reception
@@ -225,5 +234,7 @@ The driver does not automatically transit to the sleep state at the end of the r
 It is a responsibility of the MAC layer to request the transition to the required state
 and request the next delayed reception operation.
 
+This feature requires using nordic proprietary 802.15.4 Service Layer, and as such is currently
+not supported by nRF53 chips.
 
 */
