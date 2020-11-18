@@ -8,13 +8,15 @@
 
 @Library("CI_LIB") _
 
+echo JOB_NAME
+
 HashMap CI_STATE = lib_State.getConfig(JOB_NAME)
 
 pipeline {
-
     parameters {
         string(name: 'jsonstr_CI_STATE', description: 'Default State if no upstream job', defaultValue: CI_STATE.CFG.INPUT_STATE_STR)
         string(name: 'nrfx_refspec', description: 'Git refspec of nrfx used in unit tests', defaultValue: 'v2.3.0')
+        choice(name: 'CRON', description: 'Cron Test Phase', choices: CI_STATE.CFG.CRON_CHOICES)
     }
 
     environment {
@@ -37,6 +39,9 @@ pipeline {
             }
         }
         stage('Build and host tests') {
+            when {
+                expression { params.CRON == 'COMMIT'}
+            }
             parallel {
                 stage('Check pretty') {
                     stages{
@@ -118,7 +123,7 @@ pipeline {
                     string(name: 'NRF_802154_SL_REFSPEC', value: 'master'),
                     string(name: 'NRF_802154_SERIALIZATION_REFSPEC', value: 'master'),
                     string(name: 'TEST_APPS_REFSPEC', value: 'master'),
-                    string(name: 'TEST_CYCLE', value: 'COMMIT')
+                    string(name: 'TEST_CYCLE', value: params.CRON)
                 ]
             }
         }
