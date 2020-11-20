@@ -116,6 +116,7 @@ pipeline {
                 build job: '/latest/test-fw-nrfconnect-rs/master', parameters: [
                     string(name: 'NRF_802154_RADIO_DRIVER_REFSPEC', value: lib_State.getGitRef('NRF802154', CI_STATE)),
                     string(name: 'NRF_802154_SL_REFSPEC', value: 'master'),
+                    string(name: 'NRF_802154_SERIALIZATION_REFSPEC', value: 'master'),
                     string(name: 'TEST_APPS_REFSPEC', value: 'master'),
                     string(name: 'TEST_CYCLE', value: 'COMMIT')
                 ]
