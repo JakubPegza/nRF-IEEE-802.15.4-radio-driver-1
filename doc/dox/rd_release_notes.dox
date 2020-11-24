@@ -7,6 +7,125 @@
 This page lists release notes for the nRF IEEE 802.15.4 radio driver versions released so far.
 
 ---
+@section rd_release_notes_190 Radio driver v1.9.0
+
+Release date: TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+This release introduces support for nRF53 SoC. It also includes experimental impelemntation of Coex and Antenna Diversity features.
+
+@par Migration guide
+
+Version v1.9.0 the radio driver has new dependencies:
+- nrfx v2 (in previous releases the radio driver depnded on version 1.x of nrfx)
+- nRF 802.15.4 Service Layer library - a new library implementing a set of services used by the 802.15.4 driver
+
+nRF 802.15.4 Service Layer is included with nRF 802.15.4 Radio Driver release in two variants:
+- binary library (closed-source) - implements all services required by 802.15.4 operations, enabling all 802.15.4 radio driver features
+- open-source library - implements services needed by basic 802.15.4 operations
+
+Binary variant of the 802.15.4 Service Layer library depends on MPSL revision 336495bdddef5702c84f1f48605578e48787b7dc: https://github.com/nrfconnect/sdk-nrfxlib/tree/f3256d1cf9add7ecc5d9f1da776e7344fdde2cc9/mpsl
+
+MPSL is required dependency for dynamic multiprotocol operations. Dynamic multiprotocol with SoftDevice is no longer supported.
+
+Select Service Layer library variant depending on your project policy, licensing and needs.
+
+Following files are no longer present in the 802.15.4 radio driver build:
+- `src/nrf_802154_timer_coord.c`
+- `src/rsch/nrf_802154_rsch.c`
+- `src/rsch/nrf_802154_rsch_crit_sect.c`
+- `src/timer_scheduler/nrf_802154_timer_sched.c`
+
+Following files must be added to the 802.15.4 radio driver build:
+- `src/nrf_802154_debug_core.c`
+- `src/nrf_802154_debug_gpio.c`
+- `src/nrf_802154_queue.c`
+- `src/nrf_802154_stats.c`
+- `src/nrf_802154_trx.c`
+- `src/mac_features/nrf_802154_ifs.c`
+
+For nRF52 family SoCs following file must be added to the build:
+- `src/nrf_802154_trx_ppi.c`
+
+For nRF53 family SoCs following file must be added to the build:
+- `src/nrf_802154_trx_dppi.c`
+
+`_direct.c` variant of some files is deprecated and shall be replaced with `_swi.c` variant. If you have files with `_direct.c` suffix in your build remove them and add:
+- `src/nrf_802154_notification_swi.c`
+- `src/nrf_802154_priority_drop_swi.c`
+- `src/nrf_802154_request_swi.c`
+- `src/nrf_802154_swi.c`
+
+For open-source variant of nRF 802.15.4 SL library, following files must be added to the build:
+- `nrf_802154_sl/open/src/nrf_802154_sl_ant_div.c`
+- `nrf_802154_sl/open/src/nrf_802154_sl_coex.c`
+- `nrf_802154_sl/open/src/nrf_802154_sl_fem.c`
+- `nrf_802154_sl/open/src/nrf_802154_sl_log.c`
+- `nrf_802154_sl/open/src/nrf_802154_sl_rsch.c`
+- `nrf_802154_sl/open/src/nrf_802154_sl_timer.c`
+
+For binary variant of nRF 802.15.4 SL library, one selected variant found in `nrf_802154_sl/lib` directory must be added to the build.
+
+The header files for `nrf_802154_sl` can be found in `nrf_802154_sl/include` directory.
+
+Following platform port examples have been moved from `src/platform` to `nrf_802154_sl/platform` and shall be added to the build accordingly:
+- `clock`
+- `hp_timer`
+- `irq`
+- `lp_timer`
+
+A new header file was provided that defines the API of GPIOTE platform abstraction layer along with two example implementations:
+- `nrf_802154_sl/platform/gpiote/nrf_802154_gpiote_none.c`
+- `nrf_802154_sl/platform/gpiote/nrf_802154_gpiote_zephyr.c`
+
+Depending on the application's target platform, either one of those files should be added to the build system or yet another implementation of the API should be provided.
+
+Each of GPIOTE platform implementation examples should be added to the build alongside `nrf_802154_sl/platform/gpiote/nrf_802154_gpiote_crit_sect.c`.
+
+For open-source variant of the SL library, following platform abstractions must be removed from the build:
+- `gpiote`
+- `hp_timer`
+- `lp_timer`
+
+@par  New features
+- nRF5340 SoC support.
+- Modulated carrier: the 802.15.4 radio continuously transmits back-to-back frames with PSDU selected by the higher layer.
+- Getter of current time. Such function is needed to schedule first delayed reception operation in a sequence.
+- Statistics: counters and total duration of selected radio operations
+- Experimental configurable Inter-Frame-Spacing.
+- Experimental Coex module for coexistence with external arbiter (PTA) entity using three-wire coexistence interface.
+- Experimental Antenna Diversity module.
+
+@par  Changes
+- New module `nrf_802154_trx.c` containing FSM directly managing transeiver operations. FSM in `nrf_802154_core.c` manages requested 802.15.4 operations, while `nrf_802154_trx.c` manages currently active operation.
+
+@par  Bug fixes
+- Fixed GCC warning when building with GCC4
+- RSSI measurement request right after receiver is enabled measures correct RSSI value.
+- Fixed increased power consumption in example rng platform implementation.
+
+@par  Limitations
+- The 802.15.4 SL library for nRF53 is available only in open-source variant. Because of that only basic single-protocol 802.15.4 operations are available for nRF53 SoC:
+  - TX (with CCA, ACK)
+  - RX (with filtering, ACK)
+  - Energy Detection
+  - Continuous (unmodulated) carrier
+  - Modulated carrier
+  - Sleep mode
+  - Promiscuous mode
+- The driver is tested only with the default configuration (that is, without changes in the `nrf_802154_config.h` file). Test applications are compiled with optimizations for the code size. Any other configuration and optimization level is to be considered as experimental.
+- The number of supported peers for the Auto Pending Bit feature is limited to 127.
+- In the multiprotocol configuration (SoftDevice RAAL), the application cannot use IRQ priority levels 2 and 3.
+- The delayed operations do not detect delays caused by the ISR latency. Because of the ISR latency, the delayed transmission might be delayed for too long, or the reception window might be shorter than requested for the delayed transmission operation. To avoid such problems, it is recommended to minimize the ISR latency of the RTC instance that is used by the `lp_timer` module.
+
+@par Known issues
+- If `NRF_802154_USE_RAW_API` is disabled, a pointer to a frame passed by the transmission result notifications is invalid.
+  - Workaround: Enable `NRF_802154_USE_RAW_API` if the code relies on the passed pointer.
+- Deinitialization of the driver works incorrectly.
+  - There is no known workaround for this bug.
+- Calling the API of the driver in a loop when the driver is waiting for an ACK causes the waiting for an ACK to last indefinitely, which leads to an assertion fault.
+  - Workaround: Do not call the API of the driver until the last transmission request sends a notification of success or failure.
+
+---
 @section rd_release_notes_180 Radio driver v1.8.0
 
 Release date: August 21, 2020
