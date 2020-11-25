@@ -1,7 +1,4 @@
-#if defined(NRF52840_XXAA) || \
-    defined(NRF52833_XXAA) || \
-    defined(NRF52820_XXAA) || \
-    defined(NRF52811_XXAA)
+#if defined(NRF52_SERIES)
 
 #include "unity.h"
 
@@ -24,7 +21,9 @@ void setUp(void)
     nrf_mock_reset();
 }
 
-void tearDown(void) {}
+void tearDown(void)
+{
+}
 
 // Tests for RADIO ramp up
 void test_nrf_802154_trx_ppi_for_ramp_up_set_Shall_configure_ppis_when_timer_is_disabled(void)

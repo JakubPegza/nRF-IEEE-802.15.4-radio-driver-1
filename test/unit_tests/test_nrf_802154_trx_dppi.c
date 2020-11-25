@@ -21,7 +21,9 @@ void setUp(void)
     nrf_mock_reset();
 }
 
-void tearDown(void) {}
+void tearDown(void)
+{
+}
 
 // Tests for RADIO ramp up
 void test_nrf_802154_trx_ppi_for_ramp_up_set_Shall_configure_dppis_when_timer_is_disabled(void)

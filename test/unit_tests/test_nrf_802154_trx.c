@@ -1,13 +1,9 @@
-#define TESTING
 #include "unity.h"
 
 #include "nrf_802154_trx.h"
 #include "nrf_802154_peripherals.h"
 
-#if defined(NRF52840_XXAA) || \
-    defined(NRF52833_XXAA) || \
-    defined(NRF52820_XXAA) || \
-    defined(NRF52811_XXAA)
+#if defined(NRF52_SERIES)
 #define PPI
 TEST_FILE("nrf_802154_trx_ppi.c")
 
@@ -46,7 +42,9 @@ void setUp(void)
     nrf_802154_trx_module_reset();
 }
 
-void tearDown(void) {}
+void tearDown(void)
+{
+}
 
 void test_nrf_802154_trx_abort_shall_do_nothing(void)
 {
