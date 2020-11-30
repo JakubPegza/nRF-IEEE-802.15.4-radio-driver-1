@@ -11,7 +11,7 @@ This page lists release notes for the nRF IEEE 802.15.4 radio driver versions re
 
 Release date: TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-This release introduces support for nRF53 SoC. It also includes experimental impelemntation of Coex and Antenna Diversity features.
+This release introduces initial support for nRF53 SoC for development. It also includes experimental impelemntation of Coex and Antenna Diversity features.
 
 @par Migration guide
 
@@ -20,7 +20,12 @@ Version v1.9.0 the radio driver has new dependencies:
 - nRF 802.15.4 Service Layer library - a new library implementing a set of services used by the 802.15.4 driver
 
 nRF 802.15.4 Service Layer is included with nRF 802.15.4 Radio Driver release in two variants:
-- binary library (closed-source) - implements all services required by 802.15.4 operations, enabling all 802.15.4 radio driver features
+- binary library (closed-source) - implements all services required by 802.15.4 operations, enabling all 802.15.4 radio driver features:
+  - Multiprotocol support.
+  - CSMA/CA support.
+  - Front-end Module (FEM) support.
+  - Delayed transmission and reception.
+  - Timestamping.
 - open-source library - implements services needed by basic 802.15.4 operations
 
 Binary variant of the 802.15.4 Service Layer library depends on MPSL revision 336495bdddef5702c84f1f48605578e48787b7dc: https://github.com/nrfconnect/sdk-nrfxlib/tree/f3256d1cf9add7ecc5d9f1da776e7344fdde2cc9/mpsl
@@ -49,7 +54,7 @@ For nRF52 family SoCs following file must be added to the build:
 For nRF53 family SoCs following file must be added to the build:
 - `src/nrf_802154_trx_dppi.c`
 
-`_direct.c` variant of some files is deprecated and shall be replaced with `_swi.c` variant. If you have files with `_direct.c` suffix in your build remove them and add:
+`_direct.c` variant of some files is deprecated for the full-features variant of the SL library and shall be replaced with `_swi.c` variant. If you have files with `_direct.c` suffix in your build remove them and add:
 - `src/nrf_802154_notification_swi.c`
 - `src/nrf_802154_priority_drop_swi.c`
 - `src/nrf_802154_request_swi.c`
@@ -109,13 +114,13 @@ For open-source variant of the SL library, following platform abstractions must 
   - RX (with filtering, ACK)
   - Energy Detection
   - Continuous (unmodulated) carrier
-  - Modulated carrier
   - Sleep mode
   - Promiscuous mode
 - The driver is tested only with the default configuration (that is, without changes in the `nrf_802154_config.h` file). Test applications are compiled with optimizations for the code size. Any other configuration and optimization level is to be considered as experimental.
 - The number of supported peers for the Auto Pending Bit feature is limited to 127.
-- In the multiprotocol configuration (SoftDevice RAAL), the application cannot use IRQ priority levels 2 and 3.
+- In the multiprotocol configuration, the application cannot use IRQ priority levels 2 and 3.
 - The delayed operations do not detect delays caused by the ISR latency. Because of the ISR latency, the delayed transmission might be delayed for too long, or the reception window might be shorter than requested for the delayed transmission operation. To avoid such problems, it is recommended to minimize the ISR latency of the RTC instance that is used by the `lp_timer` module.
+- CSMA-CA operation is not supported for nRF53 SoC
 
 @par Known issues
 - If `NRF_802154_USE_RAW_API` is disabled, a pointer to a frame passed by the transmission result notifications is invalid.
@@ -124,6 +129,8 @@ For open-source variant of the SL library, following platform abstractions must 
   - There is no known workaround for this bug.
 - Calling the API of the driver in a loop when the driver is waiting for an ACK causes the waiting for an ACK to last indefinitely, which leads to an assertion fault.
   - Workaround: Do not call the API of the driver until the last transmission request sends a notification of success or failure.
+- CSMA-CA operation causes assertion fault when driver is configured to use open-source variant of SL library.
+  - There is no known workaround for this bug.
 
 ---
 @section rd_release_notes_180 Radio driver v1.8.0
