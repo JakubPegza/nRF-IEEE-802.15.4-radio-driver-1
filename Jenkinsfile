@@ -71,7 +71,7 @@ pipeline {
                         stage('Install ceedling') {
                             steps {
                                 sh '''
-                                    export PATH=/home/.gem/ruby/2.5.0/bin:$PATH
+                                    export PATH=/home/.gem/ruby/2.7.0/bin:$PATH
                                     gem install --user-install ceedling
                                 '''
                             }
@@ -89,19 +89,19 @@ pipeline {
                         stage('Run tests') {
                             steps {
                                 // TODO: Uncomment when dependencies support nRF53
-                                //sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf5340 test:all'
+                                //sh 'PATH=/home/.gem/ruby/2.7.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf5340 test:all'
                                 //sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf5340.xml'
 
-                                sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52840 test:all'
+                                sh 'PATH=/home/.gem/ruby/2.7.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52840 test:all'
                                 sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52840.xml'
 
-                                sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52833 test:all'
+                                sh 'PATH=/home/.gem/ruby/2.7.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52833 test:all'
                                 sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52833.xml'
 
-                                sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52820 test:all'
+                                sh 'PATH=/home/.gem/ruby/2.7.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52820 test:all'
                                 sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52820.xml'
 
-                                sh 'PATH=/home/.gem/ruby/2.5.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52811 test:all'
+                                sh 'PATH=/home/.gem/ruby/2.7.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52811 test:all'
                                 sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52811.xml'
                             }
                             post {
