@@ -131,7 +131,7 @@ For open-source variant of the SL library, following platform abstractions must 
   - Workaround: Do not call the API of the driver until the last transmission request sends a notification of success or failure.
 - CSMA-CA operation causes assertion fault when driver is configured to use open-source variant of SL library.
   - There is no known workaround for this bug.
-
+- Timer coordinator brakes after 16 seconds because 24-bit TIMER0 is used instead of 32-bit. After this time delayed operations are not working.
 ---
 @section rd_release_notes_180 Radio driver v1.8.0
 
