@@ -16,8 +16,15 @@ properties(
 
 pipeline {
     parameters {
-        string(name: 'jsonstr_CI_STATE', description: 'Default State if no upstream job', defaultValue: CI_STATE.CFG.INPUT_STATE_STR)
-        string(name: 'nrfx_refspec', description: 'Git refspec of nrfx used in unit tests', defaultValue: 'v2.3.0')
+        string(name: 'jsonstr_CI_STATE', defaultValue: CI_STATE.CFG.INPUT_STATE_STR,
+               description: 'Default State if no upstream job')
+        string(name: 'nrfx_refspec', defaultValue: 'v2.3.0', description: 'Git refspec of nrfx used in unit tests')
+        string(name: 'NRF_802154_SL_REFSPEC', defaultValue: "master",
+               description: 'Refspec of nrf-802.15.14-sl to use.')
+        string(name: 'NRF_802154_SERIALIZATION_REFSPEC', defaultValue: "master",
+               description: 'Refspec of nrf-802.15.4-serialization to use.')
+        string(name: 'TEST_APPS_REFSPEC', defaultValue: "master",
+               description: 'Branch of nrf-802.15.4-test-apps-ncs to use.')
         choice(name: 'TEST_CYCLE', description: 'Test Phase', choices: CI_STATE.CFG.CRON_CHOICES)
     }
 
@@ -83,7 +90,7 @@ pipeline {
                         stage('Checkout dependencies') {
                             steps {
                                 dir('sl') {
-                                    checkout_refspec('master', 'https://projecttools.nordicsemi.no/bitbucket/scm/krknwk/nrf-802.15.4-sl.git')
+                                    checkout_refspec(params.NRF_802154_SL_REFSPEC, 'https://projecttools.nordicsemi.no/bitbucket/scm/krknwk/nrf-802.15.4-sl.git')
                                 }
                                 dir('nrfx') {
                                     checkout_refspec(nrfx_refspec, 'https://github.com/NordicSemiconductor/nrfx')
@@ -122,10 +129,10 @@ pipeline {
             steps {
                 build job: '/latest/test-fw-nrfconnect-rs_drv154_integration/master', parameters: [
                     string(name: 'NRF_802154_RADIO_DRIVER_REFSPEC', value: lib_State.getGitRef('NRF802154', CI_STATE)),
-                    string(name: 'NRF_802154_SL_REFSPEC', value: 'master'),
-                    string(name: 'NRF_802154_SERIALIZATION_REFSPEC', value: 'master'),
-                    string(name: 'TEST_APPS_REFSPEC', value: 'master'),
-                    string(name: 'TEST_CYCLE', value: CI_STATE.ORIGIN.TEST_CYCLE)
+                    string(name: 'NRF_802154_SL_REFSPEC', value: params.NRF_802154_SL_REFSPEC),
+                    string(name: 'NRF_802154_SERIALIZATION_REFSPEC', value: params.NRF_802154_SERIALIZATION_REFSPEC),
+                    string(name: 'TEST_APPS_REFSPEC', value: params.TEST_APPS_REFSPEC),
+                    string(name: 'TEST_CYCLE', value: params.TEST_CYCLE)
                 ]
             }
         }
