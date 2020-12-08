@@ -143,9 +143,6 @@ For the open-source variant of the SL library, the following platform abstractio
     - Workaround: Do not call the API of the driver until the last transmission request sends a notification of success or failure.
   - CSMA-CA operation causes an assertion fault when the driver is configured to use the open-source variant of the SL library.
     - There is no known workaround for this bug.
-  - Timer coordinator brakes after 16 seconds because it uses a 24-bit TIMER0 instead of a 32-bit one.
-    After this time interval, delayed operations will not work.
-    - There is no known workaround for this bug.
 
 
 ---
