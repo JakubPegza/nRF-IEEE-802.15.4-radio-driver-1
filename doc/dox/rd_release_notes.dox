@@ -9,7 +9,7 @@ This page lists the release notes for all the released versions of the nRF IEEE 
 ---
 @section rd_release_notes_190 Radio driver v1.9.0
 
-Release date: TODO!!!!!!!!!!!!!!!!!!!!!!!!!!
+Release date: December 09, 2020
 
 This release introduces initial development support for the nRF53 SoC.
 It also includes an experimental implementation of the Coex and Antenna Diversity features.
