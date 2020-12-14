@@ -274,8 +274,8 @@ static void irq_init(void)
 
 #if NRF_802154_INTERNAL_RADIO_IRQ_HANDLING
     nrf_802154_irq_init(RADIO_IRQn, NRF_802154_IRQ_PRIORITY, nrf_802154_radio_irq_handler);
-    nrf_802154_irq_enable(RADIO_IRQn);
 #endif
+    nrf_802154_irq_enable(RADIO_IRQn);
 }
 
 static void trigger_disable_to_start_rampup(void)
