@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+void nrf_802154_custom_part_of_radio_init(void);
 void nrf_802154_trx_receive_ack_started(void);
 void nrf_802154_trx_receive_frame_prestarted(void);
 void nrf_802154_trx_receive_frame_started(void);
