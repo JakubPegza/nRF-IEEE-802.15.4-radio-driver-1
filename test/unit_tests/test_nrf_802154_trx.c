@@ -28,7 +28,7 @@ TEST_FILE("nrf_802154_trx_dppi.c")
 // SL mocks
 #include "mock_nrf_802154_irq.h"
 #include "mock_nrf_802154_sl_ant_div.h"
-#include "mock_nrf_fem_protocol_api.h"
+#include "mock_mpsl_fem_protocol_api.h"
 
 // Callout mocks
 #include "mock_trx_callouts.h"
@@ -57,19 +57,24 @@ static void mock_trx_disable(bool from_idle)
     nrf_802154_irq_clear_pending_Expect(RADIO_IRQn);
 
 #ifdef PPI
-    nrf_802154_fal_abort_clear_ExpectAndReturn(NRFX_SUCCESS);
+    mpsl_fem_abort_clear_ExpectAndReturn(NRFX_SUCCESS);
 #endif
-    nrf_802154_fal_deactivate_now_Expect(NRF_802154_FAL_ALL);
+    mpsl_fem_deactivate_now_Expect(MPSL_FEM_ALL);
 
     if (!from_idle)
     {
-        nrf_802154_fal_deactivate_now_Expect(NRF_802154_FAL_ALL);
+        mpsl_fem_deactivate_now_Expect(MPSL_FEM_ALL);
 
 #ifdef PPI
-        nrf_fem_prepare_powerdown_ExpectAndReturn(NULL, 0, 0, false);
-        nrf_fem_prepare_powerdown_IgnoreArg_p_instance();
-        nrf_fem_prepare_powerdown_IgnoreArg_compare_channel();
-        nrf_fem_prepare_powerdown_IgnoreArg_ppi_id();
+        mpsl_fem_prepare_powerdown_ExpectAndReturn(
+                NULL,
+                0,
+                0,
+                nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_DISABLED),
+                false);
+        mpsl_fem_prepare_powerdown_IgnoreArg_p_instance();
+        mpsl_fem_prepare_powerdown_IgnoreArg_compare_channel();
+        mpsl_fem_prepare_powerdown_IgnoreArg_ppi_id();
 #endif
     }
 }
@@ -97,11 +102,11 @@ static void mock_and_trigger_trx_enable(void)
     nrf_802154_irq_enable_Expect(RADIO_IRQn);
 
 #ifdef PPI
-    nrf_802154_fal_abort_set_ExpectAndReturn(0, 0, NRFX_SUCCESS);
-    nrf_802154_fal_abort_set_IgnoreArg_event();
-    nrf_802154_fal_abort_set_IgnoreArg_group();
+    mpsl_fem_abort_set_ExpectAndReturn(0, 0, NRFX_SUCCESS);
+    mpsl_fem_abort_set_IgnoreArg_event();
+    mpsl_fem_abort_set_IgnoreArg_group();
 #endif
-    nrf_802154_fal_deactivate_now_Expect(NRF_802154_FAL_ALL);
+    mpsl_fem_deactivate_now_Expect(MPSL_FEM_ALL);
 
     nrf_802154_trx_enable();
 }
@@ -120,8 +125,8 @@ static void mock_and_trigger_trx_receive_frame(void)
     nrf_802154_sl_ant_div_cfg_mode_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_RX, NRF_802154_SL_ANT_DIV_MODE_AUTO);
 #endif
 
-    nrf_802154_fal_lna_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
-    nrf_802154_fal_lna_configuration_set_IgnoreArg_p_activate_event();
+    mpsl_fem_lna_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
+    mpsl_fem_lna_configuration_set_IgnoreArg_p_activate_event();
 
     nrf_802154_sl_ant_div_cfg_mode_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_RX, NRF_802154_SL_ANT_DIV_MODE_AUTO);
     nrf_802154_sl_ant_div_rx_started_notify_Expect();
@@ -133,8 +138,8 @@ static void mock_ack_trigger_trx_transmit_ack(void)
 {
     const uint8_t buffer[] = {0x61, 0x98, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A};
 
-    nrf_802154_fal_pa_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
-    nrf_802154_fal_pa_configuration_set_IgnoreArg_p_activate_event();
+    mpsl_fem_pa_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
+    mpsl_fem_pa_configuration_set_IgnoreArg_p_activate_event();
 
     nrf_802154_sl_ant_div_cfg_mode_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_RX, NRF_802154_SL_ANT_DIV_MODE_AUTO);
     nrf_802154_sl_ant_div_txack_notify_Expect();
@@ -153,12 +158,12 @@ static void mock_and_trigger_trx_transmit_frame(void)
 
     nrf_802154_pib_tx_power_get_ExpectAndReturn(0);
 
-    nrf_802154_fal_lna_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
-    nrf_802154_fal_lna_configuration_set_IgnoreArg_p_activate_event();
-    nrf_802154_fal_lna_configuration_set_IgnoreArg_p_deactivate_event();
+    mpsl_fem_lna_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
+    mpsl_fem_lna_configuration_set_IgnoreArg_p_activate_event();
+    mpsl_fem_lna_configuration_set_IgnoreArg_p_deactivate_event();
 
-    nrf_802154_fal_pa_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
-    nrf_802154_fal_pa_configuration_set_IgnoreArg_p_activate_event();
+    mpsl_fem_pa_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
+    mpsl_fem_pa_configuration_set_IgnoreArg_p_activate_event();
 
     nrf_802154_sl_ant_div_cfg_mode_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_TX, NRF_802154_SL_ANT_DIV_MODE_MANUAL);
     nrf_802154_sl_ant_div_cfg_antenna_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_TX, 0);
@@ -169,8 +174,8 @@ static void mock_and_trigger_trx_transmit_frame(void)
 
 static void mock_and_trigger_trx_receive_ack(void)
 {
-    nrf_802154_fal_lna_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
-    nrf_802154_fal_lna_configuration_set_IgnoreArg_p_activate_event();
+    mpsl_fem_lna_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
+    mpsl_fem_lna_configuration_set_IgnoreArg_p_activate_event();
 
     nrf_802154_sl_ant_div_cfg_mode_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_TX, NRF_802154_SL_ANT_DIV_MODE_MANUAL);
     nrf_802154_sl_ant_div_cfg_antenna_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_TX, 1);
@@ -181,8 +186,8 @@ static void mock_and_trigger_trx_receive_ack(void)
 
 static void mock_and_trigger_trx_standalone_cca(void)
 {
-    nrf_802154_fal_lna_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
-    nrf_802154_fal_lna_configuration_set_IgnoreArg_p_activate_event();
+    mpsl_fem_lna_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
+    mpsl_fem_lna_configuration_set_IgnoreArg_p_activate_event();
 
     nrf_802154_sl_ant_div_cfg_mode_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_TX, NRF_802154_SL_ANT_DIV_MODE_MANUAL);
     nrf_802154_sl_ant_div_cfg_antenna_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_TX, 1);
@@ -193,8 +198,8 @@ static void mock_and_trigger_trx_standalone_cca(void)
 
 static void mock_and_trigger_trx_energy_detection(void)
 {
-    nrf_802154_fal_lna_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
-    nrf_802154_fal_lna_configuration_set_IgnoreArg_p_activate_event();
+    mpsl_fem_lna_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
+    mpsl_fem_lna_configuration_set_IgnoreArg_p_activate_event();
 
     nrf_802154_sl_ant_div_cfg_mode_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_RX, NRF_802154_SL_ANT_DIV_MODE_MANUAL);
     nrf_802154_sl_ant_div_cfg_antenna_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_RX, 0);
@@ -207,8 +212,8 @@ static void mock_and_trigger_trx_continuous_carrier(void)
 {
     nrf_802154_pib_tx_power_get_ExpectAndReturn(0);
 
-    nrf_802154_fal_pa_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
-    nrf_802154_fal_pa_configuration_set_IgnoreArg_p_activate_event();
+    mpsl_fem_pa_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
+    mpsl_fem_pa_configuration_set_IgnoreArg_p_activate_event();
 
     nrf_802154_sl_ant_div_cfg_mode_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_TX, NRF_802154_SL_ANT_DIV_MODE_MANUAL);
     nrf_802154_sl_ant_div_cfg_antenna_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_TX, 0);
@@ -223,8 +228,8 @@ static void mock_and_trigger_trx_modulated_carrier(void)
 
     nrf_802154_pib_tx_power_get_ExpectAndReturn(0);
 
-    nrf_802154_fal_pa_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
-    nrf_802154_fal_pa_configuration_set_IgnoreArg_p_activate_event();
+    mpsl_fem_pa_configuration_set_ExpectAndReturn(NULL, NULL, NRFX_SUCCESS);
+    mpsl_fem_pa_configuration_set_IgnoreArg_p_activate_event();
 
     nrf_802154_sl_ant_div_cfg_mode_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_TX, NRF_802154_SL_ANT_DIV_MODE_MANUAL);
     nrf_802154_sl_ant_div_cfg_antenna_get_ExpectAndReturn(NRF_802154_SL_ANT_DIV_OP_TX, 0);
@@ -238,7 +243,7 @@ static void mock_and_trigger_irq_crcok(void)
     NRF_RADIO->EVENTS_CRCOK = 1;
 
     nrf_802154_critical_section_forcefully_enter_Expect();
-    nrf_802154_fal_lna_configuration_clear_ExpectAndReturn(NRFX_SUCCESS);
+    mpsl_fem_lna_configuration_clear_ExpectAndReturn(NRFX_SUCCESS);
     nrf_802154_trx_receive_frame_received_Expect();
     nrf_802154_critical_section_exit_Expect();
 
@@ -251,8 +256,8 @@ static void mock_and_trigger_irq_phyend(void)
 
     nrf_802154_critical_section_forcefully_enter_Expect();
     // Is this order correct?
-    nrf_802154_fal_lna_configuration_clear_ExpectAndReturn(NRFX_SUCCESS);
-    nrf_802154_fal_pa_configuration_clear_ExpectAndReturn(NRFX_SUCCESS);
+    mpsl_fem_lna_configuration_clear_ExpectAndReturn(NRFX_SUCCESS);
+    mpsl_fem_pa_configuration_clear_ExpectAndReturn(NRFX_SUCCESS);
 
     nrf_802154_trx_transmit_frame_transmitted_Expect();
 

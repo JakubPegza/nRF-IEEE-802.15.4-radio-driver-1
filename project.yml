@@ -46,6 +46,7 @@
     - "#{ENV['NRFX_PATH']}/mdk"
     - "#{ENV['SL_PATH']}/include/**"
     - "#{ENV['SL_PATH']}/src/sl/**" # Should it be here?
+    - "#{ENV['SL_PATH']}/src/sl_opensource/**" # Should it be here?
   :support:
     - test/support
   :libraries: []

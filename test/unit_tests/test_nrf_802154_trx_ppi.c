@@ -14,7 +14,7 @@ TEST_FILE("nrf_802154_trx_ppi.h")
 #include "nrf_mock.h"
 
 // SL mocks
-#include "mock_nrf_fem_protocol_api.h"
+#include "mock_mpsl_fem_protocol_api.h"
 
 void setUp(void)
 {
@@ -366,7 +366,12 @@ void test_nrf_802154_trx_ppi_for_fem_powerdown_set_Shall_prepare_fem_powerdown(v
     const uint32_t         cc         = 0x21;
 
     // Setup
-    nrf_fem_prepare_powerdown_ExpectAndReturn(p_instance, cc, NRF_802154_PPI_EGU_TO_TIMER_START, true);
+    mpsl_fem_prepare_powerdown_ExpectAndReturn(
+            p_instance,
+            cc,
+            NRF_802154_PPI_EGU_TO_TIMER_START,
+            nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_DISABLED),
+            true);
 
     // Trigger
     bool result = nrf_802154_trx_ppi_for_fem_powerdown_set(p_instance, cc);
@@ -381,7 +386,12 @@ void test_nrf_802154_trx_ppi_for_fem_powerdown_set_Shall_return_false_if_powerdo
     const uint32_t         cc         = 0x2;
 
     // Setup
-    nrf_fem_prepare_powerdown_ExpectAndReturn(p_instance, cc, NRF_802154_PPI_EGU_TO_TIMER_START, false);
+    mpsl_fem_prepare_powerdown_ExpectAndReturn(
+            p_instance,
+            cc,
+            NRF_802154_PPI_EGU_TO_TIMER_START,
+            nrf_radio_event_address_get(NRF_RADIO, NRF_RADIO_EVENT_DISABLED),
+            false);
 
     // Trigger
     bool result = nrf_802154_trx_ppi_for_fem_powerdown_set(p_instance, cc);
