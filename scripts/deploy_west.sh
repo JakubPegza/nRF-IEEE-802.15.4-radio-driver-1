@@ -51,4 +51,4 @@ fi
 cd $source_dir
 
 # Deploy Radio Driver
-sh ${script_dir}/deploy_ncs.sh
+${script_dir}/deploy_ncs.sh
