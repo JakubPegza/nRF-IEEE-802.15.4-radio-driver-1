@@ -96,6 +96,8 @@ static void mock_and_trigger_trx_enable(void)
 
     nrf_802154_pib_channel_get_ExpectAndReturn(11);
 
+    nrf_802154_custom_part_of_radio_init_Expect();
+
     nrf_802154_irq_init_Expect(RADIO_IRQn, NRF_802154_IRQ_PRIORITY, NULL);
     nrf_802154_irq_init_IgnoreArg_isr();
 

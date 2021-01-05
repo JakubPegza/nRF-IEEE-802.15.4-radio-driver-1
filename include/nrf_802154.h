@@ -99,6 +99,15 @@ void nrf_802154_init(const nrf_802154_init_cfg_t * p_cfg);
  */
 void nrf_802154_uninit(void);
 
+/**
+ * @brief Perform some additional operations during initialization of the RADIO peripheral.
+ *
+ * By implementing this function the higher layer can provide some additional operations
+ * to be performed at the beginning of each new timeslot. These can in particular be
+ * modifications of RADIO peripheral register values.
+ */
+extern void nrf_802154_custom_part_of_radio_init(void);
+
 #if !NRF_802154_INTERNAL_RADIO_IRQ_HANDLING
 /**
  * @brief Handle the interrupt request from the RADIO peripheral.
