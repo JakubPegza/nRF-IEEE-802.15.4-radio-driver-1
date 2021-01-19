@@ -10,11 +10,15 @@
 
 HashMap CI_STATE = lib_State.getConfig(JOB_NAME)
 
+properties(
+  lib_State.getTriggers()
+)
+
 pipeline {
     parameters {
         string(name: 'jsonstr_CI_STATE', description: 'Default State if no upstream job', defaultValue: CI_STATE.CFG.INPUT_STATE_STR)
         string(name: 'nrfx_refspec', description: 'Git refspec of nrfx used in unit tests', defaultValue: 'v2.3.0')
-        choice(name: 'CRON', description: 'Cron Test Phase, default value: COMMIT', choices: CI_STATE.CFG.CRON_CHOICES)
+        choice(name: 'TEST_CYCLE', description: 'Test Phase', choices: CI_STATE.CFG.CRON_CHOICES)
     }
 
     environment {
@@ -121,7 +125,7 @@ pipeline {
                     string(name: 'NRF_802154_SL_REFSPEC', value: 'master'),
                     string(name: 'NRF_802154_SERIALIZATION_REFSPEC', value: 'master'),
                     string(name: 'TEST_APPS_REFSPEC', value: 'master'),
-                    string(name: 'TEST_CYCLE', value: params.CRON)
+                    string(name: 'TEST_CYCLE', value: CI_STATE.ORIGIN.TEST_CYCLE)
                 ]
             }
         }
