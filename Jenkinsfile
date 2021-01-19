@@ -42,7 +42,7 @@ pipeline {
         }
         stage('Build and host tests') {
             when {
-                expression { params.CRON == 'COMMIT'}
+                expression { params.TEST_CYCLE == 'COMMIT'}
             }
             parallel {
                 stage('Check pretty') {
