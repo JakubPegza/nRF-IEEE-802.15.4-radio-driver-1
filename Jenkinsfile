@@ -19,12 +19,22 @@ pipeline {
         string(name: 'jsonstr_CI_STATE', defaultValue: CI_STATE.CFG.INPUT_STATE_STR,
                description: 'Default State if no upstream job')
         string(name: 'nrfx_refspec', defaultValue: 'v2.3.0', description: 'Git refspec of nrfx used in unit tests')
+        booleanParam(name: 'BUILD_AND_DEPLOY_USING_ONLY_WEST_MANIFEST_IN_TEST_APPS', defaultValue: false,
+               description: "Build will be deployed only base on defaults in west.yml manifest file that is in below test_apps_ncs branch/refspec")
+        string(name: 'TEST_APPS_REFSPEC', defaultValue: "master",
+               description: 'Branch of nrf-802.15.4-test-apps-ncs to use.')
         string(name: 'NRF_802154_SL_REFSPEC', defaultValue: "master",
                description: 'Refspec of nrf-802.15.14-sl to use.')
         string(name: 'NRF_802154_SERIALIZATION_REFSPEC', defaultValue: "master",
                description: 'Refspec of nrf-802.15.4-serialization to use.')
-        string(name: 'TEST_APPS_REFSPEC', defaultValue: "master",
-               description: 'Branch of nrf-802.15.4-test-apps-ncs to use.')
+        string(name: 'MPSL_BRANCH', defaultValue: "",
+                description: '''Replace mpsl using plan:
+                                https://jenkins-ncs.nordicsemi.no/job/dragoon/job/dragoon-mpsl/job/{branch}/.
+                                Empty value will cause to use MPSL as it is in nrfxlib of NCS. ''')
+        string(name: 'MPSL_BRANCH_BUILD_NR', defaultValue: "",
+                description: '''Replace mpsl using build plan number:
+                                https://jenkins-ncs.nordicsemi.no/job/dragoon/job/dragoon-mpsl/job/{branch}/{nr}/.
+                                Empty value will cause to use MPSL as it is in nrfxlib of NCS. ''')
         choice(name: 'TEST_CYCLE', description: 'Test Phase', choices: CI_STATE.CFG.CRON_CHOICES)
     }
 
@@ -128,10 +138,13 @@ pipeline {
         stage('Target tests') {
             steps {
                 build job: '/latest/test-fw-nrfconnect-rs_drv154_integration/master', parameters: [
+                    booleanParam(name: 'BUILD_AND_DEPLOY_USING_ONLY_WEST_MANIFEST_IN_TEST_APPS', value: params.BUILD_AND_DEPLOY_USING_ONLY_WEST_MANIFEST_IN_TEST_APPS),
+                    string(name: 'TEST_APPS_REFSPEC', value: params.TEST_APPS_REFSPEC),
                     string(name: 'NRF_802154_RADIO_DRIVER_REFSPEC', value: lib_State.getGitRef('NRF802154', CI_STATE)),
                     string(name: 'NRF_802154_SL_REFSPEC', value: params.NRF_802154_SL_REFSPEC),
                     string(name: 'NRF_802154_SERIALIZATION_REFSPEC', value: params.NRF_802154_SERIALIZATION_REFSPEC),
-                    string(name: 'TEST_APPS_REFSPEC', value: params.TEST_APPS_REFSPEC),
+                    string(name: 'MPSL_BRANCH', value: params.MPSL_BRANCH),
+                    string(name: 'MPSL_BRANCH_BUILD_NR', value: params.NRF_802154_SERIALIZATION_REFSPEC),
                     string(name: 'TEST_CYCLE', value: params.TEST_CYCLE)
                 ]
             }
