@@ -103,7 +103,9 @@ pipeline {
     environment {
         SWDEV_PASS=credentials('swdev_build_password')
         SL_BRANCH = ''
-
+        NRFX_PATH='nrfx'
+        SL_PATH='sl'
+        THOR_SILENCE_DEPRECATION='true'
     }
 
     agent {
@@ -132,41 +134,13 @@ pipeline {
                 expression { params.TEST_CYCLE == 'COMMIT'}
             }
             parallel {
-                stage('Check pretty') {
-                    stages{
-                        stage('Install uncrustify') {
-                            steps {
-                                sh '''
-                                    wget https://github.com/uncrustify/uncrustify/archive/uncrustify-0.69.0.tar.gz
-                                    tar xzf uncrustify-0.69.0.tar.gz
-                                    cd uncrustify-uncrustify-0.69.0
-                                    mkdir build
-                                    cd build
-                                    cmake .. -DCMAKE_BUILD_TYPE=Release
-                                    make -j
-                                    export PATH=$PWD:$PATH
-                                    cd ../..
-                                    uncrustify --version
-                                '''
-                            }
-                        }
-                        stage('Check Radio Driver style') {
-                            steps {
-                                sh 'PATH=${WORKSPACE}/uncrustify-uncrustify-0.69.0/build:$PATH scripts/pretty.sh check'
-                            }
-                        }
+                stage('Check Radio Driver style') {
+                    steps {
+                        sh './scripts/pretty.sh check'
                     }
                 }
                 stage('Unit tests') {
                     stages{
-                        stage('Install ceedling') {
-                            steps {
-                                sh '''
-                                    export PATH=/home/.gem/ruby/2.7.0/bin:$PATH
-                                    gem install --user-install ceedling
-                                '''
-                            }
-                        }
                         stage('Checkout dependencies') {
                             steps {
                                 dir('sl') {
@@ -180,19 +154,19 @@ pipeline {
                         stage('Run tests') {
                             steps {
                                 // TODO: Uncomment when dependencies support nRF53
-                                //sh 'PATH=/home/.gem/ruby/2.7.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf5340 test:all'
+                                //sh 'ceedling options:nrf5340 test:all'
                                 //sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf5340.xml'
 
-                                sh 'PATH=/home/.gem/ruby/2.7.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52840 test:all'
+                                sh 'ceedling options:nrf52840 test:all'
                                 sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52840.xml'
 
-                                sh 'PATH=/home/.gem/ruby/2.7.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52833 test:all'
+                                sh 'ceedling options:nrf52833 test:all'
                                 sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52833.xml'
 
-                                sh 'PATH=/home/.gem/ruby/2.7.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52820 test:all'
+                                sh 'ceedling options:nrf52820 test:all'
                                 sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52820.xml'
 
-                                sh 'PATH=/home/.gem/ruby/2.7.0/bin:$PATH SL_PATH=sl NRFX_PATH=nrfx ceedling options:nrf52811 test:all'
+                                sh 'ceedling options:nrf52811 test:all'
                                 sh 'mv build/artifacts/test/report.xml build/artifacts/test/report_nrf52811.xml'
                             }
                             post {
