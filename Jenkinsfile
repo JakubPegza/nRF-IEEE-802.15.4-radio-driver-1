@@ -101,7 +101,6 @@ pipeline {
     }
 
     environment {
-        SWDEV_PASS=credentials('swdev_build_password')
         SL_BRANCH = ''
         NRFX_PATH='nrfx'
         SL_PATH='sl'
