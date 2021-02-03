@@ -1,5 +1,6 @@
 #
-# Copyright (c) 2020 Nordic Semiconductor ASA. All Rights Reserved.
+# Copyright (c) 2020 - 2021, Nordic Semiconductor ASA.
+# All Rights Reserved.
 #
 # The information contained herein is confidential property of Nordic Semiconductor ASA.
 # The use, copying, transfer or disclosure of such information is prohibited except by
