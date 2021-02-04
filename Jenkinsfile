@@ -110,7 +110,7 @@ pipeline {
     agent {
         docker {
             label CI_STATE.CFG.AGENT_LABELS
-            image "$CI_STATE.CFG.DOCKER_REG/sw-production/ncs-int:2.3"
+            image "$CI_STATE.CFG.DOCKER_REG/sw-production/ncs-int:2.4.1"
         }
     }
 
@@ -142,10 +142,10 @@ pipeline {
                     stages{
                         stage('Checkout dependencies') {
                             steps {
-                                dir('sl') {
+                                dir("${SL_PATH}") {
                                     checkout_refspec(SL_BRANCH, 'https://projecttools.nordicsemi.no/bitbucket/scm/krknwk/nrf-802.15.4-sl.git')
                                 }
-                                dir('nrfx') {
+                                dir("${NRFX_PATH}") {
                                     checkout_refspec(nrfx_refspec, 'https://github.com/NordicSemiconductor/nrfx')
                                 }
                             }
