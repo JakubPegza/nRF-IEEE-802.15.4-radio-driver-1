@@ -110,7 +110,7 @@ pipeline {
     agent {
         docker {
             label CI_STATE.CFG.AGENT_LABELS
-            image "$CI_STATE.CFG.DOCKER_REG/sw-production/ncs-int:2.4.1"
+            image "$CI_STATE.CFG.DOCKER_REG/$CI_STATE.CFG.IMAGE_TAG"
         }
     }
 
