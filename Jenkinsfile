@@ -13,6 +13,7 @@ HashMap CI_STATE = lib_State.getConfig(JOB_NAME)
 properties(
   lib_State.getTriggers()
 )
+DOWNSTREAM_TEST_JOB_LINK = '/latest/test-fw-nrfconnect-rs_drv154_integration/'
 
 pipeline {
     parameters {
@@ -82,6 +83,10 @@ pipeline {
 		)
         string(name: 'jsonstr_CI_STATE', defaultValue: CI_STATE.CFG.INPUT_STATE_STR,
                description: 'Default State if no upstream job')
+        string(name: 'TEST_RELEASE_TAG', defaultValue: "",
+               description: '''Use for release purpose if you want to run downstream tests on tag job :)
+                            https://jenkins-ncs.nordicsemi.no/job/latest/job/test-fw-nrfconnect-rs_drv154_integration/view/tags/job/{tag}
+                            ''')
         string(name: 'nrfx_refspec', defaultValue: 'v2.3.0', description: 'Git refspec of nrfx used in unit tests')
         separator(name: "TEST_FILTER", sectionHeader: "Test filters and parameters",
 			separatorStyle: "border-width: 0",
@@ -105,6 +110,7 @@ pipeline {
         NRFX_PATH='nrfx'
         SL_PATH='sl'
         THOR_SILENCE_DEPRECATION='true'
+        TEST_BUILD_JOB_LINK = ''
     }
 
     agent {
@@ -180,7 +186,15 @@ pipeline {
         }
         stage('Target tests') {
             steps {
-                build job: '/latest/test-fw-nrfconnect-rs_drv154_integration/master', parameters: [
+                script {
+                    if (params.TEST_RELEASE_TAG) {
+                        TEST_BUILD_JOB_LINK = DOWNSTREAM_TEST_JOB_LINK + params.TEST_RELEASE_TAG
+                    }
+                    else {
+                        TEST_BUILD_JOB_LINK = DOWNSTREAM_TEST_JOB_LINK + 'master'
+                    }
+                }
+                build job: TEST_BUILD_JOB_LINK, parameters: [
                     booleanParam(name: 'BUILD_AND_DEPLOY_USING_ONLY_WEST_MANIFEST_IN_TEST_APPS', value: params.BUILD_AND_DEPLOY_USING_ONLY_WEST_MANIFEST_IN_TEST_APPS),
                     string(name: 'TEST_APPS_REFSPEC', value: params.TEST_APPS_REFSPEC),
                     string(name: 'NRF_802154_RADIO_DRIVER_REFSPEC', value: lib_State.getGitRef('NRF802154', CI_STATE)),
