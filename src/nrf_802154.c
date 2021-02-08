@@ -860,10 +860,6 @@ nrf_802154_capabilities_t nrf_802154_capabilities_get(void)
     caps_drv |= (NRF_802154_ACK_TIMEOUT_ENABLED ?
                 NRF_802154_CAPABILITY_ACK_TIMEOUT : 0UL);
 
-    /* Although SL provides API for statistics, the functionality is not currently
-     * implemented there, but is provided by the driver instead. */
-    caps_drv |= NRF_802154_CAPABILITY_STATS;
-
     /* Both IFS and ACK Timeout features require timer scheduler, however
      * using them both at the same time requires that SL is able to schedule
      * several timers simultaneously.
