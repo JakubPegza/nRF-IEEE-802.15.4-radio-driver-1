@@ -1,0 +1,4 @@
+name: sdk-802154
+build:
+  cmake-ext: True
+  kconfig-ext: True

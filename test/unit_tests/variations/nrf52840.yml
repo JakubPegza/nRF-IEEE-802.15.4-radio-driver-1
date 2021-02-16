@@ -1,4 +1,0 @@
-:defines:
-  :test:
-    - NRF52840_XXAA
-    - NRF52_SERIES
