@@ -40,7 +40,7 @@
  *
  */
 
-#include "nrf_802154_random.h"
+#include "platform/nrf_802154_random.h"
 
 #include <stdlib.h>
 #include <stdint.h>

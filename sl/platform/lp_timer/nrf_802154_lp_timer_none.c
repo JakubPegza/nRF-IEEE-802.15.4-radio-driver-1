@@ -40,7 +40,7 @@
  *
  */
 
-#include "nrf_802154_lp_timer.h"
+#include "platform/nrf_802154_lp_timer.h"
 
 void nrf_802154_lp_timer_init(void)
 {

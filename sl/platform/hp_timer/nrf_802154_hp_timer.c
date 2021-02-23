@@ -41,7 +41,7 @@
  *
  */
 
-#include "platform/hp_timer/nrf_802154_hp_timer.h"
+#include "platform/nrf_802154_hp_timer.h"
 
 #include <assert.h>
 #include <stdbool.h>
